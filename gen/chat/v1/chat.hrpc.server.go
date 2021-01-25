@@ -6,6 +6,7 @@
 package v1
 
 import "context"
+import "net/http"
 
 
 
@@ -926,6 +927,208 @@ import "context"
         
 
     
+    }
+
+    type ChatServiceHandler struct {
+        Server ChatServiceServer
+    }
+
+    func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+        switch (req.URL.Path) {
+        
+        case "/protocol.chat.v1.ChatService/CreateGuild": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/CreateInvite": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/CreateChannel": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/CreateEmotePack": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetGuildList": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/AddGuildToGuildList": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/RemoveGuildFromGuildList": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetGuild": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetGuildInvites": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetGuildMembers": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetGuildChannels": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetChannelMessages": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetMessage": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetEmotePacks": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetEmotePackEmotes": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/UpdateGuildInformation": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/UpdateChannelInformation": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/UpdateChannelOrder": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/UpdateMessage": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/AddEmoteToPack": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/DeleteGuild": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/DeleteInvite": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/DeleteChannel": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/DeleteMessage": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/DeleteEmoteFromPack": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/DeleteEmotePack": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/DequipEmotePack": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/JoinGuild": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/LeaveGuild": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/TriggerAction": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/SendMessage": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/QueryHasPermission": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/SetPermissions": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetPermissions": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/MoveRole": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetGuildRoles": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/AddGuildRole": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/ModifyGuildRole": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/DeleteGuildRole": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/ManageUserRoles": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetUserRoles": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/StreamEvents": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/Sync": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetUser": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/GetUserMetadata": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/ProfileUpdate": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/Typing": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.chat.v1.ChatService/PreviewGuild": {
+            panic("unimplemented")
+        }
+        
+        }
     }
 
 

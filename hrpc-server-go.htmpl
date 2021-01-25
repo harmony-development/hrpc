@@ -6,6 +6,7 @@
 package {{ filepathBase .Options.GoPackage }}
 
 import "context"
+import "net/http"
 
 {{ $imports := newset }}
 
@@ -51,6 +52,20 @@ import "context"
         {{ end }}
 
     {{ end }}
+    }
+
+    type {{ deref .Name }}Handler struct {
+        Server {{ $sname }}
+    }
+
+    func (h *{{ deref .Name }}Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+        switch (req.URL.Path) {
+        {{ range .Method }}
+        case "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}": {
+            panic("unimplemented")
+        }
+        {{ end }}
+        }
     }
 
 {{ end }}

@@ -6,6 +6,7 @@
 package v1
 
 import "context"
+import "net/http"
 
 
 
@@ -89,6 +90,28 @@ import "context"
         
 
     
+    }
+
+    type MediaProxyServiceHandler struct {
+        Server MediaProxyServiceServer
+    }
+
+    func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+        switch (req.URL.Path) {
+        
+        case "/protocol.mediaproxy.v1.MediaProxyService/FetchLinkMetadata": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.mediaproxy.v1.MediaProxyService/InstantView": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.mediaproxy.v1.MediaProxyService/CanInstantView": {
+            panic("unimplemented")
+        }
+        
+        }
     }
 
 

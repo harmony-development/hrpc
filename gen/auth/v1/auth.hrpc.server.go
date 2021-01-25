@@ -6,6 +6,7 @@
 package v1
 
 import "context"
+import "net/http"
 
 
 
@@ -158,6 +159,44 @@ import "context"
         
 
     
+    }
+
+    type AuthServiceHandler struct {
+        Server AuthServiceServer
+    }
+
+    func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+        switch (req.URL.Path) {
+        
+        case "/protocol.auth.v1.AuthService/Federate": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.auth.v1.AuthService/LoginFederated": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.auth.v1.AuthService/Key": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.auth.v1.AuthService/BeginAuth": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.auth.v1.AuthService/NextStep": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.auth.v1.AuthService/StepBack": {
+            panic("unimplemented")
+        }
+        
+        case "/protocol.auth.v1.AuthService/StreamSteps": {
+            panic("unimplemented")
+        }
+        
+        }
     }
 
 
