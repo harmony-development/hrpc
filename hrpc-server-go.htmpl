@@ -7,6 +7,8 @@ package {{ filepathBase .Options.GoPackage }}
 
 import "context"
 import "net/http"
+import "io/ioutil"
+import "google.golang.org/protobuf/proto"
 
 {{ $imports := newset }}
 
@@ -48,7 +50,7 @@ import "net/http"
             {{ $resIn := (resolvedGoType $item . .InputType ) }}
             {{ $resOut := (resolvedGoType $item . .OutputType ) }}
 
-            {{ deref .Name }}(ctx context.Context, r *{{ $resIn.ID}}) (resp {{ $resOut.ID}}, err error)
+            {{ deref .Name }}(ctx context.Context, r *{{ $resIn.ID}}, headers http.Header) (resp *{{ $resOut.ID}}, err error)
         {{ end }}
 
     {{ end }}
@@ -56,14 +58,46 @@ import "net/http"
 
     type {{ deref .Name }}Handler struct {
         Server {{ $sname }}
+        ErrorHandler func(err error, w http.ResponseWriter)
     }
 
     func (h *{{ deref .Name }}Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
         switch (req.URL.Path) {
         {{ range .Method }}
+        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
         case "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}": {
-            panic("unimplemented")
+            body, err := ioutil.ReadAll(req.Body)
+            defer req.Body.Close()
+            if err != nil {
+                h.ErrorHandler(err, w)
+                return
+            }
+
+            {{ $resIn := (resolvedGoType $item . .InputType ) }}
+            requestProto := new({{ $resIn.ID }})
+            err = proto.Unmarshal(body, requestProto)
+            if err != nil {
+                h.ErrorHandler(err, w)
+                return
+            }
+
+            resp, err := h.Server.{{ .Name }}(req.Context(), nil, req.Header)
+
+            response, err := proto.Marshal(resp)
+            if err != nil {
+                h.ErrorHandler(err, w)
+                return
+            }
+
+            w.Header().Add("Content-Type", "application/octet-stream")
+            _, err = w.Write(response)
+
+            if err != nil {
+                h.ErrorHandler(err, w)
+                return
+            }
         }
+        {{ end }}
         {{ end }}
         }
     }
