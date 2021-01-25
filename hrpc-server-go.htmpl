@@ -1,0 +1,57 @@
+{{ $base := (trimSuffix (filepathBase .Name) ".proto") }}
+{{ setFilename (sprintf "%s/%s.hrpc.server.go" (deref .Options.GoPackage) $base) }}
+
+{{ $item := . }}
+
+package {{ filepathBase .Options.GoPackage }}
+
+import "context"
+
+{{ $imports := newset }}
+
+{{ range .Service }}
+
+    {{ range .Method }}
+
+        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
+            {{ $resIn := (resolvedGoType $item . .InputType ) }}
+            {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+
+            {{ appendSet $imports $resIn.Package }}
+            {{ appendSet $imports $resOut.Package }}
+        {{ end }}
+
+    {{ end }}
+
+{{ end }}
+
+{{ range $k, $v := $imports }}
+
+    import "{{ $k }}"
+
+{{ end }}
+
+{{ if .Service }}
+{{ setOK true }}
+{{ end }}
+
+{{ range .Service }}
+
+    {{ $serv := . }}
+    {{ $sname := (sprintf "%sServer" (deref .Name)) }}
+
+    type {{ $sname }} interface {
+    {{ range .Method }}
+
+        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
+            {{ $resIn := (resolvedGoType $item . .InputType ) }}
+            {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+
+            {{ deref .Name }}(ctx context.Context, r *{{ $resIn.ID}}) (resp {{ $resOut.ID}}, err error)
+        {{ end }}
+
+    {{ end }}
+    }
+
+{{ end }}
+

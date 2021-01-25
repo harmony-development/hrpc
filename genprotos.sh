@@ -9,7 +9,16 @@ for dir in $(find "protocol" -name '*.proto' -print0 | xargs -0 -n1 dirname | so
     --proto_path=protocol \
     --plugin=protoc-gen-custom=./hrpc \
     --custom_out=./gen \
-    --custom_opt="grpc-client-go.htmpl" \
+    --custom_opt="hrpc-server-go.htmpl" \
+    --go_out=./gen \
+    --validate_out="lang=go:gen" \
+    $(find "${dir}" -name '*.proto')
+
+    protoc --experimental_allow_proto3_optional \
+    --proto_path=protocol \
+    --plugin=protoc-gen-custom=./hrpc \
+    --custom_out=./gen \
+    --custom_opt="hrpc-client-go.htmpl" \
     --go_out=./gen \
     --validate_out="lang=go:gen" \
     $(find "${dir}" -name '*.proto')
