@@ -25,3 +25,5 @@ for dir in $(find "protocol" -name '*.proto' -print0 | xargs -0 -n1 dirname | so
 done
 
 rsync -a -v gen/github.com/harmony-development/legato/gen/ ./gen
+
+go fmt ./gen/./...

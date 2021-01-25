@@ -1,8 +1,3 @@
-
-
-
-
-
 package v1
 
 import "net/http"
@@ -11,46 +6,14 @@ import "io/ioutil"
 import "fmt"
 import "bytes"
 
+type VoiceServiceClient struct {
+	client    *http.Client
+	serverURL string
+}
 
-
-
-
-    
-
-        
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-
-    type VoiceServiceClient struct {
-        client *http.Client
-        serverURL string
-    }
-
-    func NewVoiceServiceClient(url string) *VoiceServiceClient {
-        return &VoiceServiceClient{
-            client:    &http.Client{},
-            serverURL: url,
-        }
-    }
-
-    
-
-        
-
-    
-
-
-
+func NewVoiceServiceClient(url string) *VoiceServiceClient {
+	return &VoiceServiceClient{
+		client:    &http.Client{},
+		serverURL: url,
+	}
+}
