@@ -4,14 +4,21 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
+	"reflect"
 	"strings"
+	"text/template"
 
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
-
-	. "github.com/dave/jennifer/jen"
 )
+
+type QualPair struct {
+	Package string
+	ID      string
+}
 
 func main() {
 	gen := pluginpb.CodeGeneratorRequest{}
@@ -24,101 +31,101 @@ func main() {
 		panic(err)
 	}
 
-	out := pluginpb.CodeGeneratorResponse{}
+	fname := string("")
+	setFName := func(f string) string {
+		fname = f
+		return ""
+	}
+
+	ok := false
+	setOK := func(f bool) string {
+		ok = f
+		return ""
+	}
+
+	tmpl := template.New("codegen")
+	tmpl.Funcs(template.FuncMap{
+		"setFilename":  setFName,
+		"trimSuffix":   strings.TrimSuffix,
+		"sprintf":      fmt.Sprintf,
+		"filepathBase": filepath.Base,
+		"setOK":        setOK,
+		"deref": func(v interface{}) interface{} {
+			return reflect.ValueOf(v).Elem().Interface()
+		},
+		"hasClientStream": func(v *descriptorpb.MethodDescriptorProto) bool {
+			return v.ClientStreaming != nil && *v.ClientStreaming
+		},
+		"hasServerStream": func(v *descriptorpb.MethodDescriptorProto) bool {
+			return v.ServerStreaming != nil && *v.ServerStreaming
+		},
+		"resolvedGoType": func(item *descriptorpb.FileDescriptorProto, method *descriptorpb.MethodDescriptorProto, in string) QualPair {
+			wellKnown := map[string]QualPair{
+				".google.protobuf.Empty": {
+					Package: "github.com/golang/protobuf/ptypes/empty",
+					ID:      "empty.Empty",
+				},
+			}
+
+			if val, ok := wellKnown[in]; ok {
+				return val
+			}
+
+			split := strings.Split(*method.InputType, ".")
+			final := split[len(split)-1]
+
+			return QualPair{
+				Package: *item.Options.GoPackage,
+				ID:      path.Base(*item.Options.GoPackage) + "." + final,
+			}
+		},
+		"newset": func() map[string]struct{} {
+			return map[string]struct{}{}
+		},
+		"appendSet": func(m map[string]struct{}, v string) string {
+			m[v] = struct{}{}
+			return ""
+		},
+	})
+
+	data, err = ioutil.ReadFile(*gen.Parameter)
+	if err != nil {
+		panic(err)
+	}
+
+	tmpl, err = tmpl.Parse(string(data))
+	if err != nil {
+		panic(err)
+	}
+
+	response := pluginpb.CodeGeneratorResponse{}
 
 	for _, item := range gen.ProtoFile {
-		outfile := new(pluginpb.CodeGeneratorResponse_File)
-		outfile.Name = new(string)
-		base := strings.TrimSuffix(filepath.Base(*item.Name), ".proto")
-		*outfile.Name = fmt.Sprintf("%s/%s.hrpc.go", *item.Options.GoPackage, base)
+		out := strings.Builder{}
+		ok = false
+		err = tmpl.Execute(&out, item)
+		if err != nil {
+			panic(err)
+		}
 
-		if len(item.Service) == 0 {
+		if !ok {
 			continue
 		}
 
-		f := NewFile(filepath.Base(*item.Options.GoPackage))
-
-		for _, serv := range item.Service {
-
-			sname := fmt.Sprintf("%sClient", *serv.Name)
-
-			f.Type().Id(sname).Struct(
-				Id("client *").Qual("net/http", "Client"),
-				Id("serverURL").Id("string"),
-			)
-
-			f.Func().Id(fmt.Sprintf("New%s", sname)).Params(Id("url").String()).Id(fmt.Sprintf("*%s", sname)).Block(
-				Return(Op("&").Id(sname).Values(Dict{
-					Id("serverURL"): Id("url"),
-					Id("client"):    Op("&").Qual("net/http", "Client").Block(),
-				})),
-			)
-
-			for _, method := range serv.Method {
-				if (method.ClientStreaming != nil && *method.ClientStreaming) || (method.ServerStreaming != nil && *method.ServerStreaming) {
-					continue
-				}
-
-				name := func(in string) Code {
-					wellKnown := map[string]struct {
-						pkg string
-						id  string
-					}{
-						".google.protobuf.Empty": {
-							pkg: "github.com/golang/protobuf/ptypes/empty",
-							id:  "Empty",
-						},
-					}
-
-					if val, ok := wellKnown[in]; ok {
-						return Qual(val.pkg, val.id)
-					}
-
-					split := strings.Split(*method.InputType, ".")
-					final := split[len(split)-1]
-
-					return Qual(*item.Options.GoPackage, final)
-				}
-
-				errHandler := func(msg string) Code {
-					return If(Id("err").Op("!=").Nil()).Block(
-						Return(Nil(), Qual("fmt", "Errorf").Call(Lit(msg+": %w"), Id("err"))),
-					)
-				}
-
-				f.Func().
-					Params(Id("client").Id(fmt.Sprintf("* %sClient", *serv.Name))).
-					Id(*method.Name).
-					Params(Id("r").Op("*").Add(name(*method.InputType))).
-					Params(Op("*").Add(name(*method.OutputType)), Id("error")).
-					Block(
-						List(Id("input"), Id("err")).Op(":=").Qual("google.golang.org/protobuf/proto", "Marshal").Call(Id("r")),
-						errHandler("could not martial request"),
-						List(Id("resp"), Id("err")).Op(":=").Id("client.client.Post").Call(
-							Qual("fmt", "Sprintf").Call(Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)), Id("client.serverURL")),
-							Lit("application/octet-stream"),
-							Qual("bytes", "NewReader").Call(Id("input")),
-						),
-						errHandler("error posting request"),
-						Defer().Id("resp.Body").Op(".").Id("Close").Call(),
-						List(Id("data"), Id("err")).Op(":=").Qual("io/ioutil", "ReadAll").Call(Id("resp.Body")),
-						errHandler("error reading response"),
-						Id("output").Op(":=").Op("&").Add(name(*method.OutputType)).Block(),
-						Id("err").Op("=").Qual("google.golang.org/protobuf/proto", "Unmarshal").Call(Id("data"), Id("output")),
-						errHandler("error unmarshalling response"),
-						Return(Id("output"), Nil()),
-					)
-			}
-		}
+		outfile := new(pluginpb.CodeGeneratorResponse_File)
+		outfile.Name = new(string)
+		*outfile.Name = fname
 
 		data := new(string)
-		*data = f.GoString()
+		*data = out.String()
 		outfile.Content = data
 
-		out.File = append(out.File, outfile)
+		response.File = append(response.File, outfile)
+
+		continue
 	}
 
-	msg, err := proto.Marshal(&out)
+	msg, err := proto.Marshal(&response)
 	if err != nil {
 		panic(err)
 	}

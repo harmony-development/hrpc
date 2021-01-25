@@ -1,0 +1,78 @@
+{{ $base := (trimSuffix (filepathBase .Name) ".proto") }}
+{{ setFilename (sprintf "%s/%s.hrpc.go" (deref .Options.GoPackage) $base) }}
+
+{{ $item := . }}
+
+package {{ filepathBase .Options.GoPackage }}
+
+import "net/http"
+import "google.golang.org/protobuf/proto"
+import "io/ioutil"
+import "fmt"
+
+{{ $imports := newset }}
+
+{{ if .Service }}
+{{ setOK true }}
+{{ end }}
+
+{{ range .Service }}
+
+    {{ $serv := . }}
+    {{ $sname := (sprintf "%sClient" (deref .Name)) }}
+
+    type {{ $sname }} struct {
+        client *http.Client
+        serverURL string
+    }
+
+    func New{{ $sname }}(url string) *{{ $sname }} {
+        return &{{ $sname }}{
+            client:    &http.Client{},
+            serverURL: url,
+        }
+    }
+
+    {{ range .Method }}
+
+    {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
+        {{ $resIn := (resolvedGoType $item . .InputType ) }}
+        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+
+        {{ appendSet $imports $resIn.Package }}
+        {{ appendSet $imports $resOut.Package }}
+
+        // Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
+
+        func (client *{{ $sname }}) {{ (deref .Name ) }}(r *{{ $resIn.ID }}) (*{{ $resOut.ID }}, error) {
+            input, err := proto.Marshal(r)
+            if err != nil {
+                return nil, fmt.Errorf("could not martial request: %w", err)
+            }
+            resp, err := client.client.Post(fmt.Sprintf("%s/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+            if err != nil {
+                return nil, fmt.Errorf("error posting request: %w", err)
+            }
+            defer resp.Body.Close()
+            data, err := ioutil.ReadAll(resp.Body)
+            if err != nil {
+                return nil, fmt.Errorf("error reading response: %w", err)
+            }
+            output := &{{ $resOut.ID }}{}
+            err = proto.Unmarshal(data, output)
+            if err != nil {
+                return nil, fmt.Errorf("error unmarshalling response: %w", err)
+            }
+            return output, nil
+        }
+    {{ end }}
+
+    {{ end }}
+
+{{ end }}
+
+{{ range $k, $v := $imports }}
+
+import "{{ $k }}"
+
+{{ end }}
