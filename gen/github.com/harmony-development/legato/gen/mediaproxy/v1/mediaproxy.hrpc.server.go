@@ -6,11 +6,11 @@ import "net/http"
 import "github.com/harmony-development/legato/gen/mediaproxy/v1"
 
 type MediaProxyServiceServer interface {
-	FetchLinkMetadata(ctx context.Context, r *v1.FetchLinkMetadataRequest) (resp v1.FetchLinkMetadataRequest, err error)
+	FetchLinkMetadata(ctx context.Context, r *v1.FetchLinkMetadataRequest) (resp v1.SiteMetadata, err error)
 
-	InstantView(ctx context.Context, r *v1.InstantViewRequest) (resp v1.InstantViewRequest, err error)
+	InstantView(ctx context.Context, r *v1.InstantViewRequest) (resp v1.InstantViewResponse, err error)
 
-	CanInstantView(ctx context.Context, r *v1.InstantViewRequest) (resp v1.InstantViewRequest, err error)
+	CanInstantView(ctx context.Context, r *v1.InstantViewRequest) (resp v1.CanInstantViewResponse, err error)
 }
 
 type MediaProxyServiceHandler struct {

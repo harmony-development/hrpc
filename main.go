@@ -71,7 +71,7 @@ func main() {
 				return val
 			}
 
-			split := strings.Split(*method.InputType, ".")
+			split := strings.Split(in, ".")
 			final := split[len(split)-1]
 
 			return QualPair{

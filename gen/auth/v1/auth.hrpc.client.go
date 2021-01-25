@@ -24,7 +24,7 @@ func NewAuthServiceClient(url string) *AuthServiceClient {
 
 // Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
-func (client *AuthServiceClient) Federate(r *v1.FederateRequest) (*v1.FederateRequest, error) {
+func (client *AuthServiceClient) Federate(r *v1.FederateRequest) (*v1.FederateReply, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -38,7 +38,7 @@ func (client *AuthServiceClient) Federate(r *v1.FederateRequest) (*v1.FederateRe
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.FederateRequest{}
+	output := &v1.FederateReply{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -48,7 +48,7 @@ func (client *AuthServiceClient) Federate(r *v1.FederateRequest) (*v1.FederateRe
 
 // Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
-func (client *AuthServiceClient) LoginFederated(r *v1.LoginFederatedRequest) (*v1.LoginFederatedRequest, error) {
+func (client *AuthServiceClient) LoginFederated(r *v1.LoginFederatedRequest) (*v1.Session, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -62,7 +62,7 @@ func (client *AuthServiceClient) LoginFederated(r *v1.LoginFederatedRequest) (*v
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.LoginFederatedRequest{}
+	output := &v1.Session{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -72,7 +72,7 @@ func (client *AuthServiceClient) LoginFederated(r *v1.LoginFederatedRequest) (*v
 
 // Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
-func (client *AuthServiceClient) Key(r *empty.Empty) (*v1.Empty, error) {
+func (client *AuthServiceClient) Key(r *empty.Empty) (*v1.KeyReply, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -86,7 +86,7 @@ func (client *AuthServiceClient) Key(r *empty.Empty) (*v1.Empty, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.Empty{}
+	output := &v1.KeyReply{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -96,7 +96,7 @@ func (client *AuthServiceClient) Key(r *empty.Empty) (*v1.Empty, error) {
 
 // Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
-func (client *AuthServiceClient) BeginAuth(r *empty.Empty) (*v1.Empty, error) {
+func (client *AuthServiceClient) BeginAuth(r *empty.Empty) (*v1.BeginAuthResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -110,7 +110,7 @@ func (client *AuthServiceClient) BeginAuth(r *empty.Empty) (*v1.Empty, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.Empty{}
+	output := &v1.BeginAuthResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -120,7 +120,7 @@ func (client *AuthServiceClient) BeginAuth(r *empty.Empty) (*v1.Empty, error) {
 
 // Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
-func (client *AuthServiceClient) NextStep(r *v1.NextStepRequest) (*v1.NextStepRequest, error) {
+func (client *AuthServiceClient) NextStep(r *v1.NextStepRequest) (*v1.AuthStep, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -134,7 +134,7 @@ func (client *AuthServiceClient) NextStep(r *v1.NextStepRequest) (*v1.NextStepRe
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.NextStepRequest{}
+	output := &v1.AuthStep{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -144,7 +144,7 @@ func (client *AuthServiceClient) NextStep(r *v1.NextStepRequest) (*v1.NextStepRe
 
 // Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
-func (client *AuthServiceClient) StepBack(r *v1.StepBackRequest) (*v1.StepBackRequest, error) {
+func (client *AuthServiceClient) StepBack(r *v1.StepBackRequest) (*v1.AuthStep, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -158,7 +158,7 @@ func (client *AuthServiceClient) StepBack(r *v1.StepBackRequest) (*v1.StepBackRe
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.StepBackRequest{}
+	output := &v1.AuthStep{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)

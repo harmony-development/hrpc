@@ -8,35 +8,35 @@ import "github.com/golang/protobuf/ptypes/empty"
 import "github.com/harmony-development/legato/gen/chat/v1"
 
 type ChatServiceServer interface {
-	CreateGuild(ctx context.Context, r *v1.CreateGuildRequest) (resp v1.CreateGuildRequest, err error)
+	CreateGuild(ctx context.Context, r *v1.CreateGuildRequest) (resp v1.CreateGuildResponse, err error)
 
-	CreateInvite(ctx context.Context, r *v1.CreateInviteRequest) (resp v1.CreateInviteRequest, err error)
+	CreateInvite(ctx context.Context, r *v1.CreateInviteRequest) (resp v1.CreateInviteResponse, err error)
 
-	CreateChannel(ctx context.Context, r *v1.CreateChannelRequest) (resp v1.CreateChannelRequest, err error)
+	CreateChannel(ctx context.Context, r *v1.CreateChannelRequest) (resp v1.CreateChannelResponse, err error)
 
-	CreateEmotePack(ctx context.Context, r *v1.CreateEmotePackRequest) (resp v1.CreateEmotePackRequest, err error)
+	CreateEmotePack(ctx context.Context, r *v1.CreateEmotePackRequest) (resp v1.CreateEmotePackResponse, err error)
 
-	GetGuildList(ctx context.Context, r *v1.GetGuildListRequest) (resp v1.GetGuildListRequest, err error)
+	GetGuildList(ctx context.Context, r *v1.GetGuildListRequest) (resp v1.GetGuildListResponse, err error)
 
-	AddGuildToGuildList(ctx context.Context, r *v1.AddGuildToGuildListRequest) (resp v1.AddGuildToGuildListRequest, err error)
+	AddGuildToGuildList(ctx context.Context, r *v1.AddGuildToGuildListRequest) (resp v1.AddGuildToGuildListResponse, err error)
 
-	RemoveGuildFromGuildList(ctx context.Context, r *v1.RemoveGuildFromGuildListRequest) (resp v1.RemoveGuildFromGuildListRequest, err error)
+	RemoveGuildFromGuildList(ctx context.Context, r *v1.RemoveGuildFromGuildListRequest) (resp v1.RemoveGuildFromGuildListResponse, err error)
 
-	GetGuild(ctx context.Context, r *v1.GetGuildRequest) (resp v1.GetGuildRequest, err error)
+	GetGuild(ctx context.Context, r *v1.GetGuildRequest) (resp v1.GetGuildResponse, err error)
 
-	GetGuildInvites(ctx context.Context, r *v1.GetGuildInvitesRequest) (resp v1.GetGuildInvitesRequest, err error)
+	GetGuildInvites(ctx context.Context, r *v1.GetGuildInvitesRequest) (resp v1.GetGuildInvitesResponse, err error)
 
-	GetGuildMembers(ctx context.Context, r *v1.GetGuildMembersRequest) (resp v1.GetGuildMembersRequest, err error)
+	GetGuildMembers(ctx context.Context, r *v1.GetGuildMembersRequest) (resp v1.GetGuildMembersResponse, err error)
 
-	GetGuildChannels(ctx context.Context, r *v1.GetGuildChannelsRequest) (resp v1.GetGuildChannelsRequest, err error)
+	GetGuildChannels(ctx context.Context, r *v1.GetGuildChannelsRequest) (resp v1.GetGuildChannelsResponse, err error)
 
-	GetChannelMessages(ctx context.Context, r *v1.GetChannelMessagesRequest) (resp v1.GetChannelMessagesRequest, err error)
+	GetChannelMessages(ctx context.Context, r *v1.GetChannelMessagesRequest) (resp v1.GetChannelMessagesResponse, err error)
 
-	GetMessage(ctx context.Context, r *v1.GetMessageRequest) (resp v1.GetMessageRequest, err error)
+	GetMessage(ctx context.Context, r *v1.GetMessageRequest) (resp v1.GetMessageResponse, err error)
 
-	GetEmotePacks(ctx context.Context, r *v1.GetEmotePacksRequest) (resp v1.GetEmotePacksRequest, err error)
+	GetEmotePacks(ctx context.Context, r *v1.GetEmotePacksRequest) (resp v1.GetEmotePacksResponse, err error)
 
-	GetEmotePackEmotes(ctx context.Context, r *v1.GetEmotePackEmotesRequest) (resp v1.GetEmotePackEmotesRequest, err error)
+	GetEmotePackEmotes(ctx context.Context, r *v1.GetEmotePackEmotesRequest) (resp v1.GetEmotePackEmotesResponse, err error)
 
 	UpdateGuildInformation(ctx context.Context, r *v1.UpdateGuildInformationRequest) (resp empty.Empty, err error)
 
@@ -62,25 +62,25 @@ type ChatServiceServer interface {
 
 	DequipEmotePack(ctx context.Context, r *v1.DequipEmotePackRequest) (resp empty.Empty, err error)
 
-	JoinGuild(ctx context.Context, r *v1.JoinGuildRequest) (resp v1.JoinGuildRequest, err error)
+	JoinGuild(ctx context.Context, r *v1.JoinGuildRequest) (resp v1.JoinGuildResponse, err error)
 
 	LeaveGuild(ctx context.Context, r *v1.LeaveGuildRequest) (resp empty.Empty, err error)
 
 	TriggerAction(ctx context.Context, r *v1.TriggerActionRequest) (resp empty.Empty, err error)
 
-	SendMessage(ctx context.Context, r *v1.SendMessageRequest) (resp v1.SendMessageRequest, err error)
+	SendMessage(ctx context.Context, r *v1.SendMessageRequest) (resp v1.SendMessageResponse, err error)
 
-	QueryHasPermission(ctx context.Context, r *v1.QueryPermissionsRequest) (resp v1.QueryPermissionsRequest, err error)
+	QueryHasPermission(ctx context.Context, r *v1.QueryPermissionsRequest) (resp v1.QueryPermissionsResponse, err error)
 
 	SetPermissions(ctx context.Context, r *v1.SetPermissionsRequest) (resp empty.Empty, err error)
 
-	GetPermissions(ctx context.Context, r *v1.GetPermissionsRequest) (resp v1.GetPermissionsRequest, err error)
+	GetPermissions(ctx context.Context, r *v1.GetPermissionsRequest) (resp v1.GetPermissionsResponse, err error)
 
-	MoveRole(ctx context.Context, r *v1.MoveRoleRequest) (resp v1.MoveRoleRequest, err error)
+	MoveRole(ctx context.Context, r *v1.MoveRoleRequest) (resp v1.MoveRoleResponse, err error)
 
-	GetGuildRoles(ctx context.Context, r *v1.GetGuildRolesRequest) (resp v1.GetGuildRolesRequest, err error)
+	GetGuildRoles(ctx context.Context, r *v1.GetGuildRolesRequest) (resp v1.GetGuildRolesResponse, err error)
 
-	AddGuildRole(ctx context.Context, r *v1.AddGuildRoleRequest) (resp v1.AddGuildRoleRequest, err error)
+	AddGuildRole(ctx context.Context, r *v1.AddGuildRoleRequest) (resp v1.AddGuildRoleResponse, err error)
 
 	ModifyGuildRole(ctx context.Context, r *v1.ModifyGuildRoleRequest) (resp empty.Empty, err error)
 
@@ -88,17 +88,17 @@ type ChatServiceServer interface {
 
 	ManageUserRoles(ctx context.Context, r *v1.ManageUserRolesRequest) (resp empty.Empty, err error)
 
-	GetUserRoles(ctx context.Context, r *v1.GetUserRolesRequest) (resp v1.GetUserRolesRequest, err error)
+	GetUserRoles(ctx context.Context, r *v1.GetUserRolesRequest) (resp v1.GetUserRolesResponse, err error)
 
-	GetUser(ctx context.Context, r *v1.GetUserRequest) (resp v1.GetUserRequest, err error)
+	GetUser(ctx context.Context, r *v1.GetUserRequest) (resp v1.GetUserResponse, err error)
 
-	GetUserMetadata(ctx context.Context, r *v1.GetUserMetadataRequest) (resp v1.GetUserMetadataRequest, err error)
+	GetUserMetadata(ctx context.Context, r *v1.GetUserMetadataRequest) (resp v1.GetUserMetadataResponse, err error)
 
 	ProfileUpdate(ctx context.Context, r *v1.ProfileUpdateRequest) (resp empty.Empty, err error)
 
 	Typing(ctx context.Context, r *v1.TypingRequest) (resp empty.Empty, err error)
 
-	PreviewGuild(ctx context.Context, r *v1.PreviewGuildRequest) (resp v1.PreviewGuildRequest, err error)
+	PreviewGuild(ctx context.Context, r *v1.PreviewGuildRequest) (resp v1.PreviewGuildResponse, err error)
 }
 
 type ChatServiceHandler struct {
