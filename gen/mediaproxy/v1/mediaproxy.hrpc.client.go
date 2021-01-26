@@ -20,8 +20,6 @@ func NewMediaProxyServiceClient(url string) *MediaProxyServiceClient {
 	}
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *MediaProxyServiceClient) FetchLinkMetadata(r *v1.FetchLinkMetadataRequest) (*v1.SiteMetadata, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -44,8 +42,6 @@ func (client *MediaProxyServiceClient) FetchLinkMetadata(r *v1.FetchLinkMetadata
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *MediaProxyServiceClient) InstantView(r *v1.InstantViewRequest) (*v1.InstantViewResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -67,8 +63,6 @@ func (client *MediaProxyServiceClient) InstantView(r *v1.InstantViewRequest) (*v
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *MediaProxyServiceClient) CanInstantView(r *v1.InstantViewRequest) (*v1.CanInstantViewResponse, error) {
 	input, err := proto.Marshal(r)

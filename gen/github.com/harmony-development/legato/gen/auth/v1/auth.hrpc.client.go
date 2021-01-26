@@ -22,8 +22,6 @@ func NewAuthServiceClient(url string) *AuthServiceClient {
 	}
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *AuthServiceClient) Federate(r *v1.FederateRequest) (*v1.FederateReply, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -45,8 +43,6 @@ func (client *AuthServiceClient) Federate(r *v1.FederateRequest) (*v1.FederateRe
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *AuthServiceClient) LoginFederated(r *v1.LoginFederatedRequest) (*v1.Session, error) {
 	input, err := proto.Marshal(r)
@@ -70,8 +66,6 @@ func (client *AuthServiceClient) LoginFederated(r *v1.LoginFederatedRequest) (*v
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *AuthServiceClient) Key(r *empty.Empty) (*v1.KeyReply, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -93,8 +87,6 @@ func (client *AuthServiceClient) Key(r *empty.Empty) (*v1.KeyReply, error) {
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *AuthServiceClient) BeginAuth(r *empty.Empty) (*v1.BeginAuthResponse, error) {
 	input, err := proto.Marshal(r)
@@ -118,8 +110,6 @@ func (client *AuthServiceClient) BeginAuth(r *empty.Empty) (*v1.BeginAuthRespons
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *AuthServiceClient) NextStep(r *v1.NextStepRequest) (*v1.AuthStep, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -142,8 +132,6 @@ func (client *AuthServiceClient) NextStep(r *v1.NextStepRequest) (*v1.AuthStep, 
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *AuthServiceClient) StepBack(r *v1.StepBackRequest) (*v1.AuthStep, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -164,4 +152,8 @@ func (client *AuthServiceClient) StepBack(r *v1.StepBackRequest) (*v1.AuthStep, 
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
 	}
 	return output, nil
+}
+
+func (client *AuthServiceClient) StreamSteps(r *v1.StreamStepsRequest) (chan *v1.AuthStep, error) {
+	panic("unimplemented")
 }

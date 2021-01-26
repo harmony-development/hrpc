@@ -189,12 +189,6 @@ import "github.com/gorilla/websocket"
             h.Server.{{ .Name }}(req.Context(), in, out, req.Header)
         }
         {{ end }}
-        {{ if (and (hasClientStream .) (not (hasServerStream .))) }}
-        {{ end }}
-        {{ if (and (hasServerStream .) (not (hasClientStream .))) }}
-        {{ end }}
-        {{ if (and (hasServerStream .) (hasClientStream .)) }}
-        {{ end }}
         {{ end }}
         }
     }

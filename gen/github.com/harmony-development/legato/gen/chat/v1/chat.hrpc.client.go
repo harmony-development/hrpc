@@ -22,8 +22,6 @@ func NewChatServiceClient(url string) *ChatServiceClient {
 	}
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) CreateGuild(r *v1.CreateGuildRequest) (*v1.CreateGuildResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -45,8 +43,6 @@ func (client *ChatServiceClient) CreateGuild(r *v1.CreateGuildRequest) (*v1.Crea
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) CreateInvite(r *v1.CreateInviteRequest) (*v1.CreateInviteResponse, error) {
 	input, err := proto.Marshal(r)
@@ -70,8 +66,6 @@ func (client *ChatServiceClient) CreateInvite(r *v1.CreateInviteRequest) (*v1.Cr
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) CreateChannel(r *v1.CreateChannelRequest) (*v1.CreateChannelResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -93,8 +87,6 @@ func (client *ChatServiceClient) CreateChannel(r *v1.CreateChannelRequest) (*v1.
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) CreateEmotePack(r *v1.CreateEmotePackRequest) (*v1.CreateEmotePackResponse, error) {
 	input, err := proto.Marshal(r)
@@ -118,8 +110,6 @@ func (client *ChatServiceClient) CreateEmotePack(r *v1.CreateEmotePackRequest) (
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) GetGuildList(r *v1.GetGuildListRequest) (*v1.GetGuildListResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -141,8 +131,6 @@ func (client *ChatServiceClient) GetGuildList(r *v1.GetGuildListRequest) (*v1.Ge
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) AddGuildToGuildList(r *v1.AddGuildToGuildListRequest) (*v1.AddGuildToGuildListResponse, error) {
 	input, err := proto.Marshal(r)
@@ -166,8 +154,6 @@ func (client *ChatServiceClient) AddGuildToGuildList(r *v1.AddGuildToGuildListRe
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) RemoveGuildFromGuildList(r *v1.RemoveGuildFromGuildListRequest) (*v1.RemoveGuildFromGuildListResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -189,8 +175,6 @@ func (client *ChatServiceClient) RemoveGuildFromGuildList(r *v1.RemoveGuildFromG
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) GetGuild(r *v1.GetGuildRequest) (*v1.GetGuildResponse, error) {
 	input, err := proto.Marshal(r)
@@ -214,8 +198,6 @@ func (client *ChatServiceClient) GetGuild(r *v1.GetGuildRequest) (*v1.GetGuildRe
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) GetGuildInvites(r *v1.GetGuildInvitesRequest) (*v1.GetGuildInvitesResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -237,8 +219,6 @@ func (client *ChatServiceClient) GetGuildInvites(r *v1.GetGuildInvitesRequest) (
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) GetGuildMembers(r *v1.GetGuildMembersRequest) (*v1.GetGuildMembersResponse, error) {
 	input, err := proto.Marshal(r)
@@ -262,8 +242,6 @@ func (client *ChatServiceClient) GetGuildMembers(r *v1.GetGuildMembersRequest) (
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) GetGuildChannels(r *v1.GetGuildChannelsRequest) (*v1.GetGuildChannelsResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -285,8 +263,6 @@ func (client *ChatServiceClient) GetGuildChannels(r *v1.GetGuildChannelsRequest)
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) GetChannelMessages(r *v1.GetChannelMessagesRequest) (*v1.GetChannelMessagesResponse, error) {
 	input, err := proto.Marshal(r)
@@ -310,8 +286,6 @@ func (client *ChatServiceClient) GetChannelMessages(r *v1.GetChannelMessagesRequ
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) GetMessage(r *v1.GetMessageRequest) (*v1.GetMessageResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -333,8 +307,6 @@ func (client *ChatServiceClient) GetMessage(r *v1.GetMessageRequest) (*v1.GetMes
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) GetEmotePacks(r *v1.GetEmotePacksRequest) (*v1.GetEmotePacksResponse, error) {
 	input, err := proto.Marshal(r)
@@ -358,8 +330,6 @@ func (client *ChatServiceClient) GetEmotePacks(r *v1.GetEmotePacksRequest) (*v1.
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) GetEmotePackEmotes(r *v1.GetEmotePackEmotesRequest) (*v1.GetEmotePackEmotesResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -381,8 +351,6 @@ func (client *ChatServiceClient) GetEmotePackEmotes(r *v1.GetEmotePackEmotesRequ
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) UpdateGuildInformation(r *v1.UpdateGuildInformationRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -406,8 +374,6 @@ func (client *ChatServiceClient) UpdateGuildInformation(r *v1.UpdateGuildInforma
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) UpdateChannelInformation(r *v1.UpdateChannelInformationRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -429,8 +395,6 @@ func (client *ChatServiceClient) UpdateChannelInformation(r *v1.UpdateChannelInf
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) UpdateChannelOrder(r *v1.UpdateChannelOrderRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -454,8 +418,6 @@ func (client *ChatServiceClient) UpdateChannelOrder(r *v1.UpdateChannelOrderRequ
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) UpdateMessage(r *v1.UpdateMessageRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -477,8 +439,6 @@ func (client *ChatServiceClient) UpdateMessage(r *v1.UpdateMessageRequest) (*emp
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) AddEmoteToPack(r *v1.AddEmoteToPackRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -502,8 +462,6 @@ func (client *ChatServiceClient) AddEmoteToPack(r *v1.AddEmoteToPackRequest) (*e
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) DeleteGuild(r *v1.DeleteGuildRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -525,8 +483,6 @@ func (client *ChatServiceClient) DeleteGuild(r *v1.DeleteGuildRequest) (*empty.E
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) DeleteInvite(r *v1.DeleteInviteRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -550,8 +506,6 @@ func (client *ChatServiceClient) DeleteInvite(r *v1.DeleteInviteRequest) (*empty
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) DeleteChannel(r *v1.DeleteChannelRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -573,8 +527,6 @@ func (client *ChatServiceClient) DeleteChannel(r *v1.DeleteChannelRequest) (*emp
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) DeleteMessage(r *v1.DeleteMessageRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -598,8 +550,6 @@ func (client *ChatServiceClient) DeleteMessage(r *v1.DeleteMessageRequest) (*emp
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) DeleteEmoteFromPack(r *v1.DeleteEmoteFromPackRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -621,8 +571,6 @@ func (client *ChatServiceClient) DeleteEmoteFromPack(r *v1.DeleteEmoteFromPackRe
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) DeleteEmotePack(r *v1.DeleteEmotePackRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -646,8 +594,6 @@ func (client *ChatServiceClient) DeleteEmotePack(r *v1.DeleteEmotePackRequest) (
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) DequipEmotePack(r *v1.DequipEmotePackRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -669,8 +615,6 @@ func (client *ChatServiceClient) DequipEmotePack(r *v1.DequipEmotePackRequest) (
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) JoinGuild(r *v1.JoinGuildRequest) (*v1.JoinGuildResponse, error) {
 	input, err := proto.Marshal(r)
@@ -694,8 +638,6 @@ func (client *ChatServiceClient) JoinGuild(r *v1.JoinGuildRequest) (*v1.JoinGuil
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) LeaveGuild(r *v1.LeaveGuildRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -717,8 +659,6 @@ func (client *ChatServiceClient) LeaveGuild(r *v1.LeaveGuildRequest) (*empty.Emp
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) TriggerAction(r *v1.TriggerActionRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -742,8 +682,6 @@ func (client *ChatServiceClient) TriggerAction(r *v1.TriggerActionRequest) (*emp
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) SendMessage(r *v1.SendMessageRequest) (*v1.SendMessageResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -765,8 +703,6 @@ func (client *ChatServiceClient) SendMessage(r *v1.SendMessageRequest) (*v1.Send
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) QueryHasPermission(r *v1.QueryPermissionsRequest) (*v1.QueryPermissionsResponse, error) {
 	input, err := proto.Marshal(r)
@@ -790,8 +726,6 @@ func (client *ChatServiceClient) QueryHasPermission(r *v1.QueryPermissionsReques
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) SetPermissions(r *v1.SetPermissionsRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -813,8 +747,6 @@ func (client *ChatServiceClient) SetPermissions(r *v1.SetPermissionsRequest) (*e
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) GetPermissions(r *v1.GetPermissionsRequest) (*v1.GetPermissionsResponse, error) {
 	input, err := proto.Marshal(r)
@@ -838,8 +770,6 @@ func (client *ChatServiceClient) GetPermissions(r *v1.GetPermissionsRequest) (*v
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) MoveRole(r *v1.MoveRoleRequest) (*v1.MoveRoleResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -861,8 +791,6 @@ func (client *ChatServiceClient) MoveRole(r *v1.MoveRoleRequest) (*v1.MoveRoleRe
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) GetGuildRoles(r *v1.GetGuildRolesRequest) (*v1.GetGuildRolesResponse, error) {
 	input, err := proto.Marshal(r)
@@ -886,8 +814,6 @@ func (client *ChatServiceClient) GetGuildRoles(r *v1.GetGuildRolesRequest) (*v1.
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) AddGuildRole(r *v1.AddGuildRoleRequest) (*v1.AddGuildRoleResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -909,8 +835,6 @@ func (client *ChatServiceClient) AddGuildRole(r *v1.AddGuildRoleRequest) (*v1.Ad
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) ModifyGuildRole(r *v1.ModifyGuildRoleRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -934,8 +858,6 @@ func (client *ChatServiceClient) ModifyGuildRole(r *v1.ModifyGuildRoleRequest) (
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) DeleteGuildRole(r *v1.DeleteGuildRoleRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -957,8 +879,6 @@ func (client *ChatServiceClient) DeleteGuildRole(r *v1.DeleteGuildRoleRequest) (
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) ManageUserRoles(r *v1.ManageUserRolesRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -982,8 +902,6 @@ func (client *ChatServiceClient) ManageUserRoles(r *v1.ManageUserRolesRequest) (
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) GetUserRoles(r *v1.GetUserRolesRequest) (*v1.GetUserRolesResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -1006,7 +924,13 @@ func (client *ChatServiceClient) GetUserRoles(r *v1.GetUserRolesRequest) (*v1.Ge
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
+func (client *ChatServiceClient) StreamEvents() (in chan *v1.StreamEventsRequest, out chan *v1.Event, err error) {
+	panic("unimplemented")
+}
+
+func (client *ChatServiceClient) Sync(r *v1.SyncRequest) (chan *v1.SyncEvent, error) {
+	panic("unimplemented")
+}
 
 func (client *ChatServiceClient) GetUser(r *v1.GetUserRequest) (*v1.GetUserResponse, error) {
 	input, err := proto.Marshal(r)
@@ -1030,8 +954,6 @@ func (client *ChatServiceClient) GetUser(r *v1.GetUserRequest) (*v1.GetUserRespo
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) GetUserMetadata(r *v1.GetUserMetadataRequest) (*v1.GetUserMetadataResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -1053,8 +975,6 @@ func (client *ChatServiceClient) GetUserMetadata(r *v1.GetUserMetadataRequest) (
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) ProfileUpdate(r *v1.ProfileUpdateRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
@@ -1078,8 +998,6 @@ func (client *ChatServiceClient) ProfileUpdate(r *v1.ProfileUpdateRequest) (*emp
 	return output, nil
 }
 
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
 func (client *ChatServiceClient) Typing(r *v1.TypingRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
@@ -1101,8 +1019,6 @@ func (client *ChatServiceClient) Typing(r *v1.TypingRequest) (*empty.Empty, erro
 	}
 	return output, nil
 }
-
-// Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
 
 func (client *ChatServiceClient) PreviewGuild(r *v1.PreviewGuildRequest) (*v1.PreviewGuildResponse, error) {
 	input, err := proto.Marshal(r)

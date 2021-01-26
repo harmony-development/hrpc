@@ -1,14 +1,12 @@
 package v1
 
-import (
-	"context"
-	"net/http"
+import "context"
+import "net/http"
+import "io/ioutil"
+import "google.golang.org/protobuf/proto"
+import "github.com/gorilla/websocket"
 
-	"github.com/gorilla/websocket"
-	"google.golang.org/protobuf/proto"
-
-	v1 "github.com/harmony-development/legato/gen/voice/v1"
-)
+import "github.com/harmony-development/legato/gen/voice/v1"
 
 type VoiceServiceServer interface {
 	Connect(ctx context.Context, in chan *v1.ClientSignal, out chan *v1.Signal, headers http.Header)

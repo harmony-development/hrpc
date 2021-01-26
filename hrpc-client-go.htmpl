@@ -17,13 +17,11 @@ import "bytes"
 
     {{ range .Method }}
 
-        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
-            {{ $resIn := (resolvedGoType $item . .InputType ) }}
-            {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+        {{ $resIn := (resolvedGoType $item . .InputType ) }}
+        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
 
-            {{ appendSet $imports $resIn.Package }}
-            {{ appendSet $imports $resOut.Package }}
-        {{ end }}
+        {{ appendSet $imports $resIn.Package }}
+        {{ appendSet $imports $resOut.Package }}
 
     {{ end }}
 
@@ -58,15 +56,13 @@ import "bytes"
 
     {{ range .Method }}
 
+        {{ $resIn := (resolvedGoType $item . .InputType ) }}
+        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+
+        {{ appendSet $imports $resIn.Package }}
+        {{ appendSet $imports $resOut.Package }}
+
         {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
-            {{ $resIn := (resolvedGoType $item . .InputType ) }}
-            {{ $resOut := (resolvedGoType $item . .OutputType ) }}
-
-            {{ appendSet $imports $resIn.Package }}
-            {{ appendSet $imports $resOut.Package }}
-
-            // Lit("%s/"+fmt.Sprintf("%s/%s", *item.Package+"."+*serv.Name, *method.Name)
-
             func (client *{{ $sname }}) {{ (deref .Name ) }}(r *{{ $resIn.ID }}) (*{{ $resOut.ID }}, error) {
                 input, err := proto.Marshal(r)
                 if err != nil {
@@ -87,6 +83,14 @@ import "bytes"
                     return nil, fmt.Errorf("error unmarshalling response: %w", err)
                 }
                 return output, nil
+            }
+        {{ else if (and (hasServerStream .) (not (hasClientStream .))) }}
+            func (client *{{ $sname }}) {{ (deref .Name ) }}(r *{{ $resIn.ID }}) (chan *{{ $resOut.ID }}, error) {
+                panic("unimplemented")
+            }
+        {{ else if (and (hasServerStream .) (hasClientStream .)) }}
+            func (client *{{ $sname }}) {{ (deref .Name ) }}() (in chan *{{ $resIn.ID }}, out chan *{{ $resOut.ID }}, err error) {
+                panic("unimplemented")
             }
         {{ end }}
 
