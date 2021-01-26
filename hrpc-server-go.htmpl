@@ -100,7 +100,7 @@ import "github.com/gorilla/websocket"
                 return
             }
 
-            resp, err := h.Server.{{ .Name }}(req.Context(), nil, req.Header)
+            resp, err := h.Server.{{ .Name }}(req.Context(), requestProto, req.Header)
 
             response, err := proto.Marshal(resp)
             if err != nil {
