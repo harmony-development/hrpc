@@ -4,6 +4,7 @@ import "context"
 import "net/http"
 import "io/ioutil"
 import "google.golang.org/protobuf/proto"
+import "github.com/gorilla/websocket"
 
 import "github.com/harmony-development/legato/gen/mediaproxy/v1"
 
@@ -18,6 +19,18 @@ type MediaProxyServiceServer interface {
 type MediaProxyServiceHandler struct {
 	Server       MediaProxyServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
+	upgrader     websocket.Upgrader
+}
+
+func NewMediaProxyServiceHandler(s MediaProxyServiceServer, errHandler func(err error, w http.ResponseWriter)) *MediaProxyServiceHandler {
+	return &MediaProxyServiceHandler{
+		Server:       s,
+		ErrorHandler: errHandler,
+		upgrader: websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+		},
+	}
 }
 
 func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {

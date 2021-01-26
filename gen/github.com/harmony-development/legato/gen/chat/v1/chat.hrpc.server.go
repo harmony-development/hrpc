@@ -4,6 +4,7 @@ import "context"
 import "net/http"
 import "io/ioutil"
 import "google.golang.org/protobuf/proto"
+import "github.com/gorilla/websocket"
 
 import "github.com/golang/protobuf/ptypes/empty"
 
@@ -92,6 +93,10 @@ type ChatServiceServer interface {
 
 	GetUserRoles(ctx context.Context, r *v1.GetUserRolesRequest, headers http.Header) (resp *v1.GetUserRolesResponse, err error)
 
+	StreamEvents(ctx context.Context, in chan *v1.StreamEventsRequest, out chan *v1.Event, headers http.Header)
+
+	Sync(ctx context.Context, r *v1.SyncRequest, out chan *v1.SyncEvent, headers http.Header)
+
 	GetUser(ctx context.Context, r *v1.GetUserRequest, headers http.Header) (resp *v1.GetUserResponse, err error)
 
 	GetUserMetadata(ctx context.Context, r *v1.GetUserMetadataRequest, headers http.Header) (resp *v1.GetUserMetadataResponse, err error)
@@ -106,6 +111,18 @@ type ChatServiceServer interface {
 type ChatServiceHandler struct {
 	Server       ChatServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
+	upgrader     websocket.Upgrader
+}
+
+func NewChatServiceHandler(s ChatServiceServer, errHandler func(err error, w http.ResponseWriter)) *ChatServiceHandler {
+	return &ChatServiceHandler{
+		Server:       s,
+		ErrorHandler: errHandler,
+		upgrader: websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+		},
+	}
 }
 
 func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -1462,6 +1479,131 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				h.ErrorHandler(err, w)
 				return
 			}
+		}
+
+	case "/protocol.chat.v1.ChatService/StreamEvents":
+		{
+			var err error
+
+			in := make(chan *v1.StreamEventsRequest)
+			err = nil
+
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			out := make(chan *v1.Event)
+
+			ws, err := h.upgrader.Upgrade(w, req, nil)
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			go func() {
+				for {
+					select {
+					case msg, ok := <-out:
+						if !ok {
+							ws.WriteMessage(websocket.CloseMessage, []byte{})
+							return
+						}
+
+						w, err := ws.NextWriter(websocket.BinaryMessage)
+						if err != nil {
+
+							close(in)
+
+							close(out)
+							return
+						}
+
+						response, err := proto.Marshal(msg)
+						if err != nil {
+
+							close(in)
+
+							close(out)
+							return
+						}
+
+						w.Write(response)
+						if err := w.Close(); err != nil {
+
+							close(in)
+
+							close(out)
+							return
+						}
+					}
+				}
+			}()
+
+			h.Server.StreamEvents(req.Context(), in, out, req.Header)
+		}
+
+	case "/protocol.chat.v1.ChatService/Sync":
+		{
+			var err error
+
+			body, err := ioutil.ReadAll(req.Body)
+			defer req.Body.Close()
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			in := new(v1.SyncRequest)
+			err = proto.Unmarshal(body, in)
+
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			out := make(chan *v1.SyncEvent)
+
+			ws, err := h.upgrader.Upgrade(w, req, nil)
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			go func() {
+				for {
+					select {
+					case msg, ok := <-out:
+						if !ok {
+							ws.WriteMessage(websocket.CloseMessage, []byte{})
+							return
+						}
+
+						w, err := ws.NextWriter(websocket.BinaryMessage)
+						if err != nil {
+
+							close(out)
+							return
+						}
+
+						response, err := proto.Marshal(msg)
+						if err != nil {
+
+							close(out)
+							return
+						}
+
+						w.Write(response)
+						if err := w.Close(); err != nil {
+
+							close(out)
+							return
+						}
+					}
+				}
+			}()
+
+			h.Server.Sync(req.Context(), in, out, req.Header)
 		}
 
 	case "/protocol.chat.v1.ChatService/GetUser":

@@ -9,6 +9,7 @@ import "context"
 import "net/http"
 import "io/ioutil"
 import "google.golang.org/protobuf/proto"
+import "github.com/gorilla/websocket"
 
 {{ $imports := newset }}
 
@@ -16,13 +17,11 @@ import "google.golang.org/protobuf/proto"
 
     {{ range .Method }}
 
-        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
-            {{ $resIn := (resolvedGoType $item . .InputType ) }}
-            {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+        {{ $resIn := (resolvedGoType $item . .InputType ) }}
+        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
 
-            {{ appendSet $imports $resIn.Package }}
-            {{ appendSet $imports $resOut.Package }}
-        {{ end }}
+        {{ appendSet $imports $resIn.Package }}
+        {{ appendSet $imports $resOut.Package }}
 
     {{ end }}
 
@@ -46,11 +45,15 @@ import "google.golang.org/protobuf/proto"
     type {{ $sname }} interface {
     {{ range .Method }}
 
-        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
-            {{ $resIn := (resolvedGoType $item . .InputType ) }}
-            {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+        {{ $resIn := (resolvedGoType $item . .InputType ) }}
+        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
 
+        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
             {{ deref .Name }}(ctx context.Context, r *{{ $resIn.ID}}, headers http.Header) (resp *{{ $resOut.ID}}, err error)
+        {{ else if (and (hasServerStream .) (not (hasClientStream .))) }}
+            {{ deref .Name }}(ctx context.Context, r *{{ $resIn.ID}}, out chan *{{ $resOut.ID }}, headers http.Header)
+        {{ else }}
+            {{ deref .Name }}(ctx context.Context, in chan *{{ $resIn.ID}}, out chan *{{ $resOut.ID }}, headers http.Header)
         {{ end }}
 
     {{ end }}
@@ -59,11 +62,27 @@ import "google.golang.org/protobuf/proto"
     type {{ deref .Name }}Handler struct {
         Server {{ $sname }}
         ErrorHandler func(err error, w http.ResponseWriter)
+        upgrader websocket.Upgrader
+    }
+
+    func New{{ deref .Name }}Handler(s {{ $sname }}, errHandler func(err error, w http.ResponseWriter)) *{{ deref .Name }}Handler {
+        return &{{ deref .Name }}Handler {
+            Server: s,
+            ErrorHandler: errHandler,
+            upgrader: websocket.Upgrader{
+                ReadBufferSize:  1024,
+                WriteBufferSize: 1024,
+            },
+        }
     }
 
     func (h *{{ deref .Name }}Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
         switch (req.URL.Path) {
         {{ range .Method }}
+
+        {{ $resIn := (resolvedGoType $item . .InputType ) }}
+        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+
         {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
         case "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}": {
             body, err := ioutil.ReadAll(req.Body)
@@ -97,6 +116,84 @@ import "google.golang.org/protobuf/proto"
                 return
             }
         }
+        {{ else }}
+        case "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}": {
+            var err error
+
+            {{ if (hasClientStream .) }}
+            in := make(chan *{{ $resIn.ID }})
+            err = nil
+            {{ else }}
+            body, err := ioutil.ReadAll(req.Body)
+            defer req.Body.Close()
+            if err != nil {
+                h.ErrorHandler(err, w)
+                return
+            }
+
+            in := new({{ $resIn.ID }})
+            err = proto.Unmarshal(body, in)
+            {{ end }}
+            if err != nil {
+                h.ErrorHandler(err, w)
+                return
+            }
+
+            out := make(chan *{{ $resOut.ID }})
+
+            ws, err := h.upgrader.Upgrade(w, req, nil)
+            if err != nil {
+                h.ErrorHandler(err, w)
+                return
+            }
+
+            go func() {
+                for {
+                    select {
+                    case msg, ok := <-out:
+                        if !ok {
+                            ws.WriteMessage(websocket.CloseMessage, []byte{})
+                            return
+                        }
+
+                        w, err := ws.NextWriter(websocket.BinaryMessage)
+                        if err != nil {
+                            {{ if (hasClientStream .) }}
+                            close(in)
+                            {{ end }}
+                            close(out)
+                            return
+                        }
+
+                        response, err := proto.Marshal(msg)
+                        if err != nil {
+                            {{ if (hasClientStream .) }}
+                            close(in)
+                            {{ end }}
+                            close(out)
+                            return
+                        }
+
+                        w.Write(response)
+                        if err := w.Close(); err != nil {
+                            {{ if (hasClientStream .) }}
+                            close(in)
+                            {{ end }}
+                            close(out)
+                            return
+                        }
+                    }
+                }
+            }()
+
+            h.Server.{{ .Name }}(req.Context(), in, out, req.Header)
+        }
+        {{ end }}
+        {{ if (and (hasClientStream .) (not (hasServerStream .))) }}
+        {{ end }}
+        {{ if (and (hasServerStream .) (not (hasClientStream .))) }}
+        {{ end }}
+        {{ if (and (hasServerStream .) (hasClientStream .)) }}
         {{ end }}
         {{ end }}
         }

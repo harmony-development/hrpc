@@ -4,6 +4,7 @@ import "context"
 import "net/http"
 import "io/ioutil"
 import "google.golang.org/protobuf/proto"
+import "github.com/gorilla/websocket"
 
 import "github.com/golang/protobuf/ptypes/empty"
 
@@ -21,11 +22,25 @@ type AuthServiceServer interface {
 	NextStep(ctx context.Context, r *v1.NextStepRequest, headers http.Header) (resp *v1.AuthStep, err error)
 
 	StepBack(ctx context.Context, r *v1.StepBackRequest, headers http.Header) (resp *v1.AuthStep, err error)
+
+	StreamSteps(ctx context.Context, r *v1.StreamStepsRequest, out chan *v1.AuthStep, headers http.Header)
 }
 
 type AuthServiceHandler struct {
 	Server       AuthServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
+	upgrader     websocket.Upgrader
+}
+
+func NewAuthServiceHandler(s AuthServiceServer, errHandler func(err error, w http.ResponseWriter)) *AuthServiceHandler {
+	return &AuthServiceHandler{
+		Server:       s,
+		ErrorHandler: errHandler,
+		upgrader: websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+		},
+	}
 }
 
 func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -227,6 +242,69 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				h.ErrorHandler(err, w)
 				return
 			}
+		}
+
+	case "/protocol.auth.v1.AuthService/StreamSteps":
+		{
+			var err error
+
+			body, err := ioutil.ReadAll(req.Body)
+			defer req.Body.Close()
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			in := new(v1.StreamStepsRequest)
+			err = proto.Unmarshal(body, in)
+
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			out := make(chan *v1.AuthStep)
+
+			ws, err := h.upgrader.Upgrade(w, req, nil)
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			go func() {
+				for {
+					select {
+					case msg, ok := <-out:
+						if !ok {
+							ws.WriteMessage(websocket.CloseMessage, []byte{})
+							return
+						}
+
+						w, err := ws.NextWriter(websocket.BinaryMessage)
+						if err != nil {
+
+							close(out)
+							return
+						}
+
+						response, err := proto.Marshal(msg)
+						if err != nil {
+
+							close(out)
+							return
+						}
+
+						w.Write(response)
+						if err := w.Close(); err != nil {
+
+							close(out)
+							return
+						}
+					}
+				}
+			}()
+
+			h.Server.StreamSteps(req.Context(), in, out, req.Header)
 		}
 
 	}
