@@ -52,7 +52,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			resp, err := h.Server.FetchLinkMetadata(req.Context(), nil, req.Header)
+			resp, err := h.Server.FetchLinkMetadata(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -85,7 +85,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			resp, err := h.Server.InstantView(req.Context(), nil, req.Header)
+			resp, err := h.Server.InstantView(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -118,7 +118,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			resp, err := h.Server.CanInstantView(req.Context(), nil, req.Header)
+			resp, err := h.Server.CanInstantView(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {

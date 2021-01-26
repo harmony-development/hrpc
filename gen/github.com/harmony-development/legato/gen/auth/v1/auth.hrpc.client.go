@@ -4,6 +4,8 @@ import "net/http"
 import "google.golang.org/protobuf/proto"
 import "io/ioutil"
 import "fmt"
+import "github.com/gorilla/websocket"
+import "net/url"
 import "bytes"
 
 import "github.com/golang/protobuf/ptypes/empty"
@@ -27,7 +29,7 @@ func (client *AuthServiceClient) Federate(r *v1.FederateRequest) (*v1.FederateRe
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.auth.v1.AuthService/Federate", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.auth.v1.AuthService/Federate", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}
@@ -49,7 +51,7 @@ func (client *AuthServiceClient) LoginFederated(r *v1.LoginFederatedRequest) (*v
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.auth.v1.AuthService/LoginFederated", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.auth.v1.AuthService/LoginFederated", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}
@@ -71,7 +73,7 @@ func (client *AuthServiceClient) Key(r *empty.Empty) (*v1.KeyReply, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.auth.v1.AuthService/Key", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.auth.v1.AuthService/Key", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}
@@ -93,7 +95,7 @@ func (client *AuthServiceClient) BeginAuth(r *empty.Empty) (*v1.BeginAuthRespons
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.auth.v1.AuthService/BeginAuth", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.auth.v1.AuthService/BeginAuth", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}
@@ -115,7 +117,7 @@ func (client *AuthServiceClient) NextStep(r *v1.NextStepRequest) (*v1.AuthStep, 
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.auth.v1.AuthService/NextStep", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.auth.v1.AuthService/NextStep", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}
@@ -137,7 +139,7 @@ func (client *AuthServiceClient) StepBack(r *v1.StepBackRequest) (*v1.AuthStep, 
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.auth.v1.AuthService/StepBack", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.auth.v1.AuthService/StepBack", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}

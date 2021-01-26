@@ -74,6 +74,13 @@ func main() {
 			split := strings.Split(in, ".")
 			final := split[len(split)-1]
 
+			if strings.Join(split[:len(split)-1], ".") == "."+*item.Package {
+				return QualPair{
+					Package: "",
+					ID:      final,
+				}
+			}
+
 			return QualPair{
 				Package: *item.Options.GoPackage,
 				ID:      path.Base(*item.Options.GoPackage) + "." + final,
@@ -83,6 +90,9 @@ func main() {
 			return map[string]struct{}{}
 		},
 		"appendSet": func(m map[string]struct{}, v string) string {
+			if v == "" {
+				return ""
+			}
 			m[v] = struct{}{}
 			return ""
 		},

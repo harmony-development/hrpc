@@ -62,7 +62,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.Federate(req.Context(), nil, req.Header)
+			resp, err := h.Server.Federate(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -95,7 +95,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.LoginFederated(req.Context(), nil, req.Header)
+			resp, err := h.Server.LoginFederated(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -128,7 +128,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.Key(req.Context(), nil, req.Header)
+			resp, err := h.Server.Key(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -161,7 +161,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.BeginAuth(req.Context(), nil, req.Header)
+			resp, err := h.Server.BeginAuth(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -194,7 +194,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.NextStep(req.Context(), nil, req.Header)
+			resp, err := h.Server.NextStep(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -227,7 +227,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.StepBack(req.Context(), nil, req.Header)
+			resp, err := h.Server.StepBack(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {

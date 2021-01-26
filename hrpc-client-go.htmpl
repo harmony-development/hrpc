@@ -9,6 +9,8 @@ import "net/http"
 import "google.golang.org/protobuf/proto"
 import "io/ioutil"
 import "fmt"
+import "github.com/gorilla/websocket"
+import "net/url"
 import "bytes"
 
 {{ $imports := newset }}
@@ -68,7 +70,7 @@ import "bytes"
                 if err != nil {
                     return nil, fmt.Errorf("could not martial request: %w", err)
                 }
-                resp, err := client.client.Post(fmt.Sprintf("%s/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+                resp, err := client.client.Post(fmt.Sprintf("http://%s/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}", client.serverURL), "application/octet-stream", bytes.NewReader(input))
                 if err != nil {
                     return nil, fmt.Errorf("error posting request: %w", err)
                 }
@@ -89,8 +91,66 @@ import "bytes"
                 panic("unimplemented")
             }
         {{ else if (and (hasServerStream .) (hasClientStream .)) }}
-            func (client *{{ $sname }}) {{ (deref .Name ) }}() (in chan *{{ $resIn.ID }}, out chan *{{ $resOut.ID }}, err error) {
-                panic("unimplemented")
+            func (client *{{ $sname }}) {{ (deref .Name ) }}() (in chan<- *{{ $resIn.ID }}, out <-chan *{{ $resOut.ID }}, err error) {
+                u := url.URL{Scheme: "ws", Host: client.serverURL, Path: "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}"}
+
+                c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+                if err != nil {
+                    return nil, nil, err
+                }
+
+                inC := make(chan *{{ $resIn.ID }})
+                outC := make(chan *{{ $resOut.ID }})
+
+                go func() {
+                    defer c.Close()
+
+                    msgs := make(chan []byte)
+
+                    go func() {
+                        for {
+                            _, message, err := c.ReadMessage()
+                            if err != nil {
+                                close(msgs)
+                                break
+                            }
+                            msgs <- message
+                        }
+                    }()
+
+                    for {
+                        select {
+                        case msg, ok := <-msgs:
+                            if !ok {
+                                return
+                            }
+
+                            thing := new({{ $resOut.ID }})
+                            err = proto.Unmarshal(msg, thing)
+                            if err != nil {
+                                return
+                            }
+
+                            outC <- thing
+                        case send, ok := <-inC:
+                            if !ok {
+                                return
+                            }
+
+                            data, err := proto.Marshal(send)
+                            if err != nil {
+                                return
+                            }
+
+                            err = c.WriteMessage(websocket.BinaryMessage, data)
+                            if err != nil {
+                                return
+                            }
+                        }
+                    }
+                }()
+
+                return inC, outC, nil
             }
         {{ end }}
 

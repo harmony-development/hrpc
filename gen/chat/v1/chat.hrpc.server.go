@@ -144,7 +144,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.CreateGuild(req.Context(), nil, req.Header)
+			resp, err := h.Server.CreateGuild(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -177,7 +177,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.CreateInvite(req.Context(), nil, req.Header)
+			resp, err := h.Server.CreateInvite(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -210,7 +210,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.CreateChannel(req.Context(), nil, req.Header)
+			resp, err := h.Server.CreateChannel(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -243,7 +243,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.CreateEmotePack(req.Context(), nil, req.Header)
+			resp, err := h.Server.CreateEmotePack(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -276,7 +276,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildList(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetGuildList(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -309,7 +309,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.AddGuildToGuildList(req.Context(), nil, req.Header)
+			resp, err := h.Server.AddGuildToGuildList(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -342,7 +342,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.RemoveGuildFromGuildList(req.Context(), nil, req.Header)
+			resp, err := h.Server.RemoveGuildFromGuildList(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -375,7 +375,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuild(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetGuild(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -408,7 +408,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildInvites(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetGuildInvites(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -441,7 +441,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildMembers(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetGuildMembers(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -474,7 +474,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildChannels(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetGuildChannels(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -507,7 +507,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetChannelMessages(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetChannelMessages(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -540,7 +540,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetMessage(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetMessage(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -573,7 +573,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetEmotePacks(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetEmotePacks(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -606,7 +606,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetEmotePackEmotes(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetEmotePackEmotes(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -639,7 +639,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.UpdateGuildInformation(req.Context(), nil, req.Header)
+			resp, err := h.Server.UpdateGuildInformation(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -672,7 +672,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.UpdateChannelInformation(req.Context(), nil, req.Header)
+			resp, err := h.Server.UpdateChannelInformation(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -705,7 +705,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.UpdateChannelOrder(req.Context(), nil, req.Header)
+			resp, err := h.Server.UpdateChannelOrder(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -738,7 +738,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.UpdateMessage(req.Context(), nil, req.Header)
+			resp, err := h.Server.UpdateMessage(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -771,7 +771,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.AddEmoteToPack(req.Context(), nil, req.Header)
+			resp, err := h.Server.AddEmoteToPack(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -804,7 +804,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteGuild(req.Context(), nil, req.Header)
+			resp, err := h.Server.DeleteGuild(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -837,7 +837,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteInvite(req.Context(), nil, req.Header)
+			resp, err := h.Server.DeleteInvite(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -870,7 +870,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteChannel(req.Context(), nil, req.Header)
+			resp, err := h.Server.DeleteChannel(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -903,7 +903,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteMessage(req.Context(), nil, req.Header)
+			resp, err := h.Server.DeleteMessage(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -936,7 +936,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteEmoteFromPack(req.Context(), nil, req.Header)
+			resp, err := h.Server.DeleteEmoteFromPack(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -969,7 +969,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteEmotePack(req.Context(), nil, req.Header)
+			resp, err := h.Server.DeleteEmotePack(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1002,7 +1002,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DequipEmotePack(req.Context(), nil, req.Header)
+			resp, err := h.Server.DequipEmotePack(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1035,7 +1035,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.JoinGuild(req.Context(), nil, req.Header)
+			resp, err := h.Server.JoinGuild(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1068,7 +1068,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.LeaveGuild(req.Context(), nil, req.Header)
+			resp, err := h.Server.LeaveGuild(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1101,7 +1101,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.TriggerAction(req.Context(), nil, req.Header)
+			resp, err := h.Server.TriggerAction(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1134,7 +1134,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.SendMessage(req.Context(), nil, req.Header)
+			resp, err := h.Server.SendMessage(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1167,7 +1167,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.QueryHasPermission(req.Context(), nil, req.Header)
+			resp, err := h.Server.QueryHasPermission(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1200,7 +1200,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.SetPermissions(req.Context(), nil, req.Header)
+			resp, err := h.Server.SetPermissions(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1233,7 +1233,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetPermissions(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetPermissions(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1266,7 +1266,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.MoveRole(req.Context(), nil, req.Header)
+			resp, err := h.Server.MoveRole(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1299,7 +1299,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildRoles(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetGuildRoles(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1332,7 +1332,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.AddGuildRole(req.Context(), nil, req.Header)
+			resp, err := h.Server.AddGuildRole(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1365,7 +1365,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.ModifyGuildRole(req.Context(), nil, req.Header)
+			resp, err := h.Server.ModifyGuildRole(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1398,7 +1398,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteGuildRole(req.Context(), nil, req.Header)
+			resp, err := h.Server.DeleteGuildRole(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1431,7 +1431,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.ManageUserRoles(req.Context(), nil, req.Header)
+			resp, err := h.Server.ManageUserRoles(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1464,7 +1464,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetUserRoles(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetUserRoles(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1622,7 +1622,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetUser(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetUser(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1655,7 +1655,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetUserMetadata(req.Context(), nil, req.Header)
+			resp, err := h.Server.GetUserMetadata(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1688,7 +1688,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.ProfileUpdate(req.Context(), nil, req.Header)
+			resp, err := h.Server.ProfileUpdate(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1721,7 +1721,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.Typing(req.Context(), nil, req.Header)
+			resp, err := h.Server.Typing(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1754,7 +1754,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.PreviewGuild(req.Context(), nil, req.Header)
+			resp, err := h.Server.PreviewGuild(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {

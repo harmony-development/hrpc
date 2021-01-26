@@ -4,6 +4,8 @@ import "net/http"
 import "google.golang.org/protobuf/proto"
 import "io/ioutil"
 import "fmt"
+import "github.com/gorilla/websocket"
+import "net/url"
 import "bytes"
 
 import "github.com/harmony-development/legato/gen/mediaproxy/v1"
@@ -25,7 +27,7 @@ func (client *MediaProxyServiceClient) FetchLinkMetadata(r *v1.FetchLinkMetadata
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.mediaproxy.v1.MediaProxyService/FetchLinkMetadata", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.mediaproxy.v1.MediaProxyService/FetchLinkMetadata", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}
@@ -47,7 +49,7 @@ func (client *MediaProxyServiceClient) InstantView(r *v1.InstantViewRequest) (*v
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.mediaproxy.v1.MediaProxyService/InstantView", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.mediaproxy.v1.MediaProxyService/InstantView", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}
@@ -69,7 +71,7 @@ func (client *MediaProxyServiceClient) CanInstantView(r *v1.InstantViewRequest) 
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("%s/protocol.mediaproxy.v1.MediaProxyService/CanInstantView", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/protocol.mediaproxy.v1.MediaProxyService/CanInstantView", client.serverURL), "application/octet-stream", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}

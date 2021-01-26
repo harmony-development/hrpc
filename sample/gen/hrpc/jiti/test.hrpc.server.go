@@ -1,16 +1,15 @@
 package jiti
 
-import (
-	"context"
-	"io/ioutil"
-	"net/http"
-
-	"github.com/gorilla/websocket"
-	"google.golang.org/protobuf/proto"
-)
+import "context"
+import "net/http"
+import "io/ioutil"
+import "google.golang.org/protobuf/proto"
+import "github.com/gorilla/websocket"
 
 type MuServer interface {
 	Mu(ctx context.Context, r *Ping, headers http.Header) (resp *Pong, err error)
+
+	MuMute(ctx context.Context, in chan *Ping, out chan *Pong, headers http.Header)
 }
 
 type MuHandler struct {
@@ -64,6 +63,99 @@ func (h *MuHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				h.ErrorHandler(err, w)
 				return
 			}
+		}
+
+	case "/test.Mu/MuMute":
+		{
+			var err error
+
+			in := make(chan *Ping)
+			err = nil
+
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			out := make(chan *Pong)
+
+			ws, err := h.upgrader.Upgrade(w, req, nil)
+			if err != nil {
+				h.ErrorHandler(err, w)
+				return
+			}
+
+			go func() {
+
+				msgs := make(chan []byte)
+
+				go func() {
+					for {
+						_, message, err := ws.ReadMessage()
+						if err != nil {
+							close(msgs)
+							break
+						}
+						msgs <- message
+					}
+				}()
+
+				defer ws.WriteMessage(websocket.CloseMessage, []byte{})
+
+				for {
+					select {
+
+					case data, ok := <-msgs:
+						if !ok {
+							return
+						}
+
+						item := new(Ping)
+						err = proto.Unmarshal(data, item)
+						if err != nil {
+							close(in)
+							close(out)
+							return
+						}
+
+						in <- item
+
+					case msg, ok := <-out:
+						if !ok {
+							return
+						}
+
+						w, err := ws.NextWriter(websocket.BinaryMessage)
+						if err != nil {
+
+							close(in)
+
+							close(out)
+							return
+						}
+
+						response, err := proto.Marshal(msg)
+						if err != nil {
+
+							close(in)
+
+							close(out)
+							return
+						}
+
+						w.Write(response)
+						if err := w.Close(); err != nil {
+
+							close(in)
+
+							close(out)
+							return
+						}
+					}
+				}
+			}()
+
+			h.Server.MuMute(req.Context(), in, out, req.Header)
 		}
 
 	}

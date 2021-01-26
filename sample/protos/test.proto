@@ -13,4 +13,5 @@ message Pong {
 
 service Mu {
     rpc Mu(Ping) returns (Pong);
+    rpc MuMute(stream Ping) returns (stream Pong);
 }

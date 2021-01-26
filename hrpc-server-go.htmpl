@@ -148,11 +148,43 @@ import "github.com/gorilla/websocket"
             }
 
             go func() {
+                {{ if (hasClientStream .) }}
+                msgs := make(chan []byte)
+
+                go func() {
+                    for {
+                        _, message, err := ws.ReadMessage()
+                        if err != nil {
+                            close(msgs)
+                            break
+                        }
+                        msgs <- message
+                    }
+                }()
+                {{ end }}
+
+                defer ws.WriteMessage(websocket.CloseMessage, []byte{})
+
                 for {
                     select {
+                    {{ if (hasClientStream .) }}
+                    case data, ok := <-msgs:
+                        if !ok {
+                            return
+                        }
+
+                        item := new({{ $resIn.ID }})
+                        err = proto.Unmarshal(data, item)
+                        if err != nil {
+                            close(in)
+                            close(out)
+                            return
+                        }
+
+                        in <- item
+                    {{ end }}
                     case msg, ok := <-out:
                         if !ok {
-                            ws.WriteMessage(websocket.CloseMessage, []byte{})
                             return
                         }
 
