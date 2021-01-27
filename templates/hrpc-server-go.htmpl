@@ -1,5 +1,4 @@
-{{ $base := (trimSuffix (filepathBase .Name) ".proto") }}
-{{ setFilename (sprintf "%s/%s.hrpc.server.go" (deref .Options.GoPackage) $base) }}
+{{ setFilename (goFilename . "server") }}
 
 {{ $item := . }}
 

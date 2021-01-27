@@ -9,6 +9,8 @@ import (
 	"reflect"
 	"strings"
 	"text/template"
+	"unicode"
+	"unicode/utf8"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -18,6 +20,72 @@ import (
 type QualPair struct {
 	Package string
 	ID      string
+}
+
+func badToUnderscore(r rune) rune {
+	if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
+		return r
+	}
+	return '_'
+}
+
+var isGoKeyword = map[string]bool{
+	"break":       true,
+	"case":        true,
+	"chan":        true,
+	"const":       true,
+	"continue":    true,
+	"default":     true,
+	"else":        true,
+	"defer":       true,
+	"fallthrough": true,
+	"for":         true,
+	"func":        true,
+	"go":          true,
+	"goto":        true,
+	"if":          true,
+	"import":      true,
+	"interface":   true,
+	"map":         true,
+	"package":     true,
+	"range":       true,
+	"return":      true,
+	"select":      true,
+	"struct":      true,
+	"switch":      true,
+	"type":        true,
+	"var":         true,
+}
+
+func cleanPackageName(name string) string {
+	name = strings.Map(badToUnderscore, name)
+	// Identifier must not be keyword or predeclared identifier: insert _.
+	if isGoKeyword[name] {
+		name = "_" + name
+	}
+	// Identifier must not begin with digit: insert _.
+	if r, _ := utf8.DecodeRuneInString(name); unicode.IsDigit(r) {
+		name = "_" + name
+	}
+	return name
+}
+
+func goPackageOption(d *descriptorpb.FileDescriptorProto) (impPath string, pkg string, ok bool) {
+	opt := d.GetOptions().GetGoPackage()
+	if opt == "" {
+		return "", "", false
+	}
+	// A semicolon-delimited suffix delimits the import path and package name.
+	sc := strings.Index(opt, ";")
+	if sc >= 0 {
+		return opt[:sc], cleanPackageName(opt[sc+1:]), true
+	}
+	// The presence of a slash implies there's an import path.
+	slash := strings.LastIndex(opt, "/")
+	if slash >= 0 {
+		return opt, cleanPackageName(opt[slash+1:]), true
+	}
+	return "", cleanPackageName(opt), true
 }
 
 func main() {
@@ -59,6 +127,21 @@ func main() {
 		"hasServerStream": func(v *descriptorpb.MethodDescriptorProto) bool {
 			return v.ServerStreaming != nil && *v.ServerStreaming
 		},
+		"goFilename": func(item *descriptorpb.FileDescriptorProto, interfix string) string {
+			name := *item.Name
+			if ext := path.Ext(name); ext == ".proto" || ext == ".protodevel" {
+				name = name[:len(name)-len(ext)]
+			}
+			name += ".hrpc." + interfix + ".go"
+
+			if importPath, _, ok := goPackageOption(item); ok && importPath != "" {
+				_, name = path.Split(name)
+				name = path.Join(importPath, name)
+				return name
+			}
+
+			return name
+		},
 		"resolvedGoType": func(item *descriptorpb.FileDescriptorProto, method *descriptorpb.MethodDescriptorProto, in string) QualPair {
 			wellKnown := map[string]QualPair{
 				".google.protobuf.Empty": {
@@ -98,7 +181,7 @@ func main() {
 		},
 	})
 
-	data, err = FSByte(false, *gen.Parameter)
+	data, err = FSByte(true, *gen.Parameter)
 	if err != nil {
 		data, err = ioutil.ReadFile(*gen.Parameter)
 		if err != nil {
