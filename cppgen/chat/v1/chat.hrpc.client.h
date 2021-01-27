@@ -4,7 +4,7 @@
 #include <QNetworkReply>
 #include <QString>
 #include <variant>
-// #include <QtWebSockets>
+#include <QWebSocket>
 #include "google/protobuf/empty.pb.h"
 #include "harmonytypes/v1/types.pb.h"
 #include "chat/v1/profile.pb.h"
@@ -15,11 +15,65 @@
 #include "chat/v1/permissions.pb.h"
 #include "chat/v1/streaming.pb.h"
 #include "chat/v1/postbox.pb.h"
+
+class Receive__protocol_chat_v1_Event__Send__protocol_chat_v1_StreamEventsRequest__Stream : public QWebSocket {
+	
+	Q_OBJECT
+
+	public: Q_SIGNAL void receivedMessage(protocol::chat::v1::Event msg);
+
+	public: Receive__protocol_chat_v1_Event__Send__protocol_chat_v1_StreamEventsRequest__Stream(const QString &origin = QString(), QWebSocketProtocol::Version version = QWebSocketProtocol::VersionLatest, QObject *parent = nullptr) : QWebSocket(origin, version, parent)
+	{
+		connect(this, &QWebSocket::binaryMessageReceived, [=](const QByteArray& msg) {
+			protocol::chat::v1::Event incoming;
+
+			if (!incoming.ParseFromArray(msg.constData(), msg.length())) {
+				return;
+			}
+
+			Q_EMIT receivedMessage(incoming);
+		});
+	}
+
+
+	public: bool send(const protocol::chat::v1::StreamEventsRequest& in) {
+		QByteArray data = QByteArray::fromStdString(in.SerializeAsString());
+		if (data.length() == 0) {
+			return false;
+		}
+
+		auto count = sendBinaryMessage(data);
+		return count == data.length();
+	}
+};
+
+class Receive__protocol_chat_v1_SyncEvent__Stream : public QWebSocket {
+	
+	Q_OBJECT
+
+	public: Q_SIGNAL void receivedMessage(protocol::chat::v1::SyncEvent msg);
+
+	public: Receive__protocol_chat_v1_SyncEvent__Stream(const QString &origin = QString(), QWebSocketProtocol::Version version = QWebSocketProtocol::VersionLatest, QObject *parent = nullptr) : QWebSocket(origin, version, parent)
+	{
+		connect(this, &QWebSocket::binaryMessageReceived, [=](const QByteArray& msg) {
+			protocol::chat::v1::SyncEvent incoming;
+
+			if (!incoming.ParseFromArray(msg.constData(), msg.length())) {
+				return;
+			}
+
+			Q_EMIT receivedMessage(incoming);
+		});
+	}
+
+};
+
 class ChatServiceServiceClient {
 	QString host;
 	bool secure;
 	QSharedPointer<QNetworkAccessManager> nam;
 	QString httpProtocol() const { return secure ? QStringLiteral("https://") : QStringLiteral("http://"); }
+	QString wsProtocol() const { return secure ? QStringLiteral("wss://") : QStringLiteral("ws://"); }
 	explicit ChatServiceServiceClient(const QString& host, bool secure) : host(host), secure(secure), nam(new QNetworkAccessManager) {}
 public:
 	template<typename T> using Result = std::variant<T, QString>;
@@ -64,7 +118,7 @@ public:
 	Result<google::protobuf::Empty> DeleteGuildRole(const protocol::chat::v1::DeleteGuildRoleRequest& in, QMap<QByteArray,QString> headers = {});
 	Result<google::protobuf::Empty> ManageUserRoles(const protocol::chat::v1::ManageUserRolesRequest& in, QMap<QByteArray,QString> headers = {});
 	Result<protocol::chat::v1::GetUserRolesResponse> GetUserRoles(const protocol::chat::v1::GetUserRolesRequest& in, QMap<QByteArray,QString> headers = {});
-// todo client <-> server stream
+	Receive__protocol_chat_v1_Event__Send__protocol_chat_v1_StreamEventsRequest__Stream* StreamEvents();
 // todo client <- server stream
 	Result<protocol::chat::v1::GetUserResponse> GetUser(const protocol::chat::v1::GetUserRequest& in, QMap<QByteArray,QString> headers = {});
 	Result<protocol::chat::v1::GetUserMetadataResponse> GetUserMetadata(const protocol::chat::v1::GetUserMetadataRequest& in, QMap<QByteArray,QString> headers = {});

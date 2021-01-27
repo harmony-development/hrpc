@@ -38,7 +38,7 @@ func getImports(d *descriptorpb.FileDescriptorProto) string {
 	for _, kind := range d.Service {
 		for _, meth := range kind.Method {
 			if meth.GetClientStreaming() || meth.GetServerStreaming() {
-				add(`// #include <QtWebSockets>`)
+				add(`#include <QWebSocket>`)
 			}
 		}
 	}
@@ -54,11 +54,103 @@ func typeToCxxNamespaces(s string) string {
 	return strings.ReplaceAll(s[1:], ".", "::")
 }
 
+type sPair struct {
+	fromServ string
+	fromClie string
+}
+
+func generateClientSockets(d *descriptorpb.FileDescriptorProto) string {
+	sb := strings.Builder{}
+
+	add := func(s string) { sb.WriteString(s + "\n") }
+
+	bidiPairs := []sPair{}
+	unidiPairs := []sPair{}
+
+	addPair := func(fromS, fromC string, to *[]sPair) {
+		for _, item := range *to {
+			if item.fromClie == fromC && item.fromServ == fromS {
+				continue
+			}
+		}
+
+		*to = append(*to, sPair{fromServ: fromS, fromClie: fromC})
+	}
+
+	sane := func(s string) string { return strings.ReplaceAll(typeToCxxNamespaces(s), "::", "_") }
+
+	for _, service := range d.Service {
+		for _, meth := range service.Method {
+			if meth.GetClientStreaming() && !meth.GetServerStreaming() {
+				continue
+			} else if meth.GetClientStreaming() && meth.GetServerStreaming() {
+				addPair(meth.GetOutputType(), meth.GetInputType(), &bidiPairs)
+			} else if meth.GetServerStreaming() && !meth.GetClientStreaming() {
+				addPair(meth.GetOutputType(), meth.GetInputType(), &unidiPairs)
+			}
+		}
+	}
+
+	mixin := func(receiveType, class string) string {
+		return fmt.Sprintf(
+			`
+	Q_OBJECT
+
+	public: Q_SIGNAL void receivedMessage(%s msg);
+
+	public: %s(const QString &origin = QString(), QWebSocketProtocol::Version version = QWebSocketProtocol::VersionLatest, QObject *parent = nullptr) : QWebSocket(origin, version, parent)
+	{
+		connect(this, &QWebSocket::binaryMessageReceived, [=](const QByteArray& msg) {
+			%s incoming;
+
+			if (!incoming.ParseFromArray(msg.constData(), msg.length())) {
+				return;
+			}
+
+			Q_EMIT receivedMessage(incoming);
+		});
+	}
+`,
+			receiveType, class, receiveType,
+		)
+	}
+
+	for _, pair := range bidiPairs {
+		className := fmt.Sprintf(`Receive__%s__Send__%s__Stream`, sane(pair.fromServ), sane(pair.fromClie))
+
+		add(fmt.Sprintf(`
+class %s : public QWebSocket {
+	%s
+
+	public: bool send(const %s& in) {
+		QByteArray data = QByteArray::fromStdString(in.SerializeAsString());
+		if (data.length() == 0) {
+			return false;
+		}
+
+		auto count = sendBinaryMessage(data);
+		return count == data.length();
+	}
+};`, className, mixin(typeToCxxNamespaces(pair.fromServ), className), typeToCxxNamespaces(pair.fromClie)))
+	}
+	for _, pair := range unidiPairs {
+		className := fmt.Sprintf("Receive__%s__Stream", sane(pair.fromServ))
+		add(fmt.Sprintf(`
+class %s : public QWebSocket {
+	%s
+};`, className, mixin(typeToCxxNamespaces(pair.fromServ), className)))
+	}
+
+	return sb.String()
+}
+
 func generateClientHeader(d *descriptorpb.FileDescriptorProto) string {
 	sb := strings.Builder{}
 	sb.WriteString(getImports(d))
 
 	add := func(s string) { sb.WriteString(s + "\n") }
+
+	add(generateClientSockets(d))
 
 	for _, service := range d.Service {
 		add(fmt.Sprintf("class %sServiceClient {", *service.Name))
@@ -66,6 +158,7 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto) string {
 		add(fmt.Sprintf(`	bool secure;`))
 		add(fmt.Sprintf(`	QSharedPointer<QNetworkAccessManager> nam;`))
 		add(fmt.Sprintf(`	QString httpProtocol() const { return secure ? QStringLiteral("https://") : QStringLiteral("http://"); }`))
+		add(fmt.Sprintf(`	QString wsProtocol() const { return secure ? QStringLiteral("wss://") : QStringLiteral("ws://"); }`))
 		add(fmt.Sprintf("\texplicit %sServiceClient(const QString& host, bool secure) : host(host), secure(secure), nam(new QNetworkAccessManager) {}", *service.Name))
 		add(`public:`)
 		add(`	template<typename T> using Result = std::variant<T, QString>;`)
@@ -74,7 +167,17 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto) string {
 				if meth.GetClientStreaming() && !meth.GetServerStreaming() {
 					continue
 				} else if meth.GetClientStreaming() && meth.GetServerStreaming() {
-					add(`// todo client <-> server stream`)
+					sane := func(s string) string { return strings.ReplaceAll(typeToCxxNamespaces(s), "::", "_") }
+					className := fmt.Sprintf(`Receive__%s__Send__%s__Stream`, sane(meth.GetOutputType()), sane(meth.GetInputType()))
+
+					add(
+						fmt.Sprintf(
+							"\t%s* %s();",
+
+							className,
+							meth.GetName(),
+						),
+					)
 				} else if meth.GetServerStreaming() && !meth.GetClientStreaming() {
 					add(`// todo client <- server stream`)
 				} else {
@@ -110,7 +213,23 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 			if meth.GetClientStreaming() && !meth.GetServerStreaming() {
 				continue
 			} else if meth.GetClientStreaming() && meth.GetServerStreaming() {
-				add(`// todo client <-> server stream`)
+				sane := func(s string) string { return strings.ReplaceAll(typeToCxxNamespaces(s), "::", "_") }
+				className := fmt.Sprintf(`Receive__%s__Send__%s__Stream`, sane(meth.GetOutputType()), sane(meth.GetInputType()))
+
+				add(
+					fmt.Sprintf(
+						"auto %sServiceClient::%s() -> %s*",
+
+						service.GetName(),
+						meth.GetName(),
+						className,
+					),
+				)
+				add(`{`)
+				add(fmt.Sprintf(`	auto sock = new %s();`, className))
+				add(`	sock->open(QUrl(wsProtocol()+host));`)
+				add(`	return sock;`)
+				add(`}`)
 			} else if meth.GetServerStreaming() && !meth.GetClientStreaming() {
 				add(`// todo client <- server stream`)
 			} else {

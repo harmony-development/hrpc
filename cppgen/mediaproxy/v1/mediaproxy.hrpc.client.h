@@ -5,11 +5,13 @@
 #include <QString>
 #include <variant>
 #include "harmonytypes/v1/types.pb.h"
+
 class MediaProxyServiceServiceClient {
 	QString host;
 	bool secure;
 	QSharedPointer<QNetworkAccessManager> nam;
 	QString httpProtocol() const { return secure ? QStringLiteral("https://") : QStringLiteral("http://"); }
+	QString wsProtocol() const { return secure ? QStringLiteral("wss://") : QStringLiteral("ws://"); }
 	explicit MediaProxyServiceServiceClient(const QString& host, bool secure) : host(host), secure(secure), nam(new QNetworkAccessManager) {}
 public:
 	template<typename T> using Result = std::variant<T, QString>;

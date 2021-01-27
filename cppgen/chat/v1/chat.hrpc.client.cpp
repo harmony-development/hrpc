@@ -1434,7 +1434,12 @@ auto ChatServiceServiceClient::GetUserRoles(const protocol::chat::v1::GetUserRol
 	return {ret};
 
 }
-// todo client <-> server stream
+auto ChatServiceServiceClient::StreamEvents() -> Receive__protocol_chat_v1_Event__Send__protocol_chat_v1_StreamEventsRequest__Stream*
+{
+	auto sock = new Receive__protocol_chat_v1_Event__Send__protocol_chat_v1_StreamEventsRequest__Stream();
+	sock->open(QUrl(wsProtocol()+host));
+	return sock;
+}
 // todo client <- server stream
 auto ChatServiceServiceClient::GetUser(const protocol::chat::v1::GetUserRequest& in, QMap<QByteArray,QString> headers) -> ChatServiceServiceClient::Result<protocol::chat::v1::GetUserResponse>
 {

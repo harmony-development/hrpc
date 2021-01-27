@@ -4,13 +4,36 @@
 #include <QNetworkReply>
 #include <QString>
 #include <variant>
-// #include <QtWebSockets>
+#include <QWebSocket>
 #include "google/protobuf/empty.pb.h"
+
+class Receive__protocol_auth_v1_AuthStep__Stream : public QWebSocket {
+	
+	Q_OBJECT
+
+	public: Q_SIGNAL void receivedMessage(protocol::auth::v1::AuthStep msg);
+
+	public: Receive__protocol_auth_v1_AuthStep__Stream(const QString &origin = QString(), QWebSocketProtocol::Version version = QWebSocketProtocol::VersionLatest, QObject *parent = nullptr) : QWebSocket(origin, version, parent)
+	{
+		connect(this, &QWebSocket::binaryMessageReceived, [=](const QByteArray& msg) {
+			protocol::auth::v1::AuthStep incoming;
+
+			if (!incoming.ParseFromArray(msg.constData(), msg.length())) {
+				return;
+			}
+
+			Q_EMIT receivedMessage(incoming);
+		});
+	}
+
+};
+
 class AuthServiceServiceClient {
 	QString host;
 	bool secure;
 	QSharedPointer<QNetworkAccessManager> nam;
 	QString httpProtocol() const { return secure ? QStringLiteral("https://") : QStringLiteral("http://"); }
+	QString wsProtocol() const { return secure ? QStringLiteral("wss://") : QStringLiteral("ws://"); }
 	explicit AuthServiceServiceClient(const QString& host, bool secure) : host(host), secure(secure), nam(new QNetworkAccessManager) {}
 public:
 	template<typename T> using Result = std::variant<T, QString>;
