@@ -99,6 +99,36 @@ func main() {
 		panic(err)
 	}
 
+	builtins := map[string]func(d *pluginpb.CodeGeneratorRequest) *pluginpb.CodeGeneratorResponse{
+		"qt_cpp_client": GenerateQtCxxClient,
+	}
+
+	if fn, ok := builtins[*gen.Parameter]; ok {
+		r := fn(&gen)
+
+		msg, err := proto.Marshal(r)
+		if err != nil {
+			panic(err)
+		}
+
+		os.Stdout.Write(msg)
+
+		return
+	}
+
+	if *gen.Parameter == "qt_cpp_client" {
+		resp := pluginpb.CodeGeneratorResponse{}
+
+		msg, err := proto.Marshal(&resp)
+		if err != nil {
+			panic(err)
+		}
+
+		os.Stdout.Write(msg)
+
+		return
+	}
+
 	fname := string("")
 	setFName := func(f string) string {
 		fname = f
