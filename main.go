@@ -98,9 +98,12 @@ func main() {
 		},
 	})
 
-	data, err = ioutil.ReadFile(*gen.Parameter)
+	data, err = FSByte(false, *gen.Parameter)
 	if err != nil {
-		panic(err)
+		data, err = ioutil.ReadFile(*gen.Parameter)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	tmpl, err = tmpl.Parse(string(data))

@@ -8,8 +8,6 @@ import "github.com/gorilla/websocket"
 import "net/url"
 import "bytes"
 
-import "github.com/harmony-development/legato/gen/voice/v1"
-
 type VoiceServiceClient struct {
 	client    *http.Client
 	serverURL string
@@ -22,7 +20,7 @@ func NewVoiceServiceClient(url string) *VoiceServiceClient {
 	}
 }
 
-func (client *VoiceServiceClient) Connect() (in chan *v1.ClientSignal, out chan *v1.Signal, err error) {
+func (client *VoiceServiceClient) Connect() (in chan<- *ClientSignal, out <-chan *Signal, err error) {
 	u := url.URL{Scheme: "ws", Host: client.serverURL, Path: "/protocol.voice.v1.VoiceService/Connect"}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -30,8 +28,8 @@ func (client *VoiceServiceClient) Connect() (in chan *v1.ClientSignal, out chan 
 		return nil, nil, err
 	}
 
-	in = make(chan *v1.ClientSignal)
-	out = make(chan *v1.Signal)
+	inC := make(chan *ClientSignal)
+	outC := make(chan *Signal)
 
 	go func() {
 		defer c.Close()
@@ -52,11 +50,34 @@ func (client *VoiceServiceClient) Connect() (in chan *v1.ClientSignal, out chan 
 		for {
 			select {
 			case msg, ok := <-msgs:
-				thing := new(v1.Signal)
-				proto.Unmarshal
+				if !ok {
+					return
+				}
+
+				thing := new(Signal)
+				err = proto.Unmarshal(msg, thing)
+				if err != nil {
+					return
+				}
+
+				outC <- thing
+			case send, ok := <-inC:
+				if !ok {
+					return
+				}
+
+				data, err := proto.Marshal(send)
+				if err != nil {
+					return
+				}
+
+				err = c.WriteMessage(websocket.BinaryMessage, data)
+				if err != nil {
+					return
+				}
 			}
 		}
 	}()
 
-	return in, out, nil
+	return inC, outC, nil
 }

@@ -8,22 +8,20 @@ import "github.com/gorilla/websocket"
 
 import "github.com/golang/protobuf/ptypes/empty"
 
-import "github.com/harmony-development/legato/gen/auth/v1"
-
 type AuthServiceServer interface {
-	Federate(ctx context.Context, r *v1.FederateRequest, headers http.Header) (resp *v1.FederateReply, err error)
+	Federate(ctx context.Context, r *FederateRequest, headers http.Header) (resp *FederateReply, err error)
 
-	LoginFederated(ctx context.Context, r *v1.LoginFederatedRequest, headers http.Header) (resp *v1.Session, err error)
+	LoginFederated(ctx context.Context, r *LoginFederatedRequest, headers http.Header) (resp *Session, err error)
 
-	Key(ctx context.Context, r *empty.Empty, headers http.Header) (resp *v1.KeyReply, err error)
+	Key(ctx context.Context, r *empty.Empty, headers http.Header) (resp *KeyReply, err error)
 
-	BeginAuth(ctx context.Context, r *empty.Empty, headers http.Header) (resp *v1.BeginAuthResponse, err error)
+	BeginAuth(ctx context.Context, r *empty.Empty, headers http.Header) (resp *BeginAuthResponse, err error)
 
-	NextStep(ctx context.Context, r *v1.NextStepRequest, headers http.Header) (resp *v1.AuthStep, err error)
+	NextStep(ctx context.Context, r *NextStepRequest, headers http.Header) (resp *AuthStep, err error)
 
-	StepBack(ctx context.Context, r *v1.StepBackRequest, headers http.Header) (resp *v1.AuthStep, err error)
+	StepBack(ctx context.Context, r *StepBackRequest, headers http.Header) (resp *AuthStep, err error)
 
-	StreamSteps(ctx context.Context, r *v1.StreamStepsRequest, out chan *v1.AuthStep, headers http.Header)
+	StreamSteps(ctx context.Context, r *StreamStepsRequest, out chan *AuthStep, headers http.Header)
 }
 
 type AuthServiceHandler struct {
@@ -55,7 +53,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.FederateRequest)
+			requestProto := new(FederateRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -88,7 +86,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.LoginFederatedRequest)
+			requestProto := new(LoginFederatedRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -187,7 +185,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.NextStepRequest)
+			requestProto := new(NextStepRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -220,7 +218,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.StepBackRequest)
+			requestProto := new(StepBackRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -255,7 +253,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			in := new(v1.StreamStepsRequest)
+			in := new(StreamStepsRequest)
 			err = proto.Unmarshal(body, in)
 
 			if err != nil {
@@ -263,7 +261,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			out := make(chan *v1.AuthStep)
+			out := make(chan *AuthStep)
 
 			ws, err := h.upgrader.Upgrade(w, req, nil)
 			if err != nil {
@@ -272,11 +270,14 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			go func() {
+
+				defer ws.WriteMessage(websocket.CloseMessage, []byte{})
+
 				for {
 					select {
+
 					case msg, ok := <-out:
 						if !ok {
-							ws.WriteMessage(websocket.CloseMessage, []byte{})
 							return
 						}
 

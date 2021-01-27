@@ -10,8 +10,6 @@ import "bytes"
 
 import "github.com/golang/protobuf/ptypes/empty"
 
-import "github.com/harmony-development/legato/gen/chat/v1"
-
 type ChatServiceClient struct {
 	client    *http.Client
 	serverURL string
@@ -24,7 +22,7 @@ func NewChatServiceClient(url string) *ChatServiceClient {
 	}
 }
 
-func (client *ChatServiceClient) CreateGuild(r *v1.CreateGuildRequest) (*v1.CreateGuildResponse, error) {
+func (client *ChatServiceClient) CreateGuild(r *CreateGuildRequest) (*CreateGuildResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -38,7 +36,7 @@ func (client *ChatServiceClient) CreateGuild(r *v1.CreateGuildRequest) (*v1.Crea
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.CreateGuildResponse{}
+	output := &CreateGuildResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -46,7 +44,7 @@ func (client *ChatServiceClient) CreateGuild(r *v1.CreateGuildRequest) (*v1.Crea
 	return output, nil
 }
 
-func (client *ChatServiceClient) CreateInvite(r *v1.CreateInviteRequest) (*v1.CreateInviteResponse, error) {
+func (client *ChatServiceClient) CreateInvite(r *CreateInviteRequest) (*CreateInviteResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -60,7 +58,7 @@ func (client *ChatServiceClient) CreateInvite(r *v1.CreateInviteRequest) (*v1.Cr
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.CreateInviteResponse{}
+	output := &CreateInviteResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -68,7 +66,7 @@ func (client *ChatServiceClient) CreateInvite(r *v1.CreateInviteRequest) (*v1.Cr
 	return output, nil
 }
 
-func (client *ChatServiceClient) CreateChannel(r *v1.CreateChannelRequest) (*v1.CreateChannelResponse, error) {
+func (client *ChatServiceClient) CreateChannel(r *CreateChannelRequest) (*CreateChannelResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -82,7 +80,7 @@ func (client *ChatServiceClient) CreateChannel(r *v1.CreateChannelRequest) (*v1.
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.CreateChannelResponse{}
+	output := &CreateChannelResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -90,7 +88,7 @@ func (client *ChatServiceClient) CreateChannel(r *v1.CreateChannelRequest) (*v1.
 	return output, nil
 }
 
-func (client *ChatServiceClient) CreateEmotePack(r *v1.CreateEmotePackRequest) (*v1.CreateEmotePackResponse, error) {
+func (client *ChatServiceClient) CreateEmotePack(r *CreateEmotePackRequest) (*CreateEmotePackResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -104,7 +102,7 @@ func (client *ChatServiceClient) CreateEmotePack(r *v1.CreateEmotePackRequest) (
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.CreateEmotePackResponse{}
+	output := &CreateEmotePackResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -112,7 +110,7 @@ func (client *ChatServiceClient) CreateEmotePack(r *v1.CreateEmotePackRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetGuildList(r *v1.GetGuildListRequest) (*v1.GetGuildListResponse, error) {
+func (client *ChatServiceClient) GetGuildList(r *GetGuildListRequest) (*GetGuildListResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -126,7 +124,7 @@ func (client *ChatServiceClient) GetGuildList(r *v1.GetGuildListRequest) (*v1.Ge
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetGuildListResponse{}
+	output := &GetGuildListResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -134,7 +132,7 @@ func (client *ChatServiceClient) GetGuildList(r *v1.GetGuildListRequest) (*v1.Ge
 	return output, nil
 }
 
-func (client *ChatServiceClient) AddGuildToGuildList(r *v1.AddGuildToGuildListRequest) (*v1.AddGuildToGuildListResponse, error) {
+func (client *ChatServiceClient) AddGuildToGuildList(r *AddGuildToGuildListRequest) (*AddGuildToGuildListResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -148,7 +146,7 @@ func (client *ChatServiceClient) AddGuildToGuildList(r *v1.AddGuildToGuildListRe
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.AddGuildToGuildListResponse{}
+	output := &AddGuildToGuildListResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -156,7 +154,7 @@ func (client *ChatServiceClient) AddGuildToGuildList(r *v1.AddGuildToGuildListRe
 	return output, nil
 }
 
-func (client *ChatServiceClient) RemoveGuildFromGuildList(r *v1.RemoveGuildFromGuildListRequest) (*v1.RemoveGuildFromGuildListResponse, error) {
+func (client *ChatServiceClient) RemoveGuildFromGuildList(r *RemoveGuildFromGuildListRequest) (*RemoveGuildFromGuildListResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -170,7 +168,7 @@ func (client *ChatServiceClient) RemoveGuildFromGuildList(r *v1.RemoveGuildFromG
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.RemoveGuildFromGuildListResponse{}
+	output := &RemoveGuildFromGuildListResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -178,7 +176,7 @@ func (client *ChatServiceClient) RemoveGuildFromGuildList(r *v1.RemoveGuildFromG
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetGuild(r *v1.GetGuildRequest) (*v1.GetGuildResponse, error) {
+func (client *ChatServiceClient) GetGuild(r *GetGuildRequest) (*GetGuildResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -192,7 +190,7 @@ func (client *ChatServiceClient) GetGuild(r *v1.GetGuildRequest) (*v1.GetGuildRe
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetGuildResponse{}
+	output := &GetGuildResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -200,7 +198,7 @@ func (client *ChatServiceClient) GetGuild(r *v1.GetGuildRequest) (*v1.GetGuildRe
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetGuildInvites(r *v1.GetGuildInvitesRequest) (*v1.GetGuildInvitesResponse, error) {
+func (client *ChatServiceClient) GetGuildInvites(r *GetGuildInvitesRequest) (*GetGuildInvitesResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -214,7 +212,7 @@ func (client *ChatServiceClient) GetGuildInvites(r *v1.GetGuildInvitesRequest) (
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetGuildInvitesResponse{}
+	output := &GetGuildInvitesResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -222,7 +220,7 @@ func (client *ChatServiceClient) GetGuildInvites(r *v1.GetGuildInvitesRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetGuildMembers(r *v1.GetGuildMembersRequest) (*v1.GetGuildMembersResponse, error) {
+func (client *ChatServiceClient) GetGuildMembers(r *GetGuildMembersRequest) (*GetGuildMembersResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -236,7 +234,7 @@ func (client *ChatServiceClient) GetGuildMembers(r *v1.GetGuildMembersRequest) (
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetGuildMembersResponse{}
+	output := &GetGuildMembersResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -244,7 +242,7 @@ func (client *ChatServiceClient) GetGuildMembers(r *v1.GetGuildMembersRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetGuildChannels(r *v1.GetGuildChannelsRequest) (*v1.GetGuildChannelsResponse, error) {
+func (client *ChatServiceClient) GetGuildChannels(r *GetGuildChannelsRequest) (*GetGuildChannelsResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -258,7 +256,7 @@ func (client *ChatServiceClient) GetGuildChannels(r *v1.GetGuildChannelsRequest)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetGuildChannelsResponse{}
+	output := &GetGuildChannelsResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -266,7 +264,7 @@ func (client *ChatServiceClient) GetGuildChannels(r *v1.GetGuildChannelsRequest)
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetChannelMessages(r *v1.GetChannelMessagesRequest) (*v1.GetChannelMessagesResponse, error) {
+func (client *ChatServiceClient) GetChannelMessages(r *GetChannelMessagesRequest) (*GetChannelMessagesResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -280,7 +278,7 @@ func (client *ChatServiceClient) GetChannelMessages(r *v1.GetChannelMessagesRequ
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetChannelMessagesResponse{}
+	output := &GetChannelMessagesResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -288,7 +286,7 @@ func (client *ChatServiceClient) GetChannelMessages(r *v1.GetChannelMessagesRequ
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetMessage(r *v1.GetMessageRequest) (*v1.GetMessageResponse, error) {
+func (client *ChatServiceClient) GetMessage(r *GetMessageRequest) (*GetMessageResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -302,7 +300,7 @@ func (client *ChatServiceClient) GetMessage(r *v1.GetMessageRequest) (*v1.GetMes
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetMessageResponse{}
+	output := &GetMessageResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -310,7 +308,7 @@ func (client *ChatServiceClient) GetMessage(r *v1.GetMessageRequest) (*v1.GetMes
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetEmotePacks(r *v1.GetEmotePacksRequest) (*v1.GetEmotePacksResponse, error) {
+func (client *ChatServiceClient) GetEmotePacks(r *GetEmotePacksRequest) (*GetEmotePacksResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -324,7 +322,7 @@ func (client *ChatServiceClient) GetEmotePacks(r *v1.GetEmotePacksRequest) (*v1.
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetEmotePacksResponse{}
+	output := &GetEmotePacksResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -332,7 +330,7 @@ func (client *ChatServiceClient) GetEmotePacks(r *v1.GetEmotePacksRequest) (*v1.
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetEmotePackEmotes(r *v1.GetEmotePackEmotesRequest) (*v1.GetEmotePackEmotesResponse, error) {
+func (client *ChatServiceClient) GetEmotePackEmotes(r *GetEmotePackEmotesRequest) (*GetEmotePackEmotesResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -346,7 +344,7 @@ func (client *ChatServiceClient) GetEmotePackEmotes(r *v1.GetEmotePackEmotesRequ
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetEmotePackEmotesResponse{}
+	output := &GetEmotePackEmotesResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -354,7 +352,7 @@ func (client *ChatServiceClient) GetEmotePackEmotes(r *v1.GetEmotePackEmotesRequ
 	return output, nil
 }
 
-func (client *ChatServiceClient) UpdateGuildInformation(r *v1.UpdateGuildInformationRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) UpdateGuildInformation(r *UpdateGuildInformationRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -376,7 +374,7 @@ func (client *ChatServiceClient) UpdateGuildInformation(r *v1.UpdateGuildInforma
 	return output, nil
 }
 
-func (client *ChatServiceClient) UpdateChannelInformation(r *v1.UpdateChannelInformationRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) UpdateChannelInformation(r *UpdateChannelInformationRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -398,7 +396,7 @@ func (client *ChatServiceClient) UpdateChannelInformation(r *v1.UpdateChannelInf
 	return output, nil
 }
 
-func (client *ChatServiceClient) UpdateChannelOrder(r *v1.UpdateChannelOrderRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) UpdateChannelOrder(r *UpdateChannelOrderRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -420,7 +418,7 @@ func (client *ChatServiceClient) UpdateChannelOrder(r *v1.UpdateChannelOrderRequ
 	return output, nil
 }
 
-func (client *ChatServiceClient) UpdateMessage(r *v1.UpdateMessageRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) UpdateMessage(r *UpdateMessageRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -442,7 +440,7 @@ func (client *ChatServiceClient) UpdateMessage(r *v1.UpdateMessageRequest) (*emp
 	return output, nil
 }
 
-func (client *ChatServiceClient) AddEmoteToPack(r *v1.AddEmoteToPackRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) AddEmoteToPack(r *AddEmoteToPackRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -464,7 +462,7 @@ func (client *ChatServiceClient) AddEmoteToPack(r *v1.AddEmoteToPackRequest) (*e
 	return output, nil
 }
 
-func (client *ChatServiceClient) DeleteGuild(r *v1.DeleteGuildRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) DeleteGuild(r *DeleteGuildRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -486,7 +484,7 @@ func (client *ChatServiceClient) DeleteGuild(r *v1.DeleteGuildRequest) (*empty.E
 	return output, nil
 }
 
-func (client *ChatServiceClient) DeleteInvite(r *v1.DeleteInviteRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) DeleteInvite(r *DeleteInviteRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -508,7 +506,7 @@ func (client *ChatServiceClient) DeleteInvite(r *v1.DeleteInviteRequest) (*empty
 	return output, nil
 }
 
-func (client *ChatServiceClient) DeleteChannel(r *v1.DeleteChannelRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) DeleteChannel(r *DeleteChannelRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -530,7 +528,7 @@ func (client *ChatServiceClient) DeleteChannel(r *v1.DeleteChannelRequest) (*emp
 	return output, nil
 }
 
-func (client *ChatServiceClient) DeleteMessage(r *v1.DeleteMessageRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) DeleteMessage(r *DeleteMessageRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -552,7 +550,7 @@ func (client *ChatServiceClient) DeleteMessage(r *v1.DeleteMessageRequest) (*emp
 	return output, nil
 }
 
-func (client *ChatServiceClient) DeleteEmoteFromPack(r *v1.DeleteEmoteFromPackRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) DeleteEmoteFromPack(r *DeleteEmoteFromPackRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -574,7 +572,7 @@ func (client *ChatServiceClient) DeleteEmoteFromPack(r *v1.DeleteEmoteFromPackRe
 	return output, nil
 }
 
-func (client *ChatServiceClient) DeleteEmotePack(r *v1.DeleteEmotePackRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) DeleteEmotePack(r *DeleteEmotePackRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -596,7 +594,7 @@ func (client *ChatServiceClient) DeleteEmotePack(r *v1.DeleteEmotePackRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) DequipEmotePack(r *v1.DequipEmotePackRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) DequipEmotePack(r *DequipEmotePackRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -618,7 +616,7 @@ func (client *ChatServiceClient) DequipEmotePack(r *v1.DequipEmotePackRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) JoinGuild(r *v1.JoinGuildRequest) (*v1.JoinGuildResponse, error) {
+func (client *ChatServiceClient) JoinGuild(r *JoinGuildRequest) (*JoinGuildResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -632,7 +630,7 @@ func (client *ChatServiceClient) JoinGuild(r *v1.JoinGuildRequest) (*v1.JoinGuil
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.JoinGuildResponse{}
+	output := &JoinGuildResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -640,7 +638,7 @@ func (client *ChatServiceClient) JoinGuild(r *v1.JoinGuildRequest) (*v1.JoinGuil
 	return output, nil
 }
 
-func (client *ChatServiceClient) LeaveGuild(r *v1.LeaveGuildRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) LeaveGuild(r *LeaveGuildRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -662,7 +660,7 @@ func (client *ChatServiceClient) LeaveGuild(r *v1.LeaveGuildRequest) (*empty.Emp
 	return output, nil
 }
 
-func (client *ChatServiceClient) TriggerAction(r *v1.TriggerActionRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) TriggerAction(r *TriggerActionRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -684,7 +682,7 @@ func (client *ChatServiceClient) TriggerAction(r *v1.TriggerActionRequest) (*emp
 	return output, nil
 }
 
-func (client *ChatServiceClient) SendMessage(r *v1.SendMessageRequest) (*v1.SendMessageResponse, error) {
+func (client *ChatServiceClient) SendMessage(r *SendMessageRequest) (*SendMessageResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -698,7 +696,7 @@ func (client *ChatServiceClient) SendMessage(r *v1.SendMessageRequest) (*v1.Send
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.SendMessageResponse{}
+	output := &SendMessageResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -706,7 +704,7 @@ func (client *ChatServiceClient) SendMessage(r *v1.SendMessageRequest) (*v1.Send
 	return output, nil
 }
 
-func (client *ChatServiceClient) QueryHasPermission(r *v1.QueryPermissionsRequest) (*v1.QueryPermissionsResponse, error) {
+func (client *ChatServiceClient) QueryHasPermission(r *QueryPermissionsRequest) (*QueryPermissionsResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -720,7 +718,7 @@ func (client *ChatServiceClient) QueryHasPermission(r *v1.QueryPermissionsReques
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.QueryPermissionsResponse{}
+	output := &QueryPermissionsResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -728,7 +726,7 @@ func (client *ChatServiceClient) QueryHasPermission(r *v1.QueryPermissionsReques
 	return output, nil
 }
 
-func (client *ChatServiceClient) SetPermissions(r *v1.SetPermissionsRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) SetPermissions(r *SetPermissionsRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -750,7 +748,7 @@ func (client *ChatServiceClient) SetPermissions(r *v1.SetPermissionsRequest) (*e
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetPermissions(r *v1.GetPermissionsRequest) (*v1.GetPermissionsResponse, error) {
+func (client *ChatServiceClient) GetPermissions(r *GetPermissionsRequest) (*GetPermissionsResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -764,7 +762,7 @@ func (client *ChatServiceClient) GetPermissions(r *v1.GetPermissionsRequest) (*v
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetPermissionsResponse{}
+	output := &GetPermissionsResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -772,7 +770,7 @@ func (client *ChatServiceClient) GetPermissions(r *v1.GetPermissionsRequest) (*v
 	return output, nil
 }
 
-func (client *ChatServiceClient) MoveRole(r *v1.MoveRoleRequest) (*v1.MoveRoleResponse, error) {
+func (client *ChatServiceClient) MoveRole(r *MoveRoleRequest) (*MoveRoleResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -786,7 +784,7 @@ func (client *ChatServiceClient) MoveRole(r *v1.MoveRoleRequest) (*v1.MoveRoleRe
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.MoveRoleResponse{}
+	output := &MoveRoleResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -794,7 +792,7 @@ func (client *ChatServiceClient) MoveRole(r *v1.MoveRoleRequest) (*v1.MoveRoleRe
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetGuildRoles(r *v1.GetGuildRolesRequest) (*v1.GetGuildRolesResponse, error) {
+func (client *ChatServiceClient) GetGuildRoles(r *GetGuildRolesRequest) (*GetGuildRolesResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -808,7 +806,7 @@ func (client *ChatServiceClient) GetGuildRoles(r *v1.GetGuildRolesRequest) (*v1.
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetGuildRolesResponse{}
+	output := &GetGuildRolesResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -816,7 +814,7 @@ func (client *ChatServiceClient) GetGuildRoles(r *v1.GetGuildRolesRequest) (*v1.
 	return output, nil
 }
 
-func (client *ChatServiceClient) AddGuildRole(r *v1.AddGuildRoleRequest) (*v1.AddGuildRoleResponse, error) {
+func (client *ChatServiceClient) AddGuildRole(r *AddGuildRoleRequest) (*AddGuildRoleResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -830,7 +828,7 @@ func (client *ChatServiceClient) AddGuildRole(r *v1.AddGuildRoleRequest) (*v1.Ad
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.AddGuildRoleResponse{}
+	output := &AddGuildRoleResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -838,7 +836,7 @@ func (client *ChatServiceClient) AddGuildRole(r *v1.AddGuildRoleRequest) (*v1.Ad
 	return output, nil
 }
 
-func (client *ChatServiceClient) ModifyGuildRole(r *v1.ModifyGuildRoleRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) ModifyGuildRole(r *ModifyGuildRoleRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -860,7 +858,7 @@ func (client *ChatServiceClient) ModifyGuildRole(r *v1.ModifyGuildRoleRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) DeleteGuildRole(r *v1.DeleteGuildRoleRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) DeleteGuildRole(r *DeleteGuildRoleRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -882,7 +880,7 @@ func (client *ChatServiceClient) DeleteGuildRole(r *v1.DeleteGuildRoleRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) ManageUserRoles(r *v1.ManageUserRolesRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) ManageUserRoles(r *ManageUserRolesRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -904,7 +902,7 @@ func (client *ChatServiceClient) ManageUserRoles(r *v1.ManageUserRolesRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetUserRoles(r *v1.GetUserRolesRequest) (*v1.GetUserRolesResponse, error) {
+func (client *ChatServiceClient) GetUserRoles(r *GetUserRolesRequest) (*GetUserRolesResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -918,7 +916,7 @@ func (client *ChatServiceClient) GetUserRoles(r *v1.GetUserRolesRequest) (*v1.Ge
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetUserRolesResponse{}
+	output := &GetUserRolesResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -926,7 +924,7 @@ func (client *ChatServiceClient) GetUserRoles(r *v1.GetUserRolesRequest) (*v1.Ge
 	return output, nil
 }
 
-func (client *ChatServiceClient) StreamEvents() (in chan *v1.StreamEventsRequest, out chan *v1.Event, err error) {
+func (client *ChatServiceClient) StreamEvents() (in chan<- *StreamEventsRequest, out <-chan *Event, err error) {
 	u := url.URL{Scheme: "ws", Host: client.serverURL, Path: "/protocol.chat.v1.ChatService/StreamEvents"}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -934,8 +932,8 @@ func (client *ChatServiceClient) StreamEvents() (in chan *v1.StreamEventsRequest
 		return nil, nil, err
 	}
 
-	in = make(chan *v1.StreamEventsRequest)
-	out = make(chan *v1.Event)
+	inC := make(chan *StreamEventsRequest)
+	outC := make(chan *Event)
 
 	go func() {
 		defer c.Close()
@@ -956,20 +954,43 @@ func (client *ChatServiceClient) StreamEvents() (in chan *v1.StreamEventsRequest
 		for {
 			select {
 			case msg, ok := <-msgs:
-				thing := new(v1.Event)
-				proto.Unmarshal
+				if !ok {
+					return
+				}
+
+				thing := new(Event)
+				err = proto.Unmarshal(msg, thing)
+				if err != nil {
+					return
+				}
+
+				outC <- thing
+			case send, ok := <-inC:
+				if !ok {
+					return
+				}
+
+				data, err := proto.Marshal(send)
+				if err != nil {
+					return
+				}
+
+				err = c.WriteMessage(websocket.BinaryMessage, data)
+				if err != nil {
+					return
+				}
 			}
 		}
 	}()
 
-	return in, out, nil
+	return inC, outC, nil
 }
 
-func (client *ChatServiceClient) Sync(r *v1.SyncRequest) (chan *v1.SyncEvent, error) {
+func (client *ChatServiceClient) Sync(r *SyncRequest) (chan *SyncEvent, error) {
 	panic("unimplemented")
 }
 
-func (client *ChatServiceClient) GetUser(r *v1.GetUserRequest) (*v1.GetUserResponse, error) {
+func (client *ChatServiceClient) GetUser(r *GetUserRequest) (*GetUserResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -983,7 +1004,7 @@ func (client *ChatServiceClient) GetUser(r *v1.GetUserRequest) (*v1.GetUserRespo
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetUserResponse{}
+	output := &GetUserResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -991,7 +1012,7 @@ func (client *ChatServiceClient) GetUser(r *v1.GetUserRequest) (*v1.GetUserRespo
 	return output, nil
 }
 
-func (client *ChatServiceClient) GetUserMetadata(r *v1.GetUserMetadataRequest) (*v1.GetUserMetadataResponse, error) {
+func (client *ChatServiceClient) GetUserMetadata(r *GetUserMetadataRequest) (*GetUserMetadataResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -1005,7 +1026,7 @@ func (client *ChatServiceClient) GetUserMetadata(r *v1.GetUserMetadataRequest) (
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.GetUserMetadataResponse{}
+	output := &GetUserMetadataResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -1013,7 +1034,7 @@ func (client *ChatServiceClient) GetUserMetadata(r *v1.GetUserMetadataRequest) (
 	return output, nil
 }
 
-func (client *ChatServiceClient) ProfileUpdate(r *v1.ProfileUpdateRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) ProfileUpdate(r *ProfileUpdateRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -1035,7 +1056,7 @@ func (client *ChatServiceClient) ProfileUpdate(r *v1.ProfileUpdateRequest) (*emp
 	return output, nil
 }
 
-func (client *ChatServiceClient) Typing(r *v1.TypingRequest) (*empty.Empty, error) {
+func (client *ChatServiceClient) Typing(r *TypingRequest) (*empty.Empty, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -1057,7 +1078,7 @@ func (client *ChatServiceClient) Typing(r *v1.TypingRequest) (*empty.Empty, erro
 	return output, nil
 }
 
-func (client *ChatServiceClient) PreviewGuild(r *v1.PreviewGuildRequest) (*v1.PreviewGuildResponse, error) {
+func (client *ChatServiceClient) PreviewGuild(r *PreviewGuildRequest) (*PreviewGuildResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -1071,7 +1092,7 @@ func (client *ChatServiceClient) PreviewGuild(r *v1.PreviewGuildRequest) (*v1.Pr
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.PreviewGuildResponse{}
+	output := &PreviewGuildResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)

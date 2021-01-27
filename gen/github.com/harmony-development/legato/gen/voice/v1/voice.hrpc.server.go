@@ -6,10 +6,8 @@ import "io/ioutil"
 import "google.golang.org/protobuf/proto"
 import "github.com/gorilla/websocket"
 
-import "github.com/harmony-development/legato/gen/voice/v1"
-
 type VoiceServiceServer interface {
-	Connect(ctx context.Context, in chan *v1.ClientSignal, out chan *v1.Signal, headers http.Header)
+	Connect(ctx context.Context, in chan *ClientSignal, out chan *Signal, headers http.Header)
 }
 
 type VoiceServiceHandler struct {
@@ -36,7 +34,7 @@ func (h *VoiceServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request
 		{
 			var err error
 
-			in := make(chan *v1.ClientSignal)
+			in := make(chan *ClientSignal)
 			err = nil
 
 			if err != nil {
@@ -44,7 +42,7 @@ func (h *VoiceServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request
 				return
 			}
 
-			out := make(chan *v1.Signal)
+			out := make(chan *Signal)
 
 			ws, err := h.upgrader.Upgrade(w, req, nil)
 			if err != nil {
@@ -53,11 +51,42 @@ func (h *VoiceServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request
 			}
 
 			go func() {
+
+				msgs := make(chan []byte)
+
+				go func() {
+					for {
+						_, message, err := ws.ReadMessage()
+						if err != nil {
+							close(msgs)
+							break
+						}
+						msgs <- message
+					}
+				}()
+
+				defer ws.WriteMessage(websocket.CloseMessage, []byte{})
+
 				for {
 					select {
+
+					case data, ok := <-msgs:
+						if !ok {
+							return
+						}
+
+						item := new(ClientSignal)
+						err = proto.Unmarshal(data, item)
+						if err != nil {
+							close(in)
+							close(out)
+							return
+						}
+
+						in <- item
+
 					case msg, ok := <-out:
 						if !ok {
-							ws.WriteMessage(websocket.CloseMessage, []byte{})
 							return
 						}
 

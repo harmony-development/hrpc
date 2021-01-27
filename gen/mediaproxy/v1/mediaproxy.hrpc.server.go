@@ -6,14 +6,12 @@ import "io/ioutil"
 import "google.golang.org/protobuf/proto"
 import "github.com/gorilla/websocket"
 
-import "github.com/harmony-development/legato/gen/mediaproxy/v1"
-
 type MediaProxyServiceServer interface {
-	FetchLinkMetadata(ctx context.Context, r *v1.FetchLinkMetadataRequest, headers http.Header) (resp *v1.SiteMetadata, err error)
+	FetchLinkMetadata(ctx context.Context, r *FetchLinkMetadataRequest, headers http.Header) (resp *SiteMetadata, err error)
 
-	InstantView(ctx context.Context, r *v1.InstantViewRequest, headers http.Header) (resp *v1.InstantViewResponse, err error)
+	InstantView(ctx context.Context, r *InstantViewRequest, headers http.Header) (resp *InstantViewResponse, err error)
 
-	CanInstantView(ctx context.Context, r *v1.InstantViewRequest, headers http.Header) (resp *v1.CanInstantViewResponse, err error)
+	CanInstantView(ctx context.Context, r *InstantViewRequest, headers http.Header) (resp *CanInstantViewResponse, err error)
 }
 
 type MediaProxyServiceHandler struct {
@@ -45,7 +43,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			requestProto := new(v1.FetchLinkMetadataRequest)
+			requestProto := new(FetchLinkMetadataRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -78,7 +76,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			requestProto := new(v1.InstantViewRequest)
+			requestProto := new(InstantViewRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -111,7 +109,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			requestProto := new(v1.InstantViewRequest)
+			requestProto := new(InstantViewRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)

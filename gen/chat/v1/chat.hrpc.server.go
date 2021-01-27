@@ -8,104 +8,102 @@ import "github.com/gorilla/websocket"
 
 import "github.com/golang/protobuf/ptypes/empty"
 
-import "github.com/harmony-development/legato/gen/chat/v1"
-
 type ChatServiceServer interface {
-	CreateGuild(ctx context.Context, r *v1.CreateGuildRequest, headers http.Header) (resp *v1.CreateGuildResponse, err error)
+	CreateGuild(ctx context.Context, r *CreateGuildRequest, headers http.Header) (resp *CreateGuildResponse, err error)
 
-	CreateInvite(ctx context.Context, r *v1.CreateInviteRequest, headers http.Header) (resp *v1.CreateInviteResponse, err error)
+	CreateInvite(ctx context.Context, r *CreateInviteRequest, headers http.Header) (resp *CreateInviteResponse, err error)
 
-	CreateChannel(ctx context.Context, r *v1.CreateChannelRequest, headers http.Header) (resp *v1.CreateChannelResponse, err error)
+	CreateChannel(ctx context.Context, r *CreateChannelRequest, headers http.Header) (resp *CreateChannelResponse, err error)
 
-	CreateEmotePack(ctx context.Context, r *v1.CreateEmotePackRequest, headers http.Header) (resp *v1.CreateEmotePackResponse, err error)
+	CreateEmotePack(ctx context.Context, r *CreateEmotePackRequest, headers http.Header) (resp *CreateEmotePackResponse, err error)
 
-	GetGuildList(ctx context.Context, r *v1.GetGuildListRequest, headers http.Header) (resp *v1.GetGuildListResponse, err error)
+	GetGuildList(ctx context.Context, r *GetGuildListRequest, headers http.Header) (resp *GetGuildListResponse, err error)
 
-	AddGuildToGuildList(ctx context.Context, r *v1.AddGuildToGuildListRequest, headers http.Header) (resp *v1.AddGuildToGuildListResponse, err error)
+	AddGuildToGuildList(ctx context.Context, r *AddGuildToGuildListRequest, headers http.Header) (resp *AddGuildToGuildListResponse, err error)
 
-	RemoveGuildFromGuildList(ctx context.Context, r *v1.RemoveGuildFromGuildListRequest, headers http.Header) (resp *v1.RemoveGuildFromGuildListResponse, err error)
+	RemoveGuildFromGuildList(ctx context.Context, r *RemoveGuildFromGuildListRequest, headers http.Header) (resp *RemoveGuildFromGuildListResponse, err error)
 
-	GetGuild(ctx context.Context, r *v1.GetGuildRequest, headers http.Header) (resp *v1.GetGuildResponse, err error)
+	GetGuild(ctx context.Context, r *GetGuildRequest, headers http.Header) (resp *GetGuildResponse, err error)
 
-	GetGuildInvites(ctx context.Context, r *v1.GetGuildInvitesRequest, headers http.Header) (resp *v1.GetGuildInvitesResponse, err error)
+	GetGuildInvites(ctx context.Context, r *GetGuildInvitesRequest, headers http.Header) (resp *GetGuildInvitesResponse, err error)
 
-	GetGuildMembers(ctx context.Context, r *v1.GetGuildMembersRequest, headers http.Header) (resp *v1.GetGuildMembersResponse, err error)
+	GetGuildMembers(ctx context.Context, r *GetGuildMembersRequest, headers http.Header) (resp *GetGuildMembersResponse, err error)
 
-	GetGuildChannels(ctx context.Context, r *v1.GetGuildChannelsRequest, headers http.Header) (resp *v1.GetGuildChannelsResponse, err error)
+	GetGuildChannels(ctx context.Context, r *GetGuildChannelsRequest, headers http.Header) (resp *GetGuildChannelsResponse, err error)
 
-	GetChannelMessages(ctx context.Context, r *v1.GetChannelMessagesRequest, headers http.Header) (resp *v1.GetChannelMessagesResponse, err error)
+	GetChannelMessages(ctx context.Context, r *GetChannelMessagesRequest, headers http.Header) (resp *GetChannelMessagesResponse, err error)
 
-	GetMessage(ctx context.Context, r *v1.GetMessageRequest, headers http.Header) (resp *v1.GetMessageResponse, err error)
+	GetMessage(ctx context.Context, r *GetMessageRequest, headers http.Header) (resp *GetMessageResponse, err error)
 
-	GetEmotePacks(ctx context.Context, r *v1.GetEmotePacksRequest, headers http.Header) (resp *v1.GetEmotePacksResponse, err error)
+	GetEmotePacks(ctx context.Context, r *GetEmotePacksRequest, headers http.Header) (resp *GetEmotePacksResponse, err error)
 
-	GetEmotePackEmotes(ctx context.Context, r *v1.GetEmotePackEmotesRequest, headers http.Header) (resp *v1.GetEmotePackEmotesResponse, err error)
+	GetEmotePackEmotes(ctx context.Context, r *GetEmotePackEmotesRequest, headers http.Header) (resp *GetEmotePackEmotesResponse, err error)
 
-	UpdateGuildInformation(ctx context.Context, r *v1.UpdateGuildInformationRequest, headers http.Header) (resp *empty.Empty, err error)
+	UpdateGuildInformation(ctx context.Context, r *UpdateGuildInformationRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	UpdateChannelInformation(ctx context.Context, r *v1.UpdateChannelInformationRequest, headers http.Header) (resp *empty.Empty, err error)
+	UpdateChannelInformation(ctx context.Context, r *UpdateChannelInformationRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	UpdateChannelOrder(ctx context.Context, r *v1.UpdateChannelOrderRequest, headers http.Header) (resp *empty.Empty, err error)
+	UpdateChannelOrder(ctx context.Context, r *UpdateChannelOrderRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	UpdateMessage(ctx context.Context, r *v1.UpdateMessageRequest, headers http.Header) (resp *empty.Empty, err error)
+	UpdateMessage(ctx context.Context, r *UpdateMessageRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	AddEmoteToPack(ctx context.Context, r *v1.AddEmoteToPackRequest, headers http.Header) (resp *empty.Empty, err error)
+	AddEmoteToPack(ctx context.Context, r *AddEmoteToPackRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	DeleteGuild(ctx context.Context, r *v1.DeleteGuildRequest, headers http.Header) (resp *empty.Empty, err error)
+	DeleteGuild(ctx context.Context, r *DeleteGuildRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	DeleteInvite(ctx context.Context, r *v1.DeleteInviteRequest, headers http.Header) (resp *empty.Empty, err error)
+	DeleteInvite(ctx context.Context, r *DeleteInviteRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	DeleteChannel(ctx context.Context, r *v1.DeleteChannelRequest, headers http.Header) (resp *empty.Empty, err error)
+	DeleteChannel(ctx context.Context, r *DeleteChannelRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	DeleteMessage(ctx context.Context, r *v1.DeleteMessageRequest, headers http.Header) (resp *empty.Empty, err error)
+	DeleteMessage(ctx context.Context, r *DeleteMessageRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	DeleteEmoteFromPack(ctx context.Context, r *v1.DeleteEmoteFromPackRequest, headers http.Header) (resp *empty.Empty, err error)
+	DeleteEmoteFromPack(ctx context.Context, r *DeleteEmoteFromPackRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	DeleteEmotePack(ctx context.Context, r *v1.DeleteEmotePackRequest, headers http.Header) (resp *empty.Empty, err error)
+	DeleteEmotePack(ctx context.Context, r *DeleteEmotePackRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	DequipEmotePack(ctx context.Context, r *v1.DequipEmotePackRequest, headers http.Header) (resp *empty.Empty, err error)
+	DequipEmotePack(ctx context.Context, r *DequipEmotePackRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	JoinGuild(ctx context.Context, r *v1.JoinGuildRequest, headers http.Header) (resp *v1.JoinGuildResponse, err error)
+	JoinGuild(ctx context.Context, r *JoinGuildRequest, headers http.Header) (resp *JoinGuildResponse, err error)
 
-	LeaveGuild(ctx context.Context, r *v1.LeaveGuildRequest, headers http.Header) (resp *empty.Empty, err error)
+	LeaveGuild(ctx context.Context, r *LeaveGuildRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	TriggerAction(ctx context.Context, r *v1.TriggerActionRequest, headers http.Header) (resp *empty.Empty, err error)
+	TriggerAction(ctx context.Context, r *TriggerActionRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	SendMessage(ctx context.Context, r *v1.SendMessageRequest, headers http.Header) (resp *v1.SendMessageResponse, err error)
+	SendMessage(ctx context.Context, r *SendMessageRequest, headers http.Header) (resp *SendMessageResponse, err error)
 
-	QueryHasPermission(ctx context.Context, r *v1.QueryPermissionsRequest, headers http.Header) (resp *v1.QueryPermissionsResponse, err error)
+	QueryHasPermission(ctx context.Context, r *QueryPermissionsRequest, headers http.Header) (resp *QueryPermissionsResponse, err error)
 
-	SetPermissions(ctx context.Context, r *v1.SetPermissionsRequest, headers http.Header) (resp *empty.Empty, err error)
+	SetPermissions(ctx context.Context, r *SetPermissionsRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	GetPermissions(ctx context.Context, r *v1.GetPermissionsRequest, headers http.Header) (resp *v1.GetPermissionsResponse, err error)
+	GetPermissions(ctx context.Context, r *GetPermissionsRequest, headers http.Header) (resp *GetPermissionsResponse, err error)
 
-	MoveRole(ctx context.Context, r *v1.MoveRoleRequest, headers http.Header) (resp *v1.MoveRoleResponse, err error)
+	MoveRole(ctx context.Context, r *MoveRoleRequest, headers http.Header) (resp *MoveRoleResponse, err error)
 
-	GetGuildRoles(ctx context.Context, r *v1.GetGuildRolesRequest, headers http.Header) (resp *v1.GetGuildRolesResponse, err error)
+	GetGuildRoles(ctx context.Context, r *GetGuildRolesRequest, headers http.Header) (resp *GetGuildRolesResponse, err error)
 
-	AddGuildRole(ctx context.Context, r *v1.AddGuildRoleRequest, headers http.Header) (resp *v1.AddGuildRoleResponse, err error)
+	AddGuildRole(ctx context.Context, r *AddGuildRoleRequest, headers http.Header) (resp *AddGuildRoleResponse, err error)
 
-	ModifyGuildRole(ctx context.Context, r *v1.ModifyGuildRoleRequest, headers http.Header) (resp *empty.Empty, err error)
+	ModifyGuildRole(ctx context.Context, r *ModifyGuildRoleRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	DeleteGuildRole(ctx context.Context, r *v1.DeleteGuildRoleRequest, headers http.Header) (resp *empty.Empty, err error)
+	DeleteGuildRole(ctx context.Context, r *DeleteGuildRoleRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	ManageUserRoles(ctx context.Context, r *v1.ManageUserRolesRequest, headers http.Header) (resp *empty.Empty, err error)
+	ManageUserRoles(ctx context.Context, r *ManageUserRolesRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	GetUserRoles(ctx context.Context, r *v1.GetUserRolesRequest, headers http.Header) (resp *v1.GetUserRolesResponse, err error)
+	GetUserRoles(ctx context.Context, r *GetUserRolesRequest, headers http.Header) (resp *GetUserRolesResponse, err error)
 
-	StreamEvents(ctx context.Context, in chan *v1.StreamEventsRequest, out chan *v1.Event, headers http.Header)
+	StreamEvents(ctx context.Context, in chan *StreamEventsRequest, out chan *Event, headers http.Header)
 
-	Sync(ctx context.Context, r *v1.SyncRequest, out chan *v1.SyncEvent, headers http.Header)
+	Sync(ctx context.Context, r *SyncRequest, out chan *SyncEvent, headers http.Header)
 
-	GetUser(ctx context.Context, r *v1.GetUserRequest, headers http.Header) (resp *v1.GetUserResponse, err error)
+	GetUser(ctx context.Context, r *GetUserRequest, headers http.Header) (resp *GetUserResponse, err error)
 
-	GetUserMetadata(ctx context.Context, r *v1.GetUserMetadataRequest, headers http.Header) (resp *v1.GetUserMetadataResponse, err error)
+	GetUserMetadata(ctx context.Context, r *GetUserMetadataRequest, headers http.Header) (resp *GetUserMetadataResponse, err error)
 
-	ProfileUpdate(ctx context.Context, r *v1.ProfileUpdateRequest, headers http.Header) (resp *empty.Empty, err error)
+	ProfileUpdate(ctx context.Context, r *ProfileUpdateRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	Typing(ctx context.Context, r *v1.TypingRequest, headers http.Header) (resp *empty.Empty, err error)
+	Typing(ctx context.Context, r *TypingRequest, headers http.Header) (resp *empty.Empty, err error)
 
-	PreviewGuild(ctx context.Context, r *v1.PreviewGuildRequest, headers http.Header) (resp *v1.PreviewGuildResponse, err error)
+	PreviewGuild(ctx context.Context, r *PreviewGuildRequest, headers http.Header) (resp *PreviewGuildResponse, err error)
 }
 
 type ChatServiceHandler struct {
@@ -137,7 +135,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.CreateGuildRequest)
+			requestProto := new(CreateGuildRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -170,7 +168,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.CreateInviteRequest)
+			requestProto := new(CreateInviteRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -203,7 +201,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.CreateChannelRequest)
+			requestProto := new(CreateChannelRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -236,7 +234,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.CreateEmotePackRequest)
+			requestProto := new(CreateEmotePackRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -269,7 +267,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetGuildListRequest)
+			requestProto := new(GetGuildListRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -302,7 +300,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.AddGuildToGuildListRequest)
+			requestProto := new(AddGuildToGuildListRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -335,7 +333,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.RemoveGuildFromGuildListRequest)
+			requestProto := new(RemoveGuildFromGuildListRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -368,7 +366,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetGuildRequest)
+			requestProto := new(GetGuildRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -401,7 +399,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetGuildInvitesRequest)
+			requestProto := new(GetGuildInvitesRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -434,7 +432,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetGuildMembersRequest)
+			requestProto := new(GetGuildMembersRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -467,7 +465,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetGuildChannelsRequest)
+			requestProto := new(GetGuildChannelsRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -500,7 +498,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetChannelMessagesRequest)
+			requestProto := new(GetChannelMessagesRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -533,7 +531,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetMessageRequest)
+			requestProto := new(GetMessageRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -566,7 +564,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetEmotePacksRequest)
+			requestProto := new(GetEmotePacksRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -599,7 +597,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetEmotePackEmotesRequest)
+			requestProto := new(GetEmotePackEmotesRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -632,7 +630,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.UpdateGuildInformationRequest)
+			requestProto := new(UpdateGuildInformationRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -665,7 +663,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.UpdateChannelInformationRequest)
+			requestProto := new(UpdateChannelInformationRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -698,7 +696,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.UpdateChannelOrderRequest)
+			requestProto := new(UpdateChannelOrderRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -731,7 +729,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.UpdateMessageRequest)
+			requestProto := new(UpdateMessageRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -764,7 +762,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.AddEmoteToPackRequest)
+			requestProto := new(AddEmoteToPackRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -797,7 +795,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.DeleteGuildRequest)
+			requestProto := new(DeleteGuildRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -830,7 +828,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.DeleteInviteRequest)
+			requestProto := new(DeleteInviteRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -863,7 +861,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.DeleteChannelRequest)
+			requestProto := new(DeleteChannelRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -896,7 +894,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.DeleteMessageRequest)
+			requestProto := new(DeleteMessageRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -929,7 +927,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.DeleteEmoteFromPackRequest)
+			requestProto := new(DeleteEmoteFromPackRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -962,7 +960,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.DeleteEmotePackRequest)
+			requestProto := new(DeleteEmotePackRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -995,7 +993,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.DequipEmotePackRequest)
+			requestProto := new(DequipEmotePackRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1028,7 +1026,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.JoinGuildRequest)
+			requestProto := new(JoinGuildRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1061,7 +1059,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.LeaveGuildRequest)
+			requestProto := new(LeaveGuildRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1094,7 +1092,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.TriggerActionRequest)
+			requestProto := new(TriggerActionRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1127,7 +1125,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.SendMessageRequest)
+			requestProto := new(SendMessageRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1160,7 +1158,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.QueryPermissionsRequest)
+			requestProto := new(QueryPermissionsRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1193,7 +1191,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.SetPermissionsRequest)
+			requestProto := new(SetPermissionsRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1226,7 +1224,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetPermissionsRequest)
+			requestProto := new(GetPermissionsRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1259,7 +1257,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.MoveRoleRequest)
+			requestProto := new(MoveRoleRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1292,7 +1290,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetGuildRolesRequest)
+			requestProto := new(GetGuildRolesRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1325,7 +1323,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.AddGuildRoleRequest)
+			requestProto := new(AddGuildRoleRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1358,7 +1356,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.ModifyGuildRoleRequest)
+			requestProto := new(ModifyGuildRoleRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1391,7 +1389,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.DeleteGuildRoleRequest)
+			requestProto := new(DeleteGuildRoleRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1424,7 +1422,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.ManageUserRolesRequest)
+			requestProto := new(ManageUserRolesRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1457,7 +1455,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetUserRolesRequest)
+			requestProto := new(GetUserRolesRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1485,7 +1483,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 		{
 			var err error
 
-			in := make(chan *v1.StreamEventsRequest)
+			in := make(chan *StreamEventsRequest)
 			err = nil
 
 			if err != nil {
@@ -1493,7 +1491,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			out := make(chan *v1.Event)
+			out := make(chan *Event)
 
 			ws, err := h.upgrader.Upgrade(w, req, nil)
 			if err != nil {
@@ -1502,11 +1500,42 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			go func() {
+
+				msgs := make(chan []byte)
+
+				go func() {
+					for {
+						_, message, err := ws.ReadMessage()
+						if err != nil {
+							close(msgs)
+							break
+						}
+						msgs <- message
+					}
+				}()
+
+				defer ws.WriteMessage(websocket.CloseMessage, []byte{})
+
 				for {
 					select {
+
+					case data, ok := <-msgs:
+						if !ok {
+							return
+						}
+
+						item := new(StreamEventsRequest)
+						err = proto.Unmarshal(data, item)
+						if err != nil {
+							close(in)
+							close(out)
+							return
+						}
+
+						in <- item
+
 					case msg, ok := <-out:
 						if !ok {
-							ws.WriteMessage(websocket.CloseMessage, []byte{})
 							return
 						}
 
@@ -1554,7 +1583,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			in := new(v1.SyncRequest)
+			in := new(SyncRequest)
 			err = proto.Unmarshal(body, in)
 
 			if err != nil {
@@ -1562,7 +1591,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			out := make(chan *v1.SyncEvent)
+			out := make(chan *SyncEvent)
 
 			ws, err := h.upgrader.Upgrade(w, req, nil)
 			if err != nil {
@@ -1571,11 +1600,14 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			go func() {
+
+				defer ws.WriteMessage(websocket.CloseMessage, []byte{})
+
 				for {
 					select {
+
 					case msg, ok := <-out:
 						if !ok {
-							ws.WriteMessage(websocket.CloseMessage, []byte{})
 							return
 						}
 
@@ -1615,7 +1647,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetUserRequest)
+			requestProto := new(GetUserRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1648,7 +1680,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.GetUserMetadataRequest)
+			requestProto := new(GetUserMetadataRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1681,7 +1713,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.ProfileUpdateRequest)
+			requestProto := new(ProfileUpdateRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1714,7 +1746,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.TypingRequest)
+			requestProto := new(TypingRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)
@@ -1747,7 +1779,7 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			requestProto := new(v1.PreviewGuildRequest)
+			requestProto := new(PreviewGuildRequest)
 			err = proto.Unmarshal(body, requestProto)
 			if err != nil {
 				h.ErrorHandler(err, w)

@@ -8,8 +8,6 @@ import "github.com/gorilla/websocket"
 import "net/url"
 import "bytes"
 
-import "github.com/harmony-development/legato/gen/mediaproxy/v1"
-
 type MediaProxyServiceClient struct {
 	client    *http.Client
 	serverURL string
@@ -22,7 +20,7 @@ func NewMediaProxyServiceClient(url string) *MediaProxyServiceClient {
 	}
 }
 
-func (client *MediaProxyServiceClient) FetchLinkMetadata(r *v1.FetchLinkMetadataRequest) (*v1.SiteMetadata, error) {
+func (client *MediaProxyServiceClient) FetchLinkMetadata(r *FetchLinkMetadataRequest) (*SiteMetadata, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -36,7 +34,7 @@ func (client *MediaProxyServiceClient) FetchLinkMetadata(r *v1.FetchLinkMetadata
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.SiteMetadata{}
+	output := &SiteMetadata{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -44,7 +42,7 @@ func (client *MediaProxyServiceClient) FetchLinkMetadata(r *v1.FetchLinkMetadata
 	return output, nil
 }
 
-func (client *MediaProxyServiceClient) InstantView(r *v1.InstantViewRequest) (*v1.InstantViewResponse, error) {
+func (client *MediaProxyServiceClient) InstantView(r *InstantViewRequest) (*InstantViewResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -58,7 +56,7 @@ func (client *MediaProxyServiceClient) InstantView(r *v1.InstantViewRequest) (*v
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.InstantViewResponse{}
+	output := &InstantViewResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
@@ -66,7 +64,7 @@ func (client *MediaProxyServiceClient) InstantView(r *v1.InstantViewRequest) (*v
 	return output, nil
 }
 
-func (client *MediaProxyServiceClient) CanInstantView(r *v1.InstantViewRequest) (*v1.CanInstantViewResponse, error) {
+func (client *MediaProxyServiceClient) CanInstantView(r *InstantViewRequest) (*CanInstantViewResponse, error) {
 	input, err := proto.Marshal(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
@@ -80,7 +78,7 @@ func (client *MediaProxyServiceClient) CanInstantView(r *v1.InstantViewRequest) 
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
-	output := &v1.CanInstantViewResponse{}
+	output := &CanInstantViewResponse{}
 	err = proto.Unmarshal(data, output)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %w", err)
