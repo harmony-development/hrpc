@@ -211,7 +211,7 @@ func main() {
 		},
 	})
 
-	data, err = FSByte(true, *gen.Parameter)
+	data, err = FSByte(false, *gen.Parameter)
 	if err != nil {
 		data, err = ioutil.ReadFile(*gen.Parameter)
 		if err != nil {
