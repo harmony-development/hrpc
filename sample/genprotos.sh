@@ -9,7 +9,7 @@ for dir in $(find "protos" -name '*.proto' -print0 | xargs -0 -n1 dirname | sort
     --proto_path=protos \
     --plugin=protoc-gen-custom=../hrpc \
     --custom_out=./gen \
-    --custom_opt="../hrpc-server-go.htmpl" \
+    --custom_opt="/templates/hrpc-server-go.htmpl" \
     --go_out=./gen \
     --validate_out="lang=go:gen" \
     $(find "${dir}" -name '*.proto')
@@ -18,7 +18,7 @@ for dir in $(find "protos" -name '*.proto' -print0 | xargs -0 -n1 dirname | sort
     --proto_path=protos \
     --plugin=protoc-gen-custom=../hrpc \
     --custom_out=./gen \
-    --custom_opt="../hrpc-client-go.htmpl" \
+    --custom_opt="/templates/hrpc-client-go.htmpl" \
     --go_out=./gen \
     --validate_out="lang=go:gen" \
     $(find "${dir}" -name '*.proto')

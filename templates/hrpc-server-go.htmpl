@@ -73,6 +73,7 @@ func init() {
     type {{ deref .Name }}Handler struct {
         Server {{ $sname }}
         ErrorHandler func(err error, w http.ResponseWriter)
+        UnaryPre func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
         upgrader websocket.Upgrader
     }
 
@@ -111,7 +112,15 @@ func init() {
                 return
             }
 
-            resp, err := h.Server.{{ .Name }}(req.Context(), requestProto, req.Header)
+            invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+                return h.Server.{{ .Name }}(c, req.(*{{ $resIn.ID }}), headers)
+            }
+
+            if h.UnaryPre != nil {
+                invoker = h.UnaryPre({{ fanciedName $item }}, invoker)
+            }
+
+            resp, err := invoker(req.Context(), requestProto, req.Header)
 
             response, err := proto.Marshal(resp)
             if err != nil {

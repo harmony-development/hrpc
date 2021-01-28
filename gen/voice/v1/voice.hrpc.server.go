@@ -25,6 +25,7 @@ type VoiceServiceServer interface {
 type VoiceServiceHandler struct {
 	Server       VoiceServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
+	UnaryPre     func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
 	upgrader     websocket.Upgrader
 }
 

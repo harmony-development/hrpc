@@ -39,6 +39,7 @@ type AuthServiceServer interface {
 type AuthServiceHandler struct {
 	Server       AuthServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
+	UnaryPre     func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
 	upgrader     websocket.Upgrader
 }
 
@@ -72,7 +73,15 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.Federate(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.Federate(c, req.(*FederateRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -105,7 +114,15 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.LoginFederated(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.LoginFederated(c, req.(*LoginFederatedRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -138,7 +155,15 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.Key(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.Key(c, req.(*empty.Empty), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -171,7 +196,15 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.BeginAuth(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.BeginAuth(c, req.(*empty.Empty), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -204,7 +237,15 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.NextStep(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.NextStep(c, req.(*NextStepRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -237,7 +278,15 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.StepBack(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.StepBack(c, req.(*StepBackRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {

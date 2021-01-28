@@ -29,6 +29,7 @@ type MediaProxyServiceServer interface {
 type MediaProxyServiceHandler struct {
 	Server       MediaProxyServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
+	UnaryPre     func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
 	upgrader     websocket.Upgrader
 }
 
@@ -62,7 +63,15 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			resp, err := h.Server.FetchLinkMetadata(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.FetchLinkMetadata(c, req.(*FetchLinkMetadataRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Mediaproxyᐳv1ᐳmediaproxy, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -95,7 +104,15 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			resp, err := h.Server.InstantView(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.InstantView(c, req.(*InstantViewRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Mediaproxyᐳv1ᐳmediaproxy, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -128,7 +145,15 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 				return
 			}
 
-			resp, err := h.Server.CanInstantView(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.CanInstantView(c, req.(*InstantViewRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Mediaproxyᐳv1ᐳmediaproxy, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {

@@ -121,6 +121,7 @@ type ChatServiceServer interface {
 type ChatServiceHandler struct {
 	Server       ChatServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
+	UnaryPre     func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
 	upgrader     websocket.Upgrader
 }
 
@@ -154,7 +155,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.CreateGuild(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.CreateGuild(c, req.(*CreateGuildRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -187,7 +196,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.CreateInvite(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.CreateInvite(c, req.(*CreateInviteRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -220,7 +237,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.CreateChannel(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.CreateChannel(c, req.(*CreateChannelRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -253,7 +278,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.CreateEmotePack(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.CreateEmotePack(c, req.(*CreateEmotePackRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -286,7 +319,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildList(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetGuildList(c, req.(*GetGuildListRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -319,7 +360,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.AddGuildToGuildList(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.AddGuildToGuildList(c, req.(*AddGuildToGuildListRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -352,7 +401,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.RemoveGuildFromGuildList(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.RemoveGuildFromGuildList(c, req.(*RemoveGuildFromGuildListRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -385,7 +442,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuild(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetGuild(c, req.(*GetGuildRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -418,7 +483,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildInvites(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetGuildInvites(c, req.(*GetGuildInvitesRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -451,7 +524,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildMembers(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetGuildMembers(c, req.(*GetGuildMembersRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -484,7 +565,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildChannels(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetGuildChannels(c, req.(*GetGuildChannelsRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -517,7 +606,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetChannelMessages(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetChannelMessages(c, req.(*GetChannelMessagesRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -550,7 +647,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetMessage(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetMessage(c, req.(*GetMessageRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -583,7 +688,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetEmotePacks(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetEmotePacks(c, req.(*GetEmotePacksRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -616,7 +729,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetEmotePackEmotes(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetEmotePackEmotes(c, req.(*GetEmotePackEmotesRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -649,7 +770,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.UpdateGuildInformation(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.UpdateGuildInformation(c, req.(*UpdateGuildInformationRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -682,7 +811,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.UpdateChannelInformation(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.UpdateChannelInformation(c, req.(*UpdateChannelInformationRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -715,7 +852,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.UpdateChannelOrder(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.UpdateChannelOrder(c, req.(*UpdateChannelOrderRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -748,7 +893,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.UpdateMessage(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.UpdateMessage(c, req.(*UpdateMessageRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -781,7 +934,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.AddEmoteToPack(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.AddEmoteToPack(c, req.(*AddEmoteToPackRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -814,7 +975,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteGuild(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.DeleteGuild(c, req.(*DeleteGuildRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -847,7 +1016,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteInvite(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.DeleteInvite(c, req.(*DeleteInviteRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -880,7 +1057,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteChannel(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.DeleteChannel(c, req.(*DeleteChannelRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -913,7 +1098,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteMessage(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.DeleteMessage(c, req.(*DeleteMessageRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -946,7 +1139,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteEmoteFromPack(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.DeleteEmoteFromPack(c, req.(*DeleteEmoteFromPackRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -979,7 +1180,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteEmotePack(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.DeleteEmotePack(c, req.(*DeleteEmotePackRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1012,7 +1221,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DequipEmotePack(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.DequipEmotePack(c, req.(*DequipEmotePackRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1045,7 +1262,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.JoinGuild(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.JoinGuild(c, req.(*JoinGuildRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1078,7 +1303,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.LeaveGuild(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.LeaveGuild(c, req.(*LeaveGuildRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1111,7 +1344,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.TriggerAction(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.TriggerAction(c, req.(*TriggerActionRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1144,7 +1385,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.SendMessage(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.SendMessage(c, req.(*SendMessageRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1177,7 +1426,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.QueryHasPermission(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.QueryHasPermission(c, req.(*QueryPermissionsRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1210,7 +1467,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.SetPermissions(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.SetPermissions(c, req.(*SetPermissionsRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1243,7 +1508,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetPermissions(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetPermissions(c, req.(*GetPermissionsRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1276,7 +1549,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.MoveRole(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.MoveRole(c, req.(*MoveRoleRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1309,7 +1590,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetGuildRoles(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetGuildRoles(c, req.(*GetGuildRolesRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1342,7 +1631,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.AddGuildRole(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.AddGuildRole(c, req.(*AddGuildRoleRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1375,7 +1672,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.ModifyGuildRole(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.ModifyGuildRole(c, req.(*ModifyGuildRoleRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1408,7 +1713,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.DeleteGuildRole(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.DeleteGuildRole(c, req.(*DeleteGuildRoleRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1441,7 +1754,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.ManageUserRoles(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.ManageUserRoles(c, req.(*ManageUserRolesRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1474,7 +1795,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetUserRoles(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetUserRoles(c, req.(*GetUserRolesRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1666,7 +1995,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetUser(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetUser(c, req.(*GetUserRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1699,7 +2036,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.GetUserMetadata(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.GetUserMetadata(c, req.(*GetUserMetadataRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1732,7 +2077,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.ProfileUpdate(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.ProfileUpdate(c, req.(*ProfileUpdateRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1765,7 +2118,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.Typing(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.Typing(c, req.(*TypingRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
@@ -1798,7 +2159,15 @@ func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 				return
 			}
 
-			resp, err := h.Server.PreviewGuild(req.Context(), requestProto, req.Header)
+			invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
+				return h.Server.PreviewGuild(c, req.(*PreviewGuildRequest), headers)
+			}
+
+			if h.UnaryPre != nil {
+				invoker = h.UnaryPre(Chatᐳv1ᐳchat, invoker)
+			}
+
+			resp, err := invoker(req.Context(), requestProto, req.Header)
 
 			response, err := proto.Marshal(resp)
 			if err != nil {
