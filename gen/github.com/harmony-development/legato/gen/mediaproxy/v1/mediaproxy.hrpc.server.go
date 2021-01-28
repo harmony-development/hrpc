@@ -26,10 +26,43 @@ type MediaProxyServiceServer interface {
 	CanInstantView(ctx context.Context, r *InstantViewRequest, headers http.Header) (resp *CanInstantViewResponse, err error)
 }
 
+var MediaProxyServiceServerFetchLinkMetadataData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\x11FetchLinkMetadata\x120.protocol.mediaproxy.v1.FetchLinkMetadataRequest\x1a$.protocol.mediaproxy.v1.SiteMetadata\"\x05\x9aD\x02\b\x01")
+
+	err := proto.Unmarshal(data, MediaProxyServiceServerFetchLinkMetadataData)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var MediaProxyServiceServerInstantViewData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\vInstantView\x12*.protocol.mediaproxy.v1.InstantViewRequest\x1a+.protocol.mediaproxy.v1.InstantViewResponse\"\x05\x9aD\x02\b\x01")
+
+	err := proto.Unmarshal(data, MediaProxyServiceServerInstantViewData)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var MediaProxyServiceServerCanInstantViewData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\x0eCanInstantView\x12*.protocol.mediaproxy.v1.InstantViewRequest\x1a..protocol.mediaproxy.v1.CanInstantViewResponse\"\x05\x9aD\x02\b\x01")
+
+	err := proto.Unmarshal(data, MediaProxyServiceServerCanInstantViewData)
+	if err != nil {
+		panic(err)
+	}
+}
+
 type MediaProxyServiceHandler struct {
 	Server       MediaProxyServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
-	UnaryPre     func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
+	UnaryPre     func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
 	upgrader     websocket.Upgrader
 }
 
@@ -68,7 +101,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Mediaproxyᐳv1ᐳmediaproxy, invoker)
+				invoker = h.UnaryPre(MediaProxyServiceServerFetchLinkMetadataData, Mediaproxyᐳv1ᐳmediaproxy, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)
@@ -109,7 +142,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Mediaproxyᐳv1ᐳmediaproxy, invoker)
+				invoker = h.UnaryPre(MediaProxyServiceServerInstantViewData, Mediaproxyᐳv1ᐳmediaproxy, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)
@@ -150,7 +183,7 @@ func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Re
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Mediaproxyᐳv1ᐳmediaproxy, invoker)
+				invoker = h.UnaryPre(MediaProxyServiceServerCanInstantViewData, Mediaproxyᐳv1ᐳmediaproxy, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)

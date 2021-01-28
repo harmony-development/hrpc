@@ -70,10 +70,23 @@ func init() {
     {{ end }}
     }
 
+    {{ range .Method }}
+        var {{ $sname }}{{ deref .Name }}Data *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+        func init() {
+            data := {{ methodData . }}
+
+            err := proto.Unmarshal(data, {{ $sname }}{{ deref .Name }}Data)
+            if err != nil {
+                panic(err)
+            }
+        }
+    {{ end }}
+
     type {{ deref .Name }}Handler struct {
         Server {{ $sname }}
         ErrorHandler func(err error, w http.ResponseWriter)
-        UnaryPre func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
+        UnaryPre func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
         upgrader websocket.Upgrader
     }
 
@@ -117,7 +130,7 @@ func init() {
             }
 
             if h.UnaryPre != nil {
-                invoker = h.UnaryPre({{ fanciedName $item }}, invoker)
+                invoker = h.UnaryPre({{ $sname }}{{ deref .Name }}Data, {{ fanciedName $item }}, invoker)
             }
 
             resp, err := invoker(req.Context(), requestProto, req.Header)

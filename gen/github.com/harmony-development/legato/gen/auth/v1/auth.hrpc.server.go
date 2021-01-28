@@ -36,10 +36,87 @@ type AuthServiceServer interface {
 	StreamSteps(ctx context.Context, r *StreamStepsRequest, out chan *AuthStep, headers http.Header)
 }
 
+var AuthServiceServerFederateData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\bFederate\x12!.protocol.auth.v1.FederateRequest\x1a\x1f.protocol.auth.v1.FederateReply")
+
+	err := proto.Unmarshal(data, AuthServiceServerFederateData)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var AuthServiceServerLoginFederatedData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\x0eLoginFederated\x12'.protocol.auth.v1.LoginFederatedRequest\x1a\x19.protocol.auth.v1.Session")
+
+	err := proto.Unmarshal(data, AuthServiceServerLoginFederatedData)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var AuthServiceServerKeyData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\x03Key\x12\x16.google.protobuf.Empty\x1a\x1a.protocol.auth.v1.KeyReply")
+
+	err := proto.Unmarshal(data, AuthServiceServerKeyData)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var AuthServiceServerBeginAuthData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\tBeginAuth\x12\x16.google.protobuf.Empty\x1a#.protocol.auth.v1.BeginAuthResponse")
+
+	err := proto.Unmarshal(data, AuthServiceServerBeginAuthData)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var AuthServiceServerNextStepData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\bNextStep\x12!.protocol.auth.v1.NextStepRequest\x1a\x1a.protocol.auth.v1.AuthStep")
+
+	err := proto.Unmarshal(data, AuthServiceServerNextStepData)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var AuthServiceServerStepBackData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\bStepBack\x12!.protocol.auth.v1.StepBackRequest\x1a\x1a.protocol.auth.v1.AuthStep")
+
+	err := proto.Unmarshal(data, AuthServiceServerStepBackData)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var AuthServiceServerStreamStepsData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\vStreamSteps\x12$.protocol.auth.v1.StreamStepsRequest\x1a\x1a.protocol.auth.v1.AuthStep0\x01")
+
+	err := proto.Unmarshal(data, AuthServiceServerStreamStepsData)
+	if err != nil {
+		panic(err)
+	}
+}
+
 type AuthServiceHandler struct {
 	Server       AuthServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
-	UnaryPre     func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
+	UnaryPre     func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
 	upgrader     websocket.Upgrader
 }
 
@@ -78,7 +155,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+				invoker = h.UnaryPre(AuthServiceServerFederateData, Authᐳv1ᐳauth, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)
@@ -119,7 +196,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+				invoker = h.UnaryPre(AuthServiceServerLoginFederatedData, Authᐳv1ᐳauth, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)
@@ -160,7 +237,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+				invoker = h.UnaryPre(AuthServiceServerKeyData, Authᐳv1ᐳauth, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)
@@ -201,7 +278,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+				invoker = h.UnaryPre(AuthServiceServerBeginAuthData, Authᐳv1ᐳauth, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)
@@ -242,7 +319,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+				invoker = h.UnaryPre(AuthServiceServerNextStepData, Authᐳv1ᐳauth, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)
@@ -283,7 +360,7 @@ func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request)
 			}
 
 			if h.UnaryPre != nil {
-				invoker = h.UnaryPre(Authᐳv1ᐳauth, invoker)
+				invoker = h.UnaryPre(AuthServiceServerStepBackData, Authᐳv1ᐳauth, invoker)
 			}
 
 			resp, err := invoker(req.Context(), requestProto, req.Header)

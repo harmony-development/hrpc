@@ -176,6 +176,13 @@ func main() {
 		"fanciedName": func(item *descriptorpb.FileDescriptorProto) string {
 			return strings.Title(strings.ReplaceAll(strings.ReplaceAll(*item.Name, "/", "ᐳ"), ".proto", ""))
 		},
+		"methodData": func(meth *descriptorpb.MethodDescriptorProto) string {
+			data, err := proto.Marshal(meth)
+			if err != nil {
+				panic(err)
+			}
+			return repr.String(data)
+		},
 		"fileData": func(item *descriptorpb.FileDescriptorProto) string {
 			data, err := proto.Marshal(item)
 			if err != nil {

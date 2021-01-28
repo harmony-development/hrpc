@@ -22,10 +22,21 @@ type VoiceServiceServer interface {
 	Connect(ctx context.Context, in chan *ClientSignal, out chan *Signal, headers http.Header)
 }
 
+var VoiceServiceServerConnectData *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+func init() {
+	data := []byte("\n\aConnect\x12\x1f.protocol.voice.v1.ClientSignal\x1a\x19.protocol.voice.v1.Signal\"\x00(\x010\x01")
+
+	err := proto.Unmarshal(data, VoiceServiceServerConnectData)
+	if err != nil {
+		panic(err)
+	}
+}
+
 type VoiceServiceHandler struct {
 	Server       VoiceServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
-	UnaryPre     func(d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
+	UnaryPre     func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
 	upgrader     websocket.Upgrader
 }
 
