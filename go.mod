@@ -1,4 +1,4 @@
-module hrpc
+module github.com/harmony-development/hrpc
 
 go 1.15
 
