@@ -174,7 +174,7 @@ func main() {
 			return name
 		},
 		"fanciedName": func(item *descriptorpb.FileDescriptorProto) string {
-			return strings.ReplaceAll(strings.ReplaceAll(*item.Name, "/", "ᐳ"), ".proto", "") + "ᐳfileDescriptorProto"
+			return strings.ReplaceAll(strings.ReplaceAll(*item.Name, "/", "ᐳ"), ".proto", "")
 		},
 		"fileData": func(item *descriptorpb.FileDescriptorProto) string {
 			data, err := proto.Marshal(item)

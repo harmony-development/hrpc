@@ -9,6 +9,7 @@ import "net/http"
 import "io/ioutil"
 import "google.golang.org/protobuf/proto"
 import "github.com/gorilla/websocket"
+import "google.golang.org/protobuf/types/descriptorpb"
 
 {{ $imports := newset }}
 
@@ -32,7 +33,16 @@ import "github.com/gorilla/websocket"
 
 {{ end }}
 
-var {{ fanciedName $item }} = {{ fileData $item }}
+var {{ fanciedName $item }} *descriptorpb.FileDescriptorProto = new(descriptorpb.FileDescriptorProto)
+
+func init() {
+    data := {{ fileData $item }}
+
+    err := proto.Unmarshal(data, {{ fanciedName $item }})
+    if err != nil {
+        panic(err)
+    }
+}
 
 {{ if .Service }}
 {{ setOK true }}
