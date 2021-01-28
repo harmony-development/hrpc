@@ -32,6 +32,8 @@ import "github.com/gorilla/websocket"
 
 {{ end }}
 
+var {{ fanciedName $item }} = {{ fileData $item }}
+
 {{ if .Service }}
 {{ setOK true }}
 {{ end }}

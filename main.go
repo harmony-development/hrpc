@@ -12,6 +12,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/alecthomas/repr"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
@@ -171,6 +172,16 @@ func main() {
 			}
 
 			return name
+		},
+		"fanciedName": func(item *descriptorpb.FileDescriptorProto) string {
+			return strings.ReplaceAll(strings.ReplaceAll(*item.Name, "/", "ᐳ"), ".proto", "") + "ᐳfileDescriptorProto"
+		},
+		"fileData": func(item *descriptorpb.FileDescriptorProto) string {
+			data, err := proto.Marshal(item)
+			if err != nil {
+				panic(err)
+			}
+			return repr.String(data)
 		},
 		"resolvedGoType": func(item *descriptorpb.FileDescriptorProto, method *descriptorpb.MethodDescriptorProto, in string) QualPair {
 			wellKnown := map[string]QualPair{
