@@ -6,6 +6,7 @@ import "io/ioutil"
 import "google.golang.org/protobuf/proto"
 import "github.com/gorilla/websocket"
 import "google.golang.org/protobuf/types/descriptorpb"
+import "github.com/harmony-development/hrpc/server"
 
 var Mediaproxyᐳv1ᐳmediaproxy *descriptorpb.FileDescriptorProto = new(descriptorpb.FileDescriptorProto)
 
@@ -62,7 +63,7 @@ func init() {
 type MediaProxyServiceHandler struct {
 	Server       MediaProxyServiceServer
 	ErrorHandler func(err error, w http.ResponseWriter)
-	UnaryPre     func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, f func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)) func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error)
+	UnaryPre     server.HandlerTransformer
 	upgrader     websocket.Upgrader
 }
 

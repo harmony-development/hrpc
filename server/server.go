@@ -20,7 +20,7 @@ type HRPCServer struct {
 }
 
 type Handler func(c context.Context, req protoreflect.ProtoMessage, headers http.Header) (protoreflect.ProtoMessage, error)
-type HandlerTransformer func(meth *descriptorpb.DescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
+type HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
 
 func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 	switch len(funs) {
@@ -40,7 +40,7 @@ func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 		// or
 		// handler |> a |> b |> c
 		for _, fun := range other {
-			fn = func(meth *descriptorpb.DescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
+			fn = func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
 				return fn(meth, d, fun(meth, d, h))
 			}
 		}
