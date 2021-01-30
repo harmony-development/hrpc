@@ -96,10 +96,9 @@ func main() {
 		file.WriteString(fmt.Sprintf("title: \"Reference: %s\"\n", pkg))
 		file.WriteString("---\n")
 
-		file.WriteString("# Message Types \n\n")
+		file.WriteString("## Message Types \n\n")
 		for _, item := range stuff.Messages {
-
-			file.WriteString(fmt.Sprintf("## %s\n", item.GetName()))
+			file.WriteString(fmt.Sprintf("### %s\n", item.GetName()))
 			file.WriteString("\nFields\n\n")
 			file.WriteString("| Name | Type |\n")
 			file.WriteString("| ---- | ---- |\n")
@@ -120,11 +119,11 @@ func main() {
 			file.WriteString("\n")
 		}
 
-		file.WriteString("# Services \n\n")
+		file.WriteString("## Services \n\n")
 		for _, serv := range stuff.Services {
-			file.WriteString(fmt.Sprintf("## %s\n\n", serv.GetName()))
+			file.WriteString(fmt.Sprintf("### %s\n\n", serv.GetName()))
 
-			file.WriteString("### Unary Methods\n\n")
+			file.WriteString("#### Unary Methods\n\n")
 
 			file.WriteString("| Name | Request | Response |\n")
 			file.WriteString("| ---- | ------- | -------- |\n")
@@ -144,7 +143,7 @@ func main() {
 			}
 			file.WriteString("\n")
 
-			file.WriteString("### Streaming Methods\n\n")
+			file.WriteString("#### Streaming Methods\n\n")
 
 			file.WriteString("| Name | Client Streams | Server Streams |\n")
 			file.WriteString("| ---- | -------------- | -------------- |\n")
