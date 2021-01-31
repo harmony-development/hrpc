@@ -132,6 +132,25 @@ func NewAuthServiceHandler(s AuthServiceServer, errHandler func(err error, w htt
 	}
 }
 
+func (h *AuthServiceHandler) Routes() []string {
+	return []string{
+
+		"/protocol.auth.v1.AuthService/Federate",
+
+		"/protocol.auth.v1.AuthService/LoginFederated",
+
+		"/protocol.auth.v1.AuthService/Key",
+
+		"/protocol.auth.v1.AuthService/BeginAuth",
+
+		"/protocol.auth.v1.AuthService/NextStep",
+
+		"/protocol.auth.v1.AuthService/StepBack",
+
+		"/protocol.auth.v1.AuthService/StreamSteps",
+	}
+}
+
 func (h *AuthServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.URL.Path {
 

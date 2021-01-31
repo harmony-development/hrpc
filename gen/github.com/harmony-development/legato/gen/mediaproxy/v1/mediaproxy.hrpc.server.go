@@ -78,6 +78,17 @@ func NewMediaProxyServiceHandler(s MediaProxyServiceServer, errHandler func(err 
 	}
 }
 
+func (h *MediaProxyServiceHandler) Routes() []string {
+	return []string{
+
+		"/protocol.mediaproxy.v1.MediaProxyService/FetchLinkMetadata",
+
+		"/protocol.mediaproxy.v1.MediaProxyService/InstantView",
+
+		"/protocol.mediaproxy.v1.MediaProxyService/CanInstantView",
+	}
+}
+
 func (h *MediaProxyServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.URL.Path {
 

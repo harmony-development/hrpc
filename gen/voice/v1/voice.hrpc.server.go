@@ -52,6 +52,13 @@ func NewVoiceServiceHandler(s VoiceServiceServer, errHandler func(err error, w h
 	}
 }
 
+func (h *VoiceServiceHandler) Routes() []string {
+	return []string{
+
+		"/protocol.voice.v1.VoiceService/Connect",
+	}
+}
+
 func (h *VoiceServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.URL.Path {
 

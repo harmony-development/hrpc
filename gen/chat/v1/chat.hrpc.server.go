@@ -665,6 +665,107 @@ func NewChatServiceHandler(s ChatServiceServer, errHandler func(err error, w htt
 	}
 }
 
+func (h *ChatServiceHandler) Routes() []string {
+	return []string{
+
+		"/protocol.chat.v1.ChatService/CreateGuild",
+
+		"/protocol.chat.v1.ChatService/CreateInvite",
+
+		"/protocol.chat.v1.ChatService/CreateChannel",
+
+		"/protocol.chat.v1.ChatService/CreateEmotePack",
+
+		"/protocol.chat.v1.ChatService/GetGuildList",
+
+		"/protocol.chat.v1.ChatService/AddGuildToGuildList",
+
+		"/protocol.chat.v1.ChatService/RemoveGuildFromGuildList",
+
+		"/protocol.chat.v1.ChatService/GetGuild",
+
+		"/protocol.chat.v1.ChatService/GetGuildInvites",
+
+		"/protocol.chat.v1.ChatService/GetGuildMembers",
+
+		"/protocol.chat.v1.ChatService/GetGuildChannels",
+
+		"/protocol.chat.v1.ChatService/GetChannelMessages",
+
+		"/protocol.chat.v1.ChatService/GetMessage",
+
+		"/protocol.chat.v1.ChatService/GetEmotePacks",
+
+		"/protocol.chat.v1.ChatService/GetEmotePackEmotes",
+
+		"/protocol.chat.v1.ChatService/UpdateGuildInformation",
+
+		"/protocol.chat.v1.ChatService/UpdateChannelInformation",
+
+		"/protocol.chat.v1.ChatService/UpdateChannelOrder",
+
+		"/protocol.chat.v1.ChatService/UpdateMessage",
+
+		"/protocol.chat.v1.ChatService/AddEmoteToPack",
+
+		"/protocol.chat.v1.ChatService/DeleteGuild",
+
+		"/protocol.chat.v1.ChatService/DeleteInvite",
+
+		"/protocol.chat.v1.ChatService/DeleteChannel",
+
+		"/protocol.chat.v1.ChatService/DeleteMessage",
+
+		"/protocol.chat.v1.ChatService/DeleteEmoteFromPack",
+
+		"/protocol.chat.v1.ChatService/DeleteEmotePack",
+
+		"/protocol.chat.v1.ChatService/DequipEmotePack",
+
+		"/protocol.chat.v1.ChatService/JoinGuild",
+
+		"/protocol.chat.v1.ChatService/LeaveGuild",
+
+		"/protocol.chat.v1.ChatService/TriggerAction",
+
+		"/protocol.chat.v1.ChatService/SendMessage",
+
+		"/protocol.chat.v1.ChatService/QueryHasPermission",
+
+		"/protocol.chat.v1.ChatService/SetPermissions",
+
+		"/protocol.chat.v1.ChatService/GetPermissions",
+
+		"/protocol.chat.v1.ChatService/MoveRole",
+
+		"/protocol.chat.v1.ChatService/GetGuildRoles",
+
+		"/protocol.chat.v1.ChatService/AddGuildRole",
+
+		"/protocol.chat.v1.ChatService/ModifyGuildRole",
+
+		"/protocol.chat.v1.ChatService/DeleteGuildRole",
+
+		"/protocol.chat.v1.ChatService/ManageUserRoles",
+
+		"/protocol.chat.v1.ChatService/GetUserRoles",
+
+		"/protocol.chat.v1.ChatService/StreamEvents",
+
+		"/protocol.chat.v1.ChatService/Sync",
+
+		"/protocol.chat.v1.ChatService/GetUser",
+
+		"/protocol.chat.v1.ChatService/GetUserMetadata",
+
+		"/protocol.chat.v1.ChatService/ProfileUpdate",
+
+		"/protocol.chat.v1.ChatService/Typing",
+
+		"/protocol.chat.v1.ChatService/PreviewGuild",
+	}
+}
+
 func (h *ChatServiceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.URL.Path {
 
