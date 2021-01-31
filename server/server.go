@@ -50,16 +50,16 @@ func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 }
 
 func NewHRPCServer(items ...HRPCServiceHandler) *HRPCServer {
-	herpes := &HRPCServer{
+	hentaiRPCServer := &HRPCServer{
 		handlers: items,
 		serveMux: http.NewServeMux(),
 	}
-	for _, item := range herpes.handlers {
+	for _, item := range hentaiRPCServer.handlers {
 		for _, route := range item.Routes() {
-			herpes.serveMux.Handle(route, item)
+			hentaiRPCServer.serveMux.Handle(route, item)
 		}
 	}
-	return herpes
+	return hentaiRPCServer
 }
 
 func (h *HRPCServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
