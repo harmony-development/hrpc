@@ -12,6 +12,7 @@ type HRPCServiceHandler interface {
 	http.Handler
 
 	Routes() []string
+	SetUnaryPre(h HandlerTransformer)
 }
 
 type HRPCServer struct {

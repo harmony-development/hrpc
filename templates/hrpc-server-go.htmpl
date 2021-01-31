@@ -102,6 +102,10 @@ func init() {
         }
     }
 
+    func (h* {{ deref .Name }}Handler) SetUnaryPre(s server.HandlerTransformer) {
+        h.UnaryPre = s
+    }
+
     func (h *{{ deref .Name }}Handler) Routes() []string {
         return []string{
             {{ range .Method }}
