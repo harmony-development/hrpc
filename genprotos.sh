@@ -5,22 +5,10 @@ for dir in $(find "protocol" -name '*.proto' -print0 | xargs -0 -n1 dirname | so
     echo "Generating files in ${dir}..."
     find "${dir}" -name '*.proto'
 
-    protoc --experimental_allow_proto3_optional \
+    protoc \
     --proto_path=protocol \
-    --plugin=protoc-gen-custom=./hrpc \
-    --custom_out=./gen \
-    --custom_opt="/templates/hrpc-server-go.htmpl" \
-    --go_out=./gen \
-    --validate_out="lang=go:gen" \
-    $(find "${dir}" -name '*.proto')
-
-    protoc --experimental_allow_proto3_optional \
-    --proto_path=protocol \
-    --plugin=protoc-gen-custom=./hrpc \
-    --custom_out=./gen \
-    --custom_opt="/templates/hrpc-client-go.htmpl" \
-    --go_out=./gen \
-    --validate_out="lang=go:gen" \
+    --hrpc_out=./gen \
+    --hrpc_opt=hrpc-server-go:hrpc-client-go \
     $(find "${dir}" -name '*.proto')
 done
 
