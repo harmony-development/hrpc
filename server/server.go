@@ -62,6 +62,12 @@ func NewHRPCServer(items ...HRPCServiceHandler) *HRPCServer {
 	return hentaiRPCServer
 }
 
+func (h *HRPCServer) SetUnaryPre(han HandlerTransformer) {
+	for _, item := range h.handlers {
+		item.SetUnaryPre(han)
+	}
+}
+
 func (h *HRPCServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.serveMux.ServeHTTP(w, r)
 }
