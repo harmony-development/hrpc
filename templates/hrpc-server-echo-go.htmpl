@@ -4,30 +4,15 @@
 
 package {{ filepathBase .Options.GoPackage }}
 
-import "context"
 import "github.com/labstack/echo/v4"
 import "io/ioutil"
+import "net/http"
 import "google.golang.org/protobuf/proto"
 import "github.com/gorilla/websocket"
 import "google.golang.org/protobuf/types/descriptorpb"
 import "github.com/harmony-development/hrpc/server"
 
 {{ $imports := newset }}
-
-type protobufBinder struct{}
-
-func (protobufBinder) Bind(obj interface{}, c echo.Context) error {
-	buf, err := ioutil.ReadAll(c.Request().Body)
-	if err != nil {
-		return err
-	}
-
-	if err = proto.Unmarshal(buf, obj.(proto.Message)); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 {{ range .Service }}
 
@@ -48,6 +33,19 @@ func (protobufBinder) Bind(obj interface{}, c echo.Context) error {
     import "{{ $k }}"
 
 {{ end }}
+
+func BindPB(obj interface{}, c echo.Context) error {
+	buf, err := ioutil.ReadAll(c.Request().Body)
+	if err != nil {
+		return err
+	}
+
+	if err = proto.Unmarshal(buf, obj.(proto.Message)); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 var {{ fanciedName $item }} *descriptorpb.FileDescriptorProto = new(descriptorpb.FileDescriptorProto)
 
@@ -76,11 +74,11 @@ func init() {
         {{ $resOut := (resolvedGoType $item . .OutputType ) }}
 
         {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
-            {{ deref .Name }}(ctx context.Context, r *{{ $resIn.ID}}, headers http.Header) (resp *{{ $resOut.ID}}, err error)
+            {{ deref .Name }}(ctx echo.Context, r *{{ $resIn.ID}}) (resp *{{ $resOut.ID}}, err error)
         {{ else if (and (hasServerStream .) (not (hasClientStream .))) }}
-            {{ deref .Name }}(ctx context.Context, r *{{ $resIn.ID}}, out chan *{{ $resOut.ID }}, headers http.Header)
+            {{ deref .Name }}(ctx echo.Context, r *{{ $resIn.ID}}, out chan *{{ $resOut.ID }})
         {{ else }}
-            {{ deref .Name }}(ctx context.Context, in chan *{{ $resIn.ID}}, out chan *{{ $resOut.ID }}, headers http.Header)
+            {{ deref .Name }}(ctx echo.Context, in chan *{{ $resIn.ID}}, out chan *{{ $resOut.ID }})
         {{ end }}
 
     {{ end }}
@@ -129,172 +127,110 @@ func init() {
     }
 
 	{{ range .Method }}
+    {{ $resIn := (resolvedGoType $item . .InputType ) }}
+    {{ $resOut := (resolvedGoType $item . .OutputType ) }}
     func (h *{{ $serv.Name }}Handler) {{ .Name }}Handler(c echo.Context) error {
-        	requestProto := new({{ $resIn.ID }})
-            err = proto.Unmarshal(body, requestProto)
-            if err != nil {
-                h.ErrorHandler(err, w)
-                return
+        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
+        requestProto := new({{ $resIn.ID }})
+        if err := BindPB(requestProto, c); err != nil {
+            return err
+        }
+        res, err := h.Server.{{ .Name }}(c, requestProto)
+        if err != nil {
+            return err
+        }
+        response, err := proto.Marshal(res)
+        if err != nil {
+            return err
+        }
+        return c.Blob(http.StatusOK, "application/octet-stream", response)
+        {{ else }}
+        var err error
+        {{ if (hasClientStream .) }}
+        in := make(chan *{{ $resIn.ID }})
+        err = nil
+        {{ else }}
+        in := new({{ $resIn.ID }})
+        if err = BindPB(in, c); err != nil {
+            return err
+        }
+        {{ end }}
+        out := make(chan *{{ $resOut.ID }})
+        ws, err := h.upgrader.Upgrade(c.Response(), c.Request(), nil)
+        if err != nil {
+            return err
+        }
+        h.Server.{{ .Name }}(c, in, out)
+        {{ if (hasClientStream .) }}
+        msgs := make(chan []byte)
+
+        go func() {
+            for {
+                _, message, err := ws.ReadMessage()
+                if err != nil {
+                    close(msgs)
+                    break
+                }
+                msgs <- message
             }
+        }()
+        {{ end }}
+
+        defer ws.WriteMessage(websocket.CloseMessage, []byte{})
+
+        for {
+            select {
+            {{ if (hasClientStream .) }}
+            case data, ok := <-msgs:
+                if !ok {
+                    continue 
+                }
+
+                item := new({{ $resIn.ID }})
+                if err := proto.Unmarshal(data, item); err != nil {
+                    close(in)
+                    close(out)
+                    return err
+                }
+
+                in <- item
+            {{ end }}
+            case msg, ok := <-out:
+                if !ok {
+                    continue
+                }
+
+                w, err := ws.NextWriter(websocket.BinaryMessage)
+                if err != nil {
+                    {{ if (hasClientStream .) }}
+                    close(in)
+                    {{ end }}
+                    close(out)
+                    return err
+                }
+
+                response, err := proto.Marshal(msg)
+                if err != nil {
+                    {{ if (hasClientStream .) }}
+                    close(in)
+                    {{ end }}
+                    close(out)
+                    return err
+                }
+
+                w.Write(response)
+                if err := w.Close(); err != nil {
+                    {{ if (hasClientStream .) }}
+                    close(in)
+                    {{ end }}
+                    close(out)
+                    return err
+                }
+            }
+        }
+        {{ end }}
 	}
 	{{ end }}
-
-		func (h *{{ deref .Name }}Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-        switch (req.URL.Path) {
-        {{ range .Method }}
-
-        {{ $resIn := (resolvedGoType $item . .InputType ) }}
-        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
-
-        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
-        case "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}": {
-            body, err := ioutil.ReadAll(req.Body)
-            defer req.Body.Close()
-            if err != nil {
-                h.ErrorHandler(err, w)
-                return
-            }
-
-            {{ $resIn := (resolvedGoType $item . .InputType ) }}
-            requestProto := new({{ $resIn.ID }})
-            err = proto.Unmarshal(body, requestProto)
-            if err != nil {
-                h.ErrorHandler(err, w)
-                return
-            }
-
-            invoker := func(c context.Context, req proto.Message, headers http.Header) (proto.Message, error) {
-                return h.Server.{{ .Name }}(c, req.(*{{ $resIn.ID }}), headers)
-            }
-
-            if h.UnaryPre != nil {
-                invoker = h.UnaryPre({{ $sname }}{{ deref .Name }}Data, {{ fanciedName $item }}, invoker)
-            }
-
-            resp, err := invoker(req.Context(), requestProto, req.Header)
-
-            response, err := proto.Marshal(resp)
-            if err != nil {
-                h.ErrorHandler(err, w)
-                return
-            }
-
-            w.Header().Add("Content-Type", "application/octet-stream")
-            _, err = w.Write(response)
-
-            if err != nil {
-                h.ErrorHandler(err, w)
-                return
-            }
-        }
-        {{ else }}
-        case "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}": {
-            var err error
-
-            {{ if (hasClientStream .) }}
-            in := make(chan *{{ $resIn.ID }})
-            err = nil
-            {{ else }}
-            body, err := ioutil.ReadAll(req.Body)
-            defer req.Body.Close()
-            if err != nil {
-                h.ErrorHandler(err, w)
-                return
-            }
-
-            in := new({{ $resIn.ID }})
-            err = proto.Unmarshal(body, in)
-            {{ end }}
-            if err != nil {
-                h.ErrorHandler(err, w)
-                return
-            }
-
-            out := make(chan *{{ $resOut.ID }})
-
-            ws, err := h.upgrader.Upgrade(w, req, nil)
-            if err != nil {
-                h.ErrorHandler(err, w)
-                return
-            }
-
-            go func() {
-                {{ if (hasClientStream .) }}
-                msgs := make(chan []byte)
-
-                go func() {
-                    for {
-                        _, message, err := ws.ReadMessage()
-                        if err != nil {
-                            close(msgs)
-                            break
-                        }
-                        msgs <- message
-                    }
-                }()
-                {{ end }}
-
-                defer ws.WriteMessage(websocket.CloseMessage, []byte{})
-
-                for {
-                    select {
-                    {{ if (hasClientStream .) }}
-                    case data, ok := <-msgs:
-                        if !ok {
-                            return
-                        }
-
-                        item := new({{ $resIn.ID }})
-                        err = proto.Unmarshal(data, item)
-                        if err != nil {
-                            close(in)
-                            close(out)
-                            return
-                        }
-
-                        in <- item
-                    {{ end }}
-                    case msg, ok := <-out:
-                        if !ok {
-                            return
-                        }
-
-                        w, err := ws.NextWriter(websocket.BinaryMessage)
-                        if err != nil {
-                            {{ if (hasClientStream .) }}
-                            close(in)
-                            {{ end }}
-                            close(out)
-                            return
-                        }
-
-                        response, err := proto.Marshal(msg)
-                        if err != nil {
-                            {{ if (hasClientStream .) }}
-                            close(in)
-                            {{ end }}
-                            close(out)
-                            return
-                        }
-
-                        w.Write(response)
-                        if err := w.Close(); err != nil {
-                            {{ if (hasClientStream .) }}
-                            close(in)
-                            {{ end }}
-                            close(out)
-                            return
-                        }
-                    }
-                }
-            }()
-
-            h.Server.{{ .Name }}(req.Context(), in, out, req.Header)
-        }
-        {{ end }}
-        {{ end }}
-        }
-    }
 
 {{ end }}
 
