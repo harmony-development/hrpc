@@ -176,14 +176,25 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorp
 
 					add(
 						fmt.Sprintf(
-							"\t%s* %s();",
+							"\t[[ nodiscard ]] %s* %s(QMap<QByteArray,QString> headers = {});",
 
 							className,
 							meth.GetName(),
 						),
 					)
 				} else if meth.GetServerStreaming() && !meth.GetClientStreaming() {
-					add(`// todo client <- server stream`)
+					sane := func(s string) string { return strings.ReplaceAll(typeToCxxNamespaces(s), "::", "_") }
+					className := fmt.Sprintf(`Receive__%s__Stream`, sane(meth.GetOutputType()))
+
+					add(
+						fmt.Sprintf(
+							"\t[[ nodiscard ]] %s* %s(const %s& in, QMap<QByteArray,QString> headers = {});",
+
+							className,
+							meth.GetName(),
+							typeToCxxNamespaces(meth.GetInputType()),
+						),
+					)
 				} else {
 					// unary request
 
@@ -222,7 +233,7 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 
 				add(
 					fmt.Sprintf(
-						"auto %sServiceClient::%s() -> %s*",
+						"auto %sServiceClient::%s(QMap<QByteArray,QString> headers) -> %s*",
 
 						service.GetName(),
 						meth.GetName(),
@@ -230,12 +241,41 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 					),
 				)
 				add(`{`)
+				add(`auto req = QNetworkRequest(QUrl(wsProtocol()+host));`)
+				add(`
+					for (const auto& item : headers.keys()) {
+						req.setRawHeader(item, headers[item].toLocal8Bit());
+					}
+				`)
 				add(fmt.Sprintf(`	auto sock = new %s();`, className))
-				add(`	sock->open(QUrl(wsProtocol()+host));`)
+				add(`	sock->open(req);`)
 				add(`	return sock;`)
 				add(`}`)
 			} else if meth.GetServerStreaming() && !meth.GetClientStreaming() {
-				add(`// todo client <- server stream`)
+				sane := func(s string) string { return strings.ReplaceAll(typeToCxxNamespaces(s), "::", "_") }
+				className := fmt.Sprintf(`Receive__%s__Stream`, sane(meth.GetOutputType()))
+
+				add(
+					fmt.Sprintf(
+						"auto %sServiceClient::%s(const %s& in, QMap<QByteArray,QString> headers) -> %s*",
+
+						service.GetName(),
+						meth.GetName(),
+						typeToCxxNamespaces(meth.GetInputType()),
+						className,
+					),
+				)
+				add(`{`)
+				add(`auto req = QNetworkRequest(QUrl(wsProtocol()+host));`)
+				add(`
+					for (const auto& item : headers.keys()) {
+						req.setRawHeader(item, headers[item].toLocal8Bit());
+					}
+				`)
+				add(fmt.Sprintf(`	auto sock = new %s();`, className))
+				add(`	sock->open(req);`)
+				add(`	return sock;`)
+				add(`}`)
 			} else {
 				// unary request
 
