@@ -17,7 +17,7 @@ func inc(s string) string {
 	return fmt.Sprintf(`#include "%s"`, s)
 }
 
-func getImports(d *descriptorpb.FileDescriptorProto) string {
+func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDescriptorProto) string {
 	set := []string{}
 	add := func(s string) {
 		for _, item := range set {
@@ -43,8 +43,10 @@ func getImports(d *descriptorpb.FileDescriptorProto) string {
 		}
 	}
 
-	for _, dep := range d.Dependency {
-		add(inc(convertCxxProto(dep, "pb", "h")))
+	for _, f := range mu {
+		for _, dep := range f.Dependency {
+			add(inc(convertCxxProto(dep, "pb", "h")))
+		}
 	}
 
 	return strings.Join(set, "\n") + "\n"
@@ -144,9 +146,9 @@ class %s : public QWebSocket {
 	return sb.String()
 }
 
-func generateClientHeader(d *descriptorpb.FileDescriptorProto) string {
+func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDescriptorProto) string {
 	sb := strings.Builder{}
-	sb.WriteString(getImports(d))
+	sb.WriteString(getImports(d, mu))
 
 	add := func(s string) { sb.WriteString(s + "\n") }
 
@@ -304,7 +306,7 @@ func GenerateQtCxxClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGene
 			*headerFile.Name = convertCxxProto(*file.Name, "hrpc.client", "h")
 
 			headerFile.Content = new(string)
-			*headerFile.Content = generateClientHeader(file)
+			*headerFile.Content = generateClientHeader(file, d.ProtoFile)
 
 			r.File = append(r.File, headerFile)
 		}
