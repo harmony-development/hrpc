@@ -189,7 +189,7 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorp
 
 					add(
 						fmt.Sprintf(
-							"\tResult<%s> %s(const %s& in, QMap<QByteArray,QString> headers = {});",
+							"\t[[ nodiscard ]] Result<%s> %s(const %s& in, QMap<QByteArray,QString> headers = {});",
 
 							typeToCxxNamespaces(meth.GetOutputType()),
 							meth.GetName(),
