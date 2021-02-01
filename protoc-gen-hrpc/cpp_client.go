@@ -163,7 +163,7 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorp
 		add(fmt.Sprintf(`	QSharedPointer<QNetworkAccessManager> nam;`))
 		add(fmt.Sprintf(`	QString httpProtocol() const { return secure ? QStringLiteral("https://") : QStringLiteral("http://"); }`))
 		add(fmt.Sprintf(`	QString wsProtocol() const { return secure ? QStringLiteral("wss://") : QStringLiteral("ws://"); }`))
-		add(fmt.Sprintf("\texplicit %sServiceClient(const QString& host, bool secure) : host(host), secure(secure), nam(new QNetworkAccessManager) {}", *service.Name))
+		add(fmt.Sprintf("\tpublic: explicit %sServiceClient(const QString& host, bool secure) : host(host), secure(secure), nam(new QNetworkAccessManager) {}", *service.Name))
 		add(`public:`)
 		add(`	template<typename T> using Result = std::variant<T, QString>;`)
 		{
