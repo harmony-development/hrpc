@@ -35,6 +35,8 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 	add(`#include <QString>`)
 	add(`#include <variant>`)
 
+	add(inc(convertCxxProto(*d.Name, "pb", "h")))
+
 	for _, kind := range d.Service {
 		for _, meth := range kind.Method {
 			if meth.GetClientStreaming() || meth.GetServerStreaming() {
