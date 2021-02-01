@@ -213,7 +213,7 @@ var _escData = map[string]*_escFile{
 		name:    "hrpc-client-go.htmpl",
 		local:   "../templates/hrpc-client-go.htmpl",
 		size:    5103,
-		modtime: 1611811948,
+		modtime: 1611712741,
 		compressed: `
 H4sIAAAAAAAC/+RYW2/bNhR+z684FZKCKhT63Ugf1nTrijVNUa/YwzAUjHQkE6ZIjaSSBYb++0BS18ix
 66bFCqwPjUCe2/edG5PtFk5vmEFYvgRiNS9XdZ7zf4DkXGDF7PqVu6TvWYkxRLTSyqoohqY52W7BoP2F
@@ -239,11 +239,47 @@ tDuMy0u/+C8PPdFkduAvJ/8GAAD//x9Rp4fvEwAA
 `,
 	},
 
+	"/templates/hrpc-server-echo-go.htmpl": {
+		name:    "hrpc-server-echo-go.htmpl",
+		local:   "../templates/hrpc-server-echo-go.htmpl",
+		size:    6462,
+		modtime: 1612116207,
+		compressed: `
+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
+PhkAAA==
+`,
+	},
+
 	"/templates/hrpc-server-go.htmpl": {
 		name:    "hrpc-server-go.htmpl",
 		local:   "../templates/hrpc-server-go.htmpl",
 		size:    8264,
-		modtime: 1612055902,
+		modtime: 1612110973,
 		compressed: `
 H4sIAAAAAAAC/+xZW2/cuhF+31/BLNxCMmRuW/TJjR/ipE2CNrHhC/oQBAe0NCsRK5EySXnjs9B/PyAp
 aqnbru3jE5/bvnhNDsmZb775OLQ3GyRB/YfmwEgBKEh5+x2juQRxB2IeorqezTYbdEAVFOj4BGEzUpJ4
@@ -287,6 +323,7 @@ var _escDirs = map[string][]os.FileInfo{
 
 	"../templates": {
 		_escData["/templates/hrpc-client-go.htmpl"],
+		_escData["/templates/hrpc-server-echo-go.htmpl"],
 		_escData["/templates/hrpc-server-go.htmpl"],
 	},
 }

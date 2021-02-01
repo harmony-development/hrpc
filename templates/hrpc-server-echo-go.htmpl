@@ -1,0 +1,236 @@
+{{ setFilename (goFilename . "server") }}
+
+{{ $item := . }}
+
+package {{ filepathBase .Options.GoPackage }}
+
+import "github.com/labstack/echo/v4"
+import "io/ioutil"
+import "net/http"
+import "google.golang.org/protobuf/proto"
+import "github.com/gorilla/websocket"
+import "google.golang.org/protobuf/types/descriptorpb"
+import "github.com/harmony-development/hrpc/server"
+
+{{ $imports := newset }}
+
+{{ range .Service }}
+
+    {{ range .Method }}
+
+        {{ $resIn := (resolvedGoType $item . .InputType ) }}
+        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+
+        {{ appendSet $imports $resIn.Package }}
+        {{ appendSet $imports $resOut.Package }}
+
+    {{ end }}
+
+{{ end }}
+
+{{ range $k, $v := $imports }}
+
+    import "{{ $k }}"
+
+{{ end }}
+
+func BindPB(obj interface{}, c echo.Context) error {
+	buf, err := ioutil.ReadAll(c.Request().Body)
+	if err != nil {
+		return err
+	}
+
+	if err = proto.Unmarshal(buf, obj.(proto.Message)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var {{ fanciedName $item }} *descriptorpb.FileDescriptorProto = new(descriptorpb.FileDescriptorProto)
+
+func init() {
+    data := {{ fileData $item }}
+
+    err := proto.Unmarshal(data, {{ fanciedName $item }})
+    if err != nil {
+        panic(err)
+    }
+}
+
+{{ if .Service }}
+{{ setOK true }}
+{{ end }}
+
+{{ range .Service }}
+
+    {{ $serv := . }}
+    {{ $sname := (sprintf "%sServer" (deref .Name)) }}
+
+    type {{ $sname }} interface {
+    {{ range .Method }}
+
+        {{ $resIn := (resolvedGoType $item . .InputType ) }}
+        {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+
+        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
+            {{ deref .Name }}(ctx echo.Context, r *{{ $resIn.ID}}) (resp *{{ $resOut.ID}}, err error)
+        {{ else if (and (hasServerStream .) (not (hasClientStream .))) }}
+            {{ deref .Name }}(ctx echo.Context, r *{{ $resIn.ID}}, out chan *{{ $resOut.ID }})
+        {{ else }}
+            {{ deref .Name }}(ctx echo.Context, in chan *{{ $resIn.ID}}, out chan *{{ $resOut.ID }})
+        {{ end }}
+
+    {{ end }}
+    }
+
+    {{ range .Method }}
+        var {{ $sname }}{{ deref .Name }}Data *descriptorpb.MethodDescriptorProto = new(descriptorpb.MethodDescriptorProto)
+
+        func init() {
+            data := {{ methodData . }}
+
+            err := proto.Unmarshal(data, {{ $sname }}{{ deref .Name }}Data)
+            if err != nil {
+                panic(err)
+            }
+        }
+    {{ end }}
+
+    type {{ deref .Name }}Handler struct {
+        Server {{ $sname }}
+        ErrorHandler func(err error, w http.ResponseWriter)
+        UnaryPre server.HandlerTransformer
+        upgrader websocket.Upgrader
+    }
+
+    func New{{ deref .Name }}Handler(s {{ $sname }}) *{{ deref .Name }}Handler {
+        return &{{ deref .Name }}Handler {
+            Server: s,
+            upgrader: websocket.Upgrader{
+                ReadBufferSize:  1024,
+                WriteBufferSize: 1024,
+            },
+        }
+    }
+
+    func (h* {{ deref .Name }}Handler) SetUnaryPre(s server.HandlerTransformer) {
+        h.UnaryPre = s
+    }
+
+    func (h *{{ deref .Name }}Handler) Routes() map[string]echo.HandlerFunc {
+        return map[string]echo.HandlerFunc{
+            {{ range .Method }}
+                "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}": h.{{ .Name }}Handler,
+            {{ end }}
+        }
+    }
+
+	{{ range .Method }}
+    {{ $resIn := (resolvedGoType $item . .InputType ) }}
+    {{ $resOut := (resolvedGoType $item . .OutputType ) }}
+    func (h *{{ $serv.Name }}Handler) {{ .Name }}Handler(c echo.Context) error {
+        {{ if (not (or (hasClientStream .) (hasServerStream .)) ) }}
+        requestProto := new({{ $resIn.ID }})
+        if err := BindPB(requestProto, c); err != nil {
+            return err
+        }
+        res, err := h.Server.{{ .Name }}(c, requestProto)
+        if err != nil {
+            return err
+        }
+        response, err := proto.Marshal(res)
+        if err != nil {
+            return err
+        }
+        return c.Blob(http.StatusOK, "application/octet-stream", response)
+        {{ else }}
+        var err error
+        {{ if (hasClientStream .) }}
+        in := make(chan *{{ $resIn.ID }})
+        err = nil
+        {{ else }}
+        in := new({{ $resIn.ID }})
+        if err = BindPB(in, c); err != nil {
+            return err
+        }
+        {{ end }}
+        out := make(chan *{{ $resOut.ID }})
+        ws, err := h.upgrader.Upgrade(c.Response(), c.Request(), nil)
+        if err != nil {
+            return err
+        }
+        h.Server.{{ .Name }}(c, in, out)
+        {{ if (hasClientStream .) }}
+        msgs := make(chan []byte)
+
+        go func() {
+            for {
+                _, message, err := ws.ReadMessage()
+                if err != nil {
+                    close(msgs)
+                    break
+                }
+                msgs <- message
+            }
+        }()
+        {{ end }}
+
+        defer ws.WriteMessage(websocket.CloseMessage, []byte{})
+
+        for {
+            select {
+            {{ if (hasClientStream .) }}
+            case data, ok := <-msgs:
+                if !ok {
+                    continue 
+                }
+
+                item := new({{ $resIn.ID }})
+                if err := proto.Unmarshal(data, item); err != nil {
+                    close(in)
+                    close(out)
+                    return err
+                }
+
+                in <- item
+            {{ end }}
+            case msg, ok := <-out:
+                if !ok {
+                    continue
+                }
+
+                w, err := ws.NextWriter(websocket.BinaryMessage)
+                if err != nil {
+                    {{ if (hasClientStream .) }}
+                    close(in)
+                    {{ end }}
+                    close(out)
+                    return err
+                }
+
+                response, err := proto.Marshal(msg)
+                if err != nil {
+                    {{ if (hasClientStream .) }}
+                    close(in)
+                    {{ end }}
+                    close(out)
+                    return err
+                }
+
+                w.Write(response)
+                if err := w.Close(); err != nil {
+                    {{ if (hasClientStream .) }}
+                    close(in)
+                    {{ end }}
+                    close(out)
+                    return err
+                }
+            }
+        }
+        {{ end }}
+	}
+	{{ end }}
+
+{{ end }}
+

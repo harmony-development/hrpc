@@ -1,17 +1,15 @@
 package server
 
 import (
-	"context"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 type HRPCServiceHandler interface {
-	http.Handler
-
-	Routes() []string
+	Routes() map[string]echo.HandlerFunc
 	SetUnaryPre(h HandlerTransformer)
 }
 
@@ -20,8 +18,8 @@ type HRPCServer struct {
 	serveMux *http.ServeMux
 }
 
-type Handler func(c context.Context, req protoreflect.ProtoMessage, headers http.Header) (protoreflect.ProtoMessage, error)
-type HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
+type Handler func(c echo.Context, req protoreflect.ProtoMessage) (protoreflect.ProtoMessage, error)
+type HandlerTransformer func(c echo.Context, meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
 
 func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 	switch len(funs) {
@@ -41,22 +39,22 @@ func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 		// or
 		// handler |> a |> b |> c
 		for _, fun := range other {
-			fn = func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
-				return fn(meth, d, fun(meth, d, h))
+			fn = func(c echo.Context, meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
+				return fn(c, meth, d, fun(c, meth, d, h))
 			}
 		}
 		return fn
 	}
 }
 
-func NewHRPCServer(items ...HRPCServiceHandler) *HRPCServer {
+func NewHRPCServer(e *echo.Echo, items ...HRPCServiceHandler) *HRPCServer {
 	hentaiRPCServer := &HRPCServer{
 		handlers: items,
 		serveMux: http.NewServeMux(),
 	}
 	for _, item := range hentaiRPCServer.handlers {
-		for _, route := range item.Routes() {
-			hentaiRPCServer.serveMux.Handle(route, item)
+		for handler, route := range item.Routes() {
+			e.Any(handler, route)
 		}
 	}
 	return hentaiRPCServer
@@ -66,8 +64,4 @@ func (h *HRPCServer) SetUnaryPre(han HandlerTransformer) {
 	for _, item := range h.handlers {
 		item.SetUnaryPre(han)
 	}
-}
-
-func (h *HRPCServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.serveMux.ServeHTTP(w, r)
 }
