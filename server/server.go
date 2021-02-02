@@ -30,7 +30,7 @@ func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 	default:
 		return func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
 			in := h
-			for i := len(funs); i >= 0; i-- {
+			for i := len(funs) - 1; i >= 0; i-- {
 				item := funs[i]
 				in = item(meth, d, in)
 			}
