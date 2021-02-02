@@ -135,11 +135,16 @@ func init() {
         if err := BindPB(requestProto, c); err != nil {
             return err
         }
-        fn := h.Server.{{ .Name }}
-        if h.UnaryPre != nil {
-            fn = h.UnaryPre(fn)
+
+        invoker := func(c echo.Context, req proto.Message) (proto.Message, error) {
+            return h.Server.{{ .Name }}(c, req.(*{{ $resIn.ID }}))
         }
-        res, err := fn(c, requestProto)
+
+        if h.UnaryPre != nil {
+            invoker = h.UnaryPre({{ $sname }}{{ deref .Name }}Data, {{ fanciedName $item }}, invoker)
+        }
+
+        res, err := invoker(c, requestProto)
         if err != nil {
             return err
         }
