@@ -161,10 +161,9 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorp
 		add(fmt.Sprintf("class %sServiceClient {", *service.Name))
 		add(fmt.Sprintf(`	QString host;`))
 		add(fmt.Sprintf(`	bool secure;`))
-		add(fmt.Sprintf(`	QSharedPointer<QNetworkAccessManager> nam;`))
 		add(fmt.Sprintf(`	QString httpProtocol() const { return secure ? QStringLiteral("https://") : QStringLiteral("http://"); }`))
 		add(fmt.Sprintf(`	QString wsProtocol() const { return secure ? QStringLiteral("wss://") : QStringLiteral("ws://"); }`))
-		add(fmt.Sprintf("\tpublic: explicit %sServiceClient(const QString& host, bool secure) : host(host), secure(secure), nam(new QNetworkAccessManager) {}", *service.Name))
+		add(fmt.Sprintf("\tpublic: explicit %sServiceClient(const QString& host, bool secure) : host(host), secure(secure) {}", *service.Name))
 		add(`public:`)
 		add(`	template<typename T> using Result = std::variant<T, QString>;`)
 		{
@@ -312,6 +311,7 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 	}
 	req.setRawHeader("content-type", "application/octet-stream");
 
+	auto nam = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager);
 	auto val = nam->post(req, data);
 
 	while (!val->isFinished()) {
