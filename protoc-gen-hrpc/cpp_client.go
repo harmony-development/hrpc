@@ -280,7 +280,7 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 				add(`	if (!in.SerializeToString(&strData)) { return nullptr; }`)
 				add(`	QByteArray data = QByteArray::fromStdString(strData);`)
 				add(`	sock->open(req);`)
-				add(`	sock->sendBinaryMessage(data);`)
+				add(`	QObject::connect(sock, &QWebSocket::connected, [=]() { sock->sendBinaryMessage(data); });`)
 				add(`	return sock;`)
 				add(`}`)
 			} else {
