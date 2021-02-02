@@ -28,22 +28,13 @@ func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 	case 1:
 		return funs[0]
 	default:
-		// {a, b, c}[0] -> a
-		fn := funs[0]
-		// {a, b, c}[1:] -> {b, c}
-		other := funs[1:]
-		// b, c
-		// fn = b(a(handler))
-		// c
-		// fn = c(b(a(handler)))
-		// or
-		// handler |> a |> b |> c
-		for _, fun := range other {
-			fn = func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
-				return fn(meth, d, fun(meth, d, h))
+		return func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
+			in := h
+			for _, item := range funs {
+				in = item(meth, d, in)
 			}
+			return in
 		}
-		return fn
 	}
 }
 
