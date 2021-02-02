@@ -226,6 +226,8 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 
 	for _, service := range d.Service {
 		for _, meth := range service.Method {
+			path := fmt.Sprintf("/%s.%s/%s", *d.Package, *service.Name, *meth.Name)
+
 			if meth.GetClientStreaming() && !meth.GetServerStreaming() {
 				continue
 			} else if meth.GetClientStreaming() && meth.GetServerStreaming() {
@@ -242,7 +244,7 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 					),
 				)
 				add(`{`)
-				add(`auto req = QNetworkRequest(QUrl(wsProtocol()+host));`)
+				add(`auto url = QUrl(wsProtocol()+host); url.setPath(QStringLiteral("` + path + `")); auto req = QNetworkRequest(url);`)
 				add(`
 					for (const auto& item : headers.keys()) {
 						req.setRawHeader(item, headers[item].toLocal8Bit());
@@ -267,7 +269,7 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 					),
 				)
 				add(`{`)
-				add(`auto req = QNetworkRequest(QUrl(wsProtocol()+host));`)
+				add(`auto url = QUrl(wsProtocol()+host); url.setPath(QStringLiteral("` + path + `")); auto req = QNetworkRequest(url);`)
 				add(`
 					for (const auto& item : headers.keys()) {
 						req.setRawHeader(item, headers[item].toLocal8Bit());
@@ -298,11 +300,13 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 				add(
 					fmt.Sprintf(`
 	QUrl serviceURL = QUrl(httpProtocol()+host);
+	serviceURL.setPath(QStringLiteral("`+path+`"));
 
 	QNetworkRequest req(serviceURL);
 	for (const auto& item : headers.keys()) {
 		req.setRawHeader(item, headers[item].toLocal8Bit());
 	}
+	req.setRawHeader("content-type", "application/octet-stream");
 
 	auto val = nam->post(req, data);
 
@@ -310,7 +314,7 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 		QCoreApplication::processEvents();
 	}
 
-	if (val->error() == QNetworkReply::NoError) {
+	if (val->error() != QNetworkReply::NoError) {
 		return {QStringLiteral("network failure(%%1): %%2").arg(val->error()).arg(val->errorString())};
 	}
 
