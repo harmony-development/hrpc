@@ -276,7 +276,11 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 					}
 				`)
 				add(fmt.Sprintf(`	auto sock = new %s();`, className))
+				add(`	std::string strData;`)
+				add(`	if (!in.SerializeToString(&strData)) { return nullptr; }`)
+				add(`	QByteArray data = QByteArray::fromStdString(strData);`)
 				add(`	sock->open(req);`)
+				add(`	sock->sendBinaryMessage(data);`)
 				add(`	return sock;`)
 				add(`}`)
 			} else {
