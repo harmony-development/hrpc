@@ -135,7 +135,7 @@ func init() {
         if err := BindPB(requestProto, c); err != nil {
             return err
         }
-        fn := h.Server.{{ .Name }}(c, requestProto)
+        fn := h.Server.{{ .Name }}
         if h.UnaryPre != nil {
             fn = h.UnaryPre(fn)
         }
