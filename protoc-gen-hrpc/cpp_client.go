@@ -127,10 +127,11 @@ class %s : public QWebSocket {
 	%s
 
 	public: bool send(const %s& in) {
-		QByteArray data = QByteArray::fromStdString(in.SerializeAsString());
-		if (data.length() == 0) {
+		std::string strData;
+		if (!in.SerializeToString(&strData)) {
 			return false;
 		}
+		QByteArray data = QByteArray::fromStdString(strData);
 
 		auto count = sendBinaryMessage(data);
 		return count == data.length();
@@ -291,14 +292,11 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 					),
 				)
 				add(`{`)
-
-				add(`	QByteArray data = QByteArray::fromStdString(in.SerializeAsString());`)
+				add(`	std::string strData;`)
+				add(`	if (!in.SerializeToString(&strData)) { return {QStringLiteral("failed to serialize protobuf")}; }`)
+				add(`	QByteArray data = QByteArray::fromStdString(strData);`)
 				add(
 					fmt.Sprintf(`
-	if (data.length() == 0) {
-		return {QStringLiteral("failed to serialize protobuf")};
-	}
-
 	QUrl serviceURL = QUrl(httpProtocol()+host);
 
 	QNetworkRequest req(serviceURL);
