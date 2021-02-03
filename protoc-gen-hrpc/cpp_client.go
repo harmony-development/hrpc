@@ -222,6 +222,27 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 	add := func(s string) { sb.WriteString(s + "\n") }
 
 	add(inc(convertCxxProto(*d.Name, "hrpc.client", "h")))
+	add(inc("QThreadStorage"))
+
+	add(`namespace {`)
+	add(`QThreadStorage<QNetworkAccessManager*> globalNam;`)
+	add(`void initialiseGlobalNam(bool secure, const QString& host) {
+	if (globalNam.hasLocalData()) {
+		return;
+	}
+
+	auto split = host.split(":");
+	auto hname = split[0];
+	auto port = split[1].toInt();
+	
+	globalNam.setLocalData(new QNetworkAccessManager);
+	if (secure) {
+		globalNam.localData()->connectToHostEncrypted(hname, port);
+	} else {
+		globalNam.localData()->connectToHost(hname, port);
+	}
+}`)
+	add(`}`)
 
 	for _, service := range d.Service {
 		for _, meth := range service.Method {
@@ -302,6 +323,8 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 				add(`	QByteArray data = QByteArray::fromStdString(strData);`)
 				add(
 					fmt.Sprintf(`
+	initialiseGlobalNam(secure, host);
+
 	QUrl serviceURL = QUrl(httpProtocol()+host);
 	serviceURL.setPath(QStringLiteral("`+path+`"));
 
@@ -310,8 +333,9 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 		req.setRawHeader(item, headers[item].toLocal8Bit());
 	}
 	req.setRawHeader("content-type", "application/octet-stream");
+	req.setAttribute(QNetworkRequest::Http2AllowedAttribute, true);
 
-	auto nam = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager);
+	auto nam = globalNam.localData();
 	auto val = nam->post(req, data);
 
 	while (!val->isFinished()) {
