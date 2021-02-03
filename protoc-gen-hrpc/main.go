@@ -106,6 +106,7 @@ func main() {
 	for _, item := range strings.Split(*input.Parameter, ":") {
 		builtins := map[string]func(d *pluginpb.CodeGeneratorRequest) *pluginpb.CodeGeneratorResponse{
 			"qt_cpp_client": GenerateQtCxxClient,
+			"d_client":      GenerateDClient,
 		}
 
 		if fn, ok := builtins[item]; ok {
