@@ -38,6 +38,7 @@ func GenerateDClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerato
 
 		module := *f.Package + "." + path.Base(strings.TrimSuffix(*f.Name, ".proto"))
 		add("module %sHrpc;", module)
+		add("import %s;", module)
 
 		for _, dep := range f.Dependency {
 			add(`import %s;`, strings.ReplaceAll(strings.TrimSuffix(dep, ".proto"), "/", "."))
