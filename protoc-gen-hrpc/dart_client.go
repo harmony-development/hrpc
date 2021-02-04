@@ -66,7 +66,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Stream<%s> %s(Stream<%s> input, {Map<String,dynamic> headers = const {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
+						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://${this.host}/%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
 						add(`var combined = $async.StreamGroup.merge<dynamic>([socket, input]);`)
 						add(`await for (var value in combined) {`)
 						indent++
@@ -94,7 +94,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Future<%s> %s(%s input, {Map<String,String> headers = const {}}) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var response = await $http.post("${this.unaryPrefix}://%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/octet-stream"}..addAll(headers));`, *f.Package, *service.Name, *meth.Name)
+						add(`var response = await $http.post("${this.unaryPrefix}://${this.host}/%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/octet-stream"}..addAll(headers));`, *f.Package, *service.Name, *meth.Name)
 						add(`if (response.statusCode != 200) { throw response; }`)
 						add(`return %s.fromBuffer(response.bodyBytes);`, kind(*meth.OutputType))
 					}
@@ -104,7 +104,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Stream<%s> %s(%s input, {Map<String,dynamic> headers = const {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
+						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://${this.host}/%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
 						add(`await socket.add(input.writeToBuffer());`)
 						add(`await for (var value in socket) {`)
 						indent++
