@@ -63,7 +63,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 				if meth.GetClientStreaming() && !meth.GetServerStreaming() {
 					continue
 				} else if meth.GetClientStreaming() && meth.GetServerStreaming() {
-					add(`Stream<%s> %s(Stream<%s> input, {Map<String,dynamic> headers}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
+					add(`Stream<%s> %s(Stream<%s> input, {Map<String,dynamic> headers = {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
 						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
@@ -91,7 +91,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					indent--
 					add(`}`)
 				} else if !meth.GetServerStreaming() && !meth.GetClientStreaming() {
-					add(`Future<%s> %s(%s input, {Map<String,String> headers}) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
+					add(`Future<%s> %s(%s input, {Map<String,String> headers = {}}) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
 						add(`var response = await $http.post("${this.unaryPrefix}://%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/octet-stream"}..addAll(headers));`, *f.Package, *service.Name, *meth.Name)
@@ -101,7 +101,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					indent--
 					add(`}`)
 				} else if meth.GetServerStreaming() && !meth.GetClientStreaming() {
-					add(`Stream<%s> %s(%s input, {Map<String,dynamic> headers}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
+					add(`Stream<%s> %s(%s input, {Map<String,dynamic> headers = {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
 						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
