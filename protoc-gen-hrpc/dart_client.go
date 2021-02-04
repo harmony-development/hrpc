@@ -52,6 +52,10 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 		for _, service := range f.Service {
 			add(`class %sClient {`, *service.Name)
 			indent++
+			add(`bool secure = true;`)
+			add(`String host;`)
+			add(`%sClient({this.secure,this.host});`, *service.Name)
+			add(`String get unaryPrefix => secure ? "https" : "http";`)
 			for _, meth := range service.Method {
 				if meth.GetClientStreaming() && !meth.GetServerStreaming() {
 					continue
@@ -61,7 +65,9 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Future<%s> %s(%s input) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var response = await $http.post();`)
+						add(`var response = await $http.post("${this.unaryPrefix}://%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/octet-stream"});`, *f.Package, *service.Name, *meth.Name)
+						add(`if (response.statusCode != 200) { throw response; }`)
+						add(`return %s.fromBuffer(response.bodyBytes);`, kind(*meth.OutputType))
 					}
 					indent--
 					add(`}`)
