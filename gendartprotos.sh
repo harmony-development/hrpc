@@ -9,6 +9,6 @@ for dir in $(find "protocol" -name '*.proto' -print0 | xargs -0 -n1 dirname | so
     --proto_path=protocol \
     --dart_out=./gendart \
     --hrpc_out=./gendart \
-    --hrpc_opt=hrpc-client-dart \
+    --hrpc_opt=dart_client \
     $(find "${dir}" -name '*.proto')
 done

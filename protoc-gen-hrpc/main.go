@@ -107,6 +107,7 @@ func main() {
 		builtins := map[string]func(d *pluginpb.CodeGeneratorRequest) *pluginpb.CodeGeneratorResponse{
 			"qt_cpp_client": GenerateQtCxxClient,
 			"d_client":      GenerateDClient,
+			"dart_client":   GenerateDartClient,
 		}
 
 		if fn, ok := builtins[item]; ok {
