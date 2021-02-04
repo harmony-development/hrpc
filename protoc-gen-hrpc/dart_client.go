@@ -43,6 +43,8 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 		}
 		add(`import '%s';`, strings.TrimSuffix(path.Base(*f.Name), ".proto")+".pb.dart")
 		add(`import 'package:http/http.dart' as $http;`)
+		add(`import 'dart:io' as $io;`)
+		add(`import 'package:async/async.dart' as $async;`)
 
 		kind := func(in string) string {
 			split := strings.Split(in, ".")
@@ -56,23 +58,73 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 			add(`String host;`)
 			add(`%sClient({this.secure,this.host});`, *service.Name)
 			add(`String get unaryPrefix => secure ? "https" : "http";`)
+			add(`String get wsPrefix => secure ? "wss" : "ws";`)
 			for _, meth := range service.Method {
 				if meth.GetClientStreaming() && !meth.GetServerStreaming() {
 					continue
 				} else if meth.GetClientStreaming() && meth.GetServerStreaming() {
-
-				} else if !meth.GetServerStreaming() && !meth.GetClientStreaming() {
-					add(`Future<%s> %s(%s input) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
+					add(`Stream<%s> %s(Stream<%s> input, {Map<String,dynamic> headers}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var response = await $http.post("${this.unaryPrefix}://%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/octet-stream"});`, *f.Package, *service.Name, *meth.Name)
+						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
+						add(`var combined = $async.StreamGroup.merge([socket, input]);`)
+						add(`await for (var value in combined) {`)
+						indent++
+						{
+							add(`if (value is List<int>) {`)
+							indent++
+							{
+								add(`yield %s.fromBuffer(value);`, kind(*meth.OutputType))
+							}
+							indent--
+							add(`} else if (value is %s) {`, kind(*meth.InputType))
+							indent++
+							{
+								add(`await socket.add(value.writeToBuffer());`)
+							}
+							indent--
+							add(`}`)
+						}
+						indent--
+						add(`}`)
+					}
+					indent--
+					add(`}`)
+				} else if !meth.GetServerStreaming() && !meth.GetClientStreaming() {
+					add(`Future<%s> %s(%s input, {Map<String,String> headers}) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
+					indent++
+					{
+						add(`var response = await $http.post("${this.unaryPrefix}://%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/octet-stream"}..addAll(headers));`, *f.Package, *service.Name, *meth.Name)
 						add(`if (response.statusCode != 200) { throw response; }`)
 						add(`return %s.fromBuffer(response.bodyBytes);`, kind(*meth.OutputType))
 					}
 					indent--
 					add(`}`)
+				} else if meth.GetServerStreaming() && !meth.GetClientStreaming() {
+					add(`Stream<%s> %s(%s input, {Map<String,dynamic> headers}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
+					indent++
+					{
+						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
+						add(`await socket.add(input.writeToBuffer());`)
+						add(`await for (var value in socket) {`)
+						indent++
+						{
+							add(`if (value is List<int>) {`)
+							indent++
+							{
+								add(`yield %s.fromBuffer(value);`, kind(*meth.OutputType))
+							}
+							indent--
+							add(`}`)
+						}
+						indent--
+						add(`}`)
+					}
+					indent--
+					add(`}`)
 				}
 			}
+			indent--
 			add(`}`)
 		}
 
