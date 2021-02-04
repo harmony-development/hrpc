@@ -67,7 +67,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					indent++
 					{
 						add(`var socket = await $io.WebSocket.connect("${this.unaryPrefix}://%s/.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
-						add(`var combined = $async.StreamGroup.merge([socket, input]);`)
+						add(`var combined = $async.StreamGroup.merge<dynamic>([socket, input]);`)
 						add(`await for (var value in combined) {`)
 						indent++
 						{
