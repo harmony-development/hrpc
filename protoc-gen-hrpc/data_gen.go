@@ -242,8 +242,8 @@ tDuMy0u/+C8PPdFkduAvJ/8GAAD//x9Rp4fvEwAA
 	"/templates/hrpc-server-echo-go.htmpl": {
 		name:    "hrpc-server-echo-go.htmpl",
 		local:   "../templates/hrpc-server-echo-go.htmpl",
-		size:    7104,
-		modtime: 1612556835,
+		size:    7114,
+		modtime: 1612560405,
 		compressed: `
 H4sIAAAAAAAC/+xZ3W/buhV/jv8K1sgGKlDobehT2jws7doVXZsgabGHohho6UhmLZEqSdnNDP3vA0l9
 UJbkOFm3e4F7/WQfHp6P3/lkstshBfoNy4DTHBBORfudoLkCuQE5D1BVzWa7HTplGnJ0cYmIpRQ0WtMU
@@ -269,10 +269,10 @@ vtqjNiKDwB0fGE+LHTFhf/p+qGevBPVTlNjDiFxlYontaLvTVJfq+n2I5rQoMhZRzQRfiEiDPlc2l+dh
 a93oatbSth1QK9KMi2ZG2Iegk4KDEHnPwtC4cZx3EfmHSFOQOCB2bg8XB++ZN/Q/hsRMYEVeZcKYMdje
 RyrbK2FmO1lO14CHu2Wvft3j1TdiZJV14g72gX+FKPfKzvBvlX1a19WI/y+4de1ofydsrWP8UE/6L/Xv
 bX/mI9xwGAbDW+e9oT7elRi374HgcWmQq1T1dX/5urzX4ClMheuu+10yEXJkB35MlI/dqy3qNsuNucHo
-+VICXQ9OhjuFdfjleWPk1KKOg0MBm669ISgKMugt8EfHxrpNFSD3WBFrA+bLc+PBxRiGz8R6ArwpcIZS
-6j/8HizkhyvJGWyEHSqkfmgZDw6c9jL7cdV4oCoPIcFNlhgXHtgd2yjlKu2CJEr9v4rR1i+sj/BDu5cc
-7l4yV8zsEc3O86RyOzpBjwviOGy/cIgfWFNylf6O3WQSEpt1eLhMDbvDtmmTL36T2B36U1DfxpPKPkBH
-/hfynwAAAP//6HV7bMAbAAA=
++VICXQ9OhjuFdfjleWPk1KKOg0MBm669ISgKMugt8EfHxrpNFSD3WBFrA+bLc+PBxRiGz8R6AryRhBwZ
+Dq2o+q+/B6v54XJyVhthh6qpH1/GgwOnvfR+XEk+EQluUsW48MAC2YYqV2kXKVHq/2mgtn6JfYQf2r3p
+cPemuWJmo2i2nycV3tGpelwkx7H7heP8wMKSq/R37CaTkNisw8O1atgitk3DfPGbxO7QH4X6Np5U9ik6
+8l+R/wQAAP//Ha9JG8obAAA=
 `,
 	},
 
