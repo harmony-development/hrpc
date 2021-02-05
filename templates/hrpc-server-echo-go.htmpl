@@ -203,7 +203,7 @@ func init() {
             {{ if (hasClientStream .) }}
             case data, ok := <-msgs:
                 if !ok {
-                    continue 
+                    break
                 }
 
                 item := new({{ $resIn.ID }})
@@ -218,7 +218,7 @@ func init() {
             {{ end }}
             case msg, ok := <-out:
                 if !ok {
-                    continue
+                    break
                 }
 
                 w, err := ws.NextWriter(websocket.BinaryMessage)
