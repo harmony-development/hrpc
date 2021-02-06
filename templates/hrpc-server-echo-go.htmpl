@@ -164,7 +164,6 @@ func init() {
 
         {{ if (hasClientStream .) }}
         in := make(chan *{{ $resIn.ID }})
-        err = nil
         {{ else }}
         in := new({{ $resIn.ID }})
         _, message, err := ws.ReadMessage()
@@ -198,9 +197,9 @@ func init() {
 
         defer ws.Close()
 
+            {{ if (hasClientStream .) }}
         for {
             select {
-            {{ if (hasClientStream .) }}
             case data, ok := <-msgs:
                 if !ok {
                     return nil
@@ -215,11 +214,13 @@ func init() {
                 }
 
                 in <- item
-            {{ end }}
             case msg, ok := <-out:
                 if !ok {
                     return nil
                 }
+            {{ else }}
+            for msg := range out {
+            {{ end }}
 
                 w, err := ws.NextWriter(websocket.BinaryMessage)
                 if err != nil {
@@ -241,7 +242,14 @@ func init() {
                     return nil
                 }
 
-                w.Write(response)
+                if _, err := w.Write(response); err != nil {
+                    {{ if (hasClientStream .) }}
+                    close(in)
+                    {{ end }}
+                    close(out)
+                    c.Logger().Error(err)
+                    return nil
+                }
                 if err := w.Close(); err != nil {
                     {{ if (hasClientStream .) }}
                     close(in)
@@ -251,7 +259,11 @@ func init() {
                     return nil
                 }
             }
+        {{ if (hasClientStream .) }}
         }
+        {{ else }}
+        return nil
+        {{ end }}
         {{ end }}
 	}
 	{{ end }}
