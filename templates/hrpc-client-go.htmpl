@@ -47,12 +47,19 @@ import "bytes"
     type {{ $sname }} struct {
         client *http.Client
         serverURL string
+
+        Header http.Header
+        HTTPProto string
+        WSProto string
     }
 
     func New{{ $sname }}(url string) *{{ $sname }} {
         return &{{ $sname }}{
             client:    &http.Client{},
             serverURL: url,
+            Header: http.Header{},
+            HTTPProto: "https",
+            WSProto: "wss",
         }
     }
 
@@ -70,7 +77,15 @@ import "bytes"
                 if err != nil {
                     return nil, fmt.Errorf("could not martial request: %w", err)
                 }
-                resp, err := client.client.Post(fmt.Sprintf("http://%s/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+                req, err := http.NewRequest("POST", fmt.Sprintf("%s://%s/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}", client.HTTPProto, client.serverURL), bytes.NewReader(input))
+                if err != nil {
+                    return nil, fmt.Errorf("error creating request: %w", err)
+                }
+                for k, v := range client.Header {
+                    req.Header[k] = v
+                }
+                req.Header.Add("content-type", "application/octet-stream")
+                resp, err := client.client.Do(req)
                 if err != nil {
                     return nil, fmt.Errorf("error posting request: %w", err)
                 }
@@ -92,9 +107,9 @@ import "bytes"
             }
         {{ else if (and (hasServerStream .) (hasClientStream .)) }}
             func (client *{{ $sname }}) {{ (deref .Name ) }}() (in chan<- *{{ $resIn.ID }}, out <-chan *{{ $resOut.ID }}, err error) {
-                u := url.URL{Scheme: "ws", Host: client.serverURL, Path: "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}"}
+                u := url.URL{Scheme: client.WSProto, Host: client.serverURL, Path: "/{{ $item.Package }}.{{ $serv.Name }}/{{ .Name }}"}
 
-                c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+                c, _, err := websocket.DefaultDialer.Dial(u.String(), client.Header)
                 if err != nil {
                     return nil, nil, err
                 }
