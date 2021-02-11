@@ -108,6 +108,7 @@ func main() {
 			"qt_cpp_client": GenerateQtCxxClient,
 			"d_client":      GenerateDClient,
 			"ts_client":     GenerateTSClient,
+			"dart_client":   GenerateDartClient,
 		}
 
 		if fn, ok := builtins[item]; ok {
