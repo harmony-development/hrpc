@@ -8,7 +8,7 @@ import "github.com/labstack/echo/v4"
 import "io/ioutil"
 import "net/http"
 import "google.golang.org/protobuf/proto"
-import "google.golang.org/protobuf/jsonpb"
+import "google.golang.org/protobuf/encoding/protojson"
 import "github.com/gorilla/websocket"
 import "google.golang.org/protobuf/types/descriptorpb"
 import "github.com/harmony-development/hrpc/server"
@@ -48,7 +48,7 @@ func BindPB(obj interface{}, c echo.Context) error {
             return err
         }
     case "application/hrpc-json":
-        if err = jsonpb.Unmarshal(buf, obj.(proto.Message)); err != nil {
+        if err = protojson.Unmarshal(buf, obj.(proto.Message)); err != nil {
             return err
         }
     }
@@ -163,7 +163,7 @@ func init() {
 
         switch ct {
         case "application/hrpc-json":
-            response, err = jsonpb.Marshal(res)
+            response, err = protojson.Marshal(res)
         default:
             response, err = proto.Marshal(res)
         }
@@ -201,7 +201,7 @@ func init() {
         }
         switch c.Request().Header.Get("Content-Type") {
         case "application/hrpc-json":
-            if err = jsonpb.Unmarshal(message, in); err != nil {
+            if err = protojson.Unmarshal(message, in); err != nil {
                 return err
             }
         default:
@@ -242,7 +242,7 @@ func init() {
                 item := new({{ $resIn.ID }})
                 switch c.Request().Header.Get("Content-Type") {
                 case "application/hrpc-json":
-                    if err = jsonpb.Unmarshal(data, item); err != nil {
+                    if err = protojson.Unmarshal(data, item); err != nil {
                         close(in)
                         close(out)
                         c.Logger().Error(err)
@@ -280,7 +280,7 @@ func init() {
 
                 switch c.Request().Header.Get("Content-Type") {
                 case "application/hrpc-json":
-                    response, err = jsonpb.Marshal(msg)
+                    response, err = protojson.Marshal(msg)
                 default:
                     response, err = proto.Marshal(msg)
                 }
