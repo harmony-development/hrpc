@@ -163,7 +163,7 @@ func init() {
         defer ws.Close()
 
         {{ if (hasClientStream .) }}
-        in := make(chan *{{ $resIn.ID }})
+        in := make(chan *{{ $resIn.ID }}, 100)
         {{ else }}
         in := new({{ $resIn.ID }})
         _, message, err := ws.ReadMessage()
@@ -177,7 +177,7 @@ func init() {
         }
         {{ end }}
 
-        out := make(chan *{{ $resOut.ID }})
+        out := make(chan *{{ $resOut.ID }}, 100)
 
         h.Server.{{ .Name }}(c, in, out)
         {{ if (hasClientStream .) }}
