@@ -49,6 +49,8 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 			add(`class %s {`, *service.Name)
 			add(`
 			host: string;
+			session?: string;
+
 			constructor(host: string) {
 				this.host = host;
 			}
@@ -62,17 +64,22 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 						body,
 						headers: {
 							"Content-Type": "application/octet-stream",
+							Authorization: this.session || "",
 						}
 					}
 				)
 			}`)
+			add(`
+			stream(endpoint: string) {
+				return new WebSocket(` + "`" + `${this.host}${endpoint}` + "`" + `, ["access_token", this.session || ""])
+			}`)
 			for _, meth := range service.Method {
 				path := fmt.Sprintf("/%s.%s/%s", *f.Package, *service.Name, *meth.Name)
-				if meth.GetClientStreaming() && !meth.GetServerStreaming() {
-					continue
-				} else if meth.GetClientStreaming() && meth.GetServerStreaming() {
-
-				} else if !meth.GetServerStreaming() && !meth.GetClientStreaming() {
+				if meth.GetClientStreaming() || meth.GetServerStreaming() {
+					add(`%s() {`, *meth.Name)
+					add(`return this.stream("%s")`, path)
+					add("}")
+				} else {
 					inputPackage := finalRemoved(splitter((*meth.InputType)[1:]))
 					inputType := final(splitter((*meth.InputType)[1:]))
 					outputPackage := finalRemoved(splitter((*meth.OutputType)[1:]))
