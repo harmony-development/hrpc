@@ -96,7 +96,7 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 					}
 
 					outputJSType := ""
-					if inputPackage == *f.Package {
+					if outputPackage == *f.Package {
 						outputJSType = fmt.Sprintf("svc.%s", outputType)
 					} else {
 						outputJSType = fmt.Sprintf("gen.%s.%s", outputPackage, outputType)
