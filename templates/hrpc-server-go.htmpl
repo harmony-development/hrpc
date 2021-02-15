@@ -154,7 +154,7 @@ func init() {
                 return
             }
 
-            w.Header().Add("Content-Type", "application/octet-stream")
+            w.Header().Add("Content-Type", "application/hrpc")
             _, err = w.Write(response)
 
             if err != nil {

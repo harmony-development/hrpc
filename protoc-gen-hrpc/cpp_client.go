@@ -332,7 +332,7 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 	for (const auto& item : headers.keys()) {
 		req.setRawHeader(item, headers[item].toLocal8Bit());
 	}
-	req.setRawHeader("content-type", "application/octet-stream");
+	req.setRawHeader("content-type", "application/hrpc");
 	req.setAttribute(QNetworkRequest::Http2AllowedAttribute, true);
 
 	auto nam = globalNam.localData();

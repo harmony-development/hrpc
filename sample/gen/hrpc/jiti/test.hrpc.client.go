@@ -1,12 +1,15 @@
 package jiti
 
-import "net/http"
-import "google.golang.org/protobuf/proto"
-import "io/ioutil"
-import "fmt"
-import "github.com/gorilla/websocket"
-import "net/url"
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+
+	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
+)
 
 type MuClient struct {
 	client    *http.Client
@@ -25,7 +28,7 @@ func (client *MuClient) Mu(r *Ping) (*Pong, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not martial request: %w", err)
 	}
-	resp, err := client.client.Post(fmt.Sprintf("http://%s/test.Mu/Mu", client.serverURL), "application/octet-stream", bytes.NewReader(input))
+	resp, err := client.client.Post(fmt.Sprintf("http://%s/test.Mu/Mu", client.serverURL), "application/hrpc", bytes.NewReader(input))
 	if err != nil {
 		return nil, fmt.Errorf("error posting request: %w", err)
 	}

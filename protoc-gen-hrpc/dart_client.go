@@ -94,7 +94,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Future<%s> %s(%s input, {Map<String,String> headers = const {}}) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var response = await $http.post("${this.unaryPrefix}://${this.host}/%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/octet-stream"}..addAll(headers));`, *f.Package, *service.Name, *meth.Name)
+						add(`var response = await $http.post("${this.unaryPrefix}://${this.host}/%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/hrpc"}..addAll(headers));`, *f.Package, *service.Name, *meth.Name)
 						add(`if (response.statusCode != 200) { throw response; }`)
 						add(`return %s.fromBuffer(response.bodyBytes);`, kind(*meth.OutputType))
 					}

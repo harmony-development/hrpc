@@ -1,11 +1,14 @@
 package jiti
 
-import "context"
-import "net/http"
-import "io/ioutil"
-import "google.golang.org/protobuf/proto"
-import "github.com/gorilla/websocket"
-import "google.golang.org/protobuf/types/descriptorpb"
+import (
+	"context"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/descriptorpb"
+)
 
 var Test *descriptorpb.FileDescriptorProto = new(descriptorpb.FileDescriptorProto)
 
@@ -78,7 +81,7 @@ func (h *MuHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 
-			w.Header().Add("Content-Type", "application/octet-stream")
+			w.Header().Add("Content-Type", "application/hrpc")
 			_, err = w.Write(response)
 
 			if err != nil {

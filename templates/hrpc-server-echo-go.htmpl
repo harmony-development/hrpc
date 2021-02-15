@@ -8,6 +8,7 @@ import "github.com/labstack/echo/v4"
 import "io/ioutil"
 import "net/http"
 import "google.golang.org/protobuf/proto"
+import "google.golang.org/protobuf/encoding/protojson"
 import "github.com/gorilla/websocket"
 import "google.golang.org/protobuf/types/descriptorpb"
 import "github.com/harmony-development/hrpc/server"
@@ -35,14 +36,22 @@ import "github.com/harmony-development/hrpc/server"
 {{ end }}
 
 func BindPB(obj interface{}, c echo.Context) error {
-	buf, err := ioutil.ReadAll(c.Request().Body)
-	if err != nil {
-		return err
-	}
+    buf, err := ioutil.ReadAll(c.Request().Body)
+    if err != nil {
+        return err
+    }
 
-	if err = proto.Unmarshal(buf, obj.(proto.Message)); err != nil {
-		return err
-	}
+    ct := c.Request().Header.Get("Content-Type")
+    switch ct {
+    case "application/hrpc", "application/octet-stream":
+        if err = proto.Unmarshal(buf, obj.(proto.Message)); err != nil {
+            return err
+        }
+    case "application/hrpc-json":
+        if err = protojson.Unmarshal(buf, obj.(proto.Message)); err != nil {
+            return err
+        }
+    }
 
 	return nil
 }
@@ -148,11 +157,26 @@ func init() {
         if err != nil {
             return err
         }
-        response, err := proto.Marshal(res)
+        var response []byte
+
+        ct := c.Request().Header.Get("Content-Type")
+
+        switch ct {
+        case "application/hrpc-json":
+            response, err = protojson.Marshal(res)
+        default:
+            response, err = proto.Marshal(res)
+        }
+
         if err != nil {
             return err
         }
-        return c.Blob(http.StatusOK, "application/octet-stream", response)
+
+        if ct == "application/hrpc-json" {
+            return c.Blob(http.StatusOK, "application/hrpc-json", response)
+        }
+        return c.Blob(http.StatusOK, "application/hrpc", response)
+
         {{ else }}
 
         ws, err := h.upgrader.Upgrade(c.Response(), c.Request(), nil)
@@ -174,6 +198,16 @@ func init() {
         if err := proto.Unmarshal(message, in); err != nil {
             c.Logger().Error(err)
             return nil
+        }
+        switch c.Request().Header.Get("Content-Type") {
+        case "application/hrpc-json":
+            if err = protojson.Unmarshal(message, in); err != nil {
+                return err
+            }
+        default:
+            if err = proto.Unmarshal(message, in); err != nil {
+                return err
+            }
         }
         {{ end }}
 
@@ -206,11 +240,21 @@ func init() {
                 }
 
                 item := new({{ $resIn.ID }})
-                if err := proto.Unmarshal(data, item); err != nil {
-                    close(in)
-                    close(out)
-                    c.Logger().Error(err)
-                    return nil
+                switch c.Request().Header.Get("Content-Type") {
+                case "application/hrpc-json":
+                    if err = protojson.Unmarshal(data, item); err != nil {
+                        close(in)
+                        close(out)
+                        c.Logger().Error(err)
+                        return nil
+                    }
+                default:
+                    if err = proto.Unmarshal(data, item); err != nil {
+                        close(in)
+                        close(out)
+                        c.Logger().Error(err)
+                        return nil
+                    }
                 }
 
                 in <- item
@@ -232,7 +276,15 @@ func init() {
                     return nil
                 }
 
-                response, err := proto.Marshal(msg)
+                var response []byte
+
+                switch c.Request().Header.Get("Content-Type") {
+                case "application/hrpc-json":
+                    response, err = protojson.Marshal(msg)
+                default:
+                    response, err = proto.Marshal(msg)
+                }
+
                 if err != nil {
                     {{ if (hasClientStream .) }}
                     close(in)
