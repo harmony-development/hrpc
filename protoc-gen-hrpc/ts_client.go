@@ -46,7 +46,7 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 		add("import svc = gen.%s;", namespace)
 
 		for _, service := range f.Service {
-			add(`class %s {`, *service.Name)
+			add(`export default class %s {`, *service.Name)
 			add(`
 			host: string;
 			session?: string;
