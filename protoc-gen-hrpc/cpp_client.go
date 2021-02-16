@@ -35,7 +35,7 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 	add(`#include <QString>`)
 	add(`#include <variant>`)
 
-	add(inc(convertCxxProto(*d.Name, "pb", "h")))
+	add(inc(convertCxxProto(*d.Name, "hrpc.proto", "h")))
 
 	for _, kind := range d.Service {
 		for _, meth := range kind.Method {
@@ -47,7 +47,7 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 
 	for _, f := range mu {
 		for _, dep := range f.Dependency {
-			add(inc(convertCxxProto(dep, "pb", "h")))
+			add(inc(convertCxxProto(dep, "hrpc.proto", "h")))
 		}
 	}
 
