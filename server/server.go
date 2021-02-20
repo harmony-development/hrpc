@@ -19,7 +19,7 @@ type HRPCServer struct {
 }
 
 type Handler func(c echo.Context, req protoreflect.ProtoMessage) (protoreflect.ProtoMessage, error)
-type HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
+type HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, service *descriptorpb.ServiceDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
 
 func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 	switch len(funs) {
@@ -28,11 +28,11 @@ func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 	case 1:
 		return funs[0]
 	default:
-		return func(meth *descriptorpb.MethodDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
+		return func(meth *descriptorpb.MethodDescriptorProto, service *descriptorpb.ServiceDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler {
 			in := h
 			for i := len(funs) - 1; i >= 0; i-- {
 				item := funs[i]
-				in = item(meth, d, in)
+				in = item(meth, service, d, in)
 			}
 			return in
 		}

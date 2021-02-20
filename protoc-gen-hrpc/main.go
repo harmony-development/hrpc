@@ -181,6 +181,13 @@ func main() {
 				}
 				return repr.String(data)
 			},
+			"serviceData": func(item *descriptorpb.ServiceDescriptorProto) string {
+				data, err := proto.Marshal(item)
+				if err != nil {
+					panic(err)
+				}
+				return repr.String(data)
+			},
 			"resolvedGoType": func(item *descriptorpb.FileDescriptorProto, method *descriptorpb.MethodDescriptorProto, in string) QualPair {
 				wellKnown := map[string]QualPair{
 					".google.protobuf.Empty": {

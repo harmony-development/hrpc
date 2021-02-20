@@ -76,6 +76,16 @@ func init() {
     {{ $serv := . }}
     {{ $sname := (sprintf "%sServer" (deref .Name)) }}
 
+    var {{ (deref .Name) }}Data *descriptorpb.ServiceDescriptorProto = new(descriptorpb.ServiceDescriptorProto)
+    func init() {
+        data := {{ serviceData $serv }}
+
+        err := proto.Unmarshal(data, {{ (deref .Name) }}Data)
+        if err != nil {
+            panic(err)
+        }
+    }
+
     type {{ $sname }} interface {
     {{ range .Method }}
 
@@ -150,7 +160,7 @@ func init() {
         }
 
         if h.UnaryPre != nil {
-            invoker = h.UnaryPre({{ $sname }}{{ deref .Name }}Data, {{ fanciedName $item }}, invoker)
+            invoker = h.UnaryPre({{ $sname }}{{ deref .Name }}Data, {{ (deref $serv.Name) }}Data, {{ fanciedName $item }}, invoker)
         }
 
         res, err := invoker(c, requestProto)
