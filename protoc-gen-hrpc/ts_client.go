@@ -40,10 +40,7 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 		}()
 
 		// module := *f.Package + "." + path.Base(strings.TrimSuffix(*f.Name, ".proto"))
-		namespace := strings.TrimSuffix(*f.Package, ".proto")
 		add("import gen from '%s';", "./output")
-
-		add("import svc = gen.%s;", namespace)
 
 		for _, service := range f.Service {
 			add(`export default class %s {`, *service.Name)
@@ -85,28 +82,13 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 					outputPackage := finalRemoved(splitter((*meth.OutputType)[1:]))
 					outputType := final(splitter((*meth.OutputType)[1:]))
 
-					inputJSType := ""
-					IinputJSType := ""
-					if inputPackage == *f.Package {
-						IinputJSType = fmt.Sprintf("svc.I%s", inputType)
-						inputJSType = fmt.Sprintf("svc.%s", inputType)
-					} else {
-						IinputJSType = fmt.Sprintf("gen.%s.I%s", inputPackage, inputType)
-						inputJSType = fmt.Sprintf("gen.%s.%s", inputPackage, inputType)
-					}
+					IinputJSType := fmt.Sprintf("gen.%s.I%s", inputPackage, inputType)
+					inputJSType := fmt.Sprintf("gen.%s.%s", inputPackage, inputType)
 
-					outputJSType := ""
-					if outputPackage == *f.Package {
-						outputJSType = fmt.Sprintf("svc.%s", outputType)
-					} else {
-						outputJSType = fmt.Sprintf("gen.%s.%s", outputPackage, outputType)
-					}
+					outputJSType := fmt.Sprintf("gen.%s.%s", outputPackage, outputType)
 
 					add(`async %s (req: %s) {`, *meth.Name, IinputJSType)
-					add(`const buffer = %s.encode(
-						%s.create(req)
-					).finish();`, inputJSType, inputJSType)
-					add(`const resp = await this.unary('%s', buffer)`, path)
+					add(`const resp = await this.unary('%s', %s.encode(req).finish())`, path, inputJSType)
 					add(`return %s.decode(new Uint8Array(await resp.arrayBuffer()));`, outputJSType)
 					add("}")
 				}
