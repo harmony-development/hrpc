@@ -91,7 +91,7 @@ func readTag(iw *indentWriter, len, idx string) {
 		iw.Add(``)
 		iw.Add(`auto wireType = num & 0b111;`)
 		iw.Add(`auto index = num ^ 0b111;`)
-		iw.Add(`return {len, wireType};`)
+		iw.Add(`return {index, wireType};`)
 	}
 	iw.Indent--
 	iw.Add(`}();`)
@@ -99,7 +99,6 @@ func readTag(iw *indentWriter, len, idx string) {
 
 const readVarIntNumber = `[&]() -> quint64 {
 	currentBuffer.clear();
-	currentBitTwiddling.clear();
 
 readLoop:
 	if (!b.getChar(&current)) {
@@ -111,27 +110,9 @@ readLoop:
 		goto readLoop;
 	}
 
-	auto it = currentBuffer.constEnd();
-	while (it != currentBuffer.constBegin()) {
-		it--;
-		currentBitTwiddling.push_back((*it >> 0) & 1);
-		currentBitTwiddling.push_back((*it >> 1) & 1);
-		currentBitTwiddling.push_back((*it >> 2) & 1);
-		currentBitTwiddling.push_back((*it >> 3) & 1);
-		currentBitTwiddling.push_back((*it >> 4) & 1);
-		currentBitTwiddling.push_back((*it >> 5) & 1);
-		currentBitTwiddling.push_back((*it >> 6) & 1);
-	}
-
 	quint64 ret = 0;
-	auto i = 0;
-	for (const auto& item : currentBitTwiddling) {
-		if (item) {
-			ret |= 1UL << i;
-		} else {
-			ret &= ~(1UL << i);
-		}
-		i++;
+	for (auto item : currentBuffer) {
+		ret = (ret << 7) | (item & 127);
 	}
 
 	return ret;
@@ -176,7 +157,6 @@ func genMessages(iw *indentWriter, msgs []*descriptorpb.DescriptorProto) {
 			iw.Add(`QBuffer b(&ba);`)
 
 			iw.Add(`QList<char> currentBuffer;`)
-			iw.Add(`std::vector<bool> currentBitTwiddling;`)
 			iw.Add(`char current = 0;`)
 			iw.Add(`bool unexpectedEOF = false;`)
 
@@ -184,18 +164,18 @@ func genMessages(iw *indentWriter, msgs []*descriptorpb.DescriptorProto) {
 			iw.Indent++
 			{
 				readTag(iw, "idx", "kind")
-				iw.Add(`if (unexpectedEOF) return {QStringLiteral("unexpected EOF");`)
+				iw.Add(`if (unexpectedEOF) return {QStringLiteral("unexpected EOF")};`)
 				iw.Add(`currentBuffer.clear();`)
-				iw.Add(`currentBitTwiddling.clear();`)
 
 				iw.Add(`switch (kind) {`)
 				// varint
 				iw.Add(`case 0: {`)
 				iw.Indent++
 				{
-
+					iw.Add(`qDebug() << "h";`)
 				}
 				iw.Indent--
+				iw.Add(`}`)
 				iw.Add(`}`)
 			}
 			iw.Indent--
