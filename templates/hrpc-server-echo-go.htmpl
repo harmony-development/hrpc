@@ -246,6 +246,8 @@ func init() {
             select {
             case data, ok := <-msgs:
                 if !ok {
+                    close(in)
+                    close(out)
                     return nil
                 }
 
@@ -270,6 +272,8 @@ func init() {
                 in <- item
             case msg, ok := <-out:
                 if !ok {
+                    close(in)
+                    close(out)
                     return nil
                 }
             {{ else }}
