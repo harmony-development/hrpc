@@ -126,7 +126,7 @@ func generateClientSockets(d *descriptorpb.FileDescriptorProto) string {
 class %s : public QWebSocket {
 	%s
 
-	public: bool send(const %s& in) {
+	public: [[nodiscard]] bool send(const %s& in) {
 		std::string strData;
 		if (!in.SerializeToString(&strData)) {
 			return false;
