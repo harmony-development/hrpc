@@ -41,6 +41,7 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 
 		// module := *f.Package + "." + path.Base(strings.TrimSuffix(*f.Name, ".proto"))
 		add("import gen from '%s';", "./output")
+		add("import { Stream } from \"src/harmonystream\"")
 
 		for _, service := range f.Service {
 			add(`export default class %s {`, *service.Name)
@@ -72,21 +73,21 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 			}`)
 			for _, meth := range service.Method {
 				path := fmt.Sprintf("/%s.%s/%s", *f.Package, *service.Name, *meth.Name)
+				inputPackage := finalRemoved(splitter((*meth.InputType)[1:]))
+				inputType := final(splitter((*meth.InputType)[1:]))
+				outputPackage := finalRemoved(splitter((*meth.OutputType)[1:]))
+				outputType := final(splitter((*meth.OutputType)[1:]))
+
+				IinputJSType := fmt.Sprintf("gen.%s.I%s", inputPackage, inputType)
+				inputJSType := fmt.Sprintf("gen.%s.%s", inputPackage, inputType)
+
+				outputJSType := fmt.Sprintf("gen.%s.%s", outputPackage, outputType)
+
 				if meth.GetClientStreaming() || meth.GetServerStreaming() {
 					add(`%s() {`, *meth.Name)
-					add(`return this.stream("%s")`, path)
+					add(`return new Stream<typeof %s, typeof %s, %s, %s>(this.host, "%s", %s, %s)`, outputJSType, inputJSType, inputJSType, outputJSType, path, outputJSType, inputJSType)
 					add("}")
 				} else {
-					inputPackage := finalRemoved(splitter((*meth.InputType)[1:]))
-					inputType := final(splitter((*meth.InputType)[1:]))
-					outputPackage := finalRemoved(splitter((*meth.OutputType)[1:]))
-					outputType := final(splitter((*meth.OutputType)[1:]))
-
-					IinputJSType := fmt.Sprintf("gen.%s.I%s", inputPackage, inputType)
-					inputJSType := fmt.Sprintf("gen.%s.%s", inputPackage, inputType)
-
-					outputJSType := fmt.Sprintf("gen.%s.%s", outputPackage, outputType)
-
 					add(`async %s (req: %s) {`, *meth.Name, IinputJSType)
 					add(`const resp = await this.unary('%s', %s.encode(req).finish())`, path, inputJSType)
 					add(`return %s.decode(new Uint8Array(await resp.arrayBuffer()));`, outputJSType)
