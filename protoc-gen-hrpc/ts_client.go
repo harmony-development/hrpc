@@ -54,8 +54,8 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 			}
 			`)
 			add(`
-			unary(endpoint: string, body: Uint8Array) {
-				return fetch(
+			async unary(endpoint: string, body: Uint8Array) {
+				const resp = await fetch(
 					` + "`" + `${this.host}${endpoint}` + "`" + `,
 					{
 						method: "POST",
@@ -66,7 +66,9 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 						}
 					}
 				)
-			}`)
+				if (resp.status >= 400 && resp.status < 600) throw resp
+				return resp
+				}`)
 			add(`
 			stream(endpoint: string) {
 				return new WebSocket(` + "`" + `${this.host}${endpoint}` + "`" + `, ["access_token", this.session || ""])
