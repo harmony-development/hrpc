@@ -212,32 +212,32 @@ var _escData = map[string]*_escFile{
 	"/templates/hrpc-client-go.htmpl": {
 		name:    "hrpc-client-go.htmpl",
 		local:   "../templates/hrpc-client-go.htmpl",
-		size:    5638,
-		modtime: 1613407163,
+		size:    5769,
+		modtime: 1614909041,
 		compressed: `
-H4sIAAAAAAAC/+RYW2/UPhZ/76c4RC1KUOp5H5UHaHcBLaUVU8QDQshNTjLWOHZqO+1Wo3z3le1cm7kw
-QLVI/z50Ip+Lz+93LnayXsPxLdUI89cQGsWKRZVl7L8QZoxjSc3yrRWST7TACAJSKmlkEEFdH63XoNH8
-m3EUtEAIdamYMBkEJ3p2oslSlQlJOENhSC4DCFNUmAG5Kg2TQpN38pomK5pj5ANwPq3TY2awsOEQt1J6
-LVivYRzSxJFTZ0UplYFAoJktjSmDbiWXMudIcsmpyIlU+cyBua0y/9BrMjljsjKM90tZYQaemFlWtySR
-xSyXinFOZw94q2WywoGWjaBSAx+3jwZ10GB0a9rCFPig0bToFRU5AlmgumeJhwQA0Esu0Sxl2gka4bFC
-/UG4JCrUkt9j+k7ePJbY0EmAfBBlZdySo/qJ8VVldlpfVWZkPrSnZYkiXaDpcfl4yCAz+/WvKjM0aHGj
-SFtyBo+ejeNVDMf3NvDOU2vZsm7xraCug6ceWDai2Zfz1X/AqKpdmOy3KS/HGtV9V6/domsKy+igL85d
-O/S94Lqqp9NYdnvjugZtVJUYWHfs+YaCV7a0iXfXyWwcqL58/mjNmMj7HL1HmqICZ+Sfe9HNzfW1Lf/W
-qBV8XUyWmzCzSiTwCR+GkYaV4o1qBK9GGPrgFZpKCXg5FPfSHt7cPr4cQFzX8UitQzqHSvGxzOObD8E+
-Ne8wzyGwajoYyxvocwge9FBWD1n4p3ZkY8EyCIU0EEoF4ZI2pb0wCmkBJHJrC5embi0aw+xKKWyLelgX
-kd1k2CfOOFRey2P5cOEUw1c9Y34tBlRKqgjG1eXGguXcyS25bvCTS6r0kvJQRVP1zKm+eA2C8Q3uBmUt
-GI8hKwz5l907C4NEVjwFS1JBlWGUg8K7CrWZw8lD4GKYblgfTd3fdfG6ov6ED5+9ozC4vlrcBH7bhZ8z
-YXCi57PZiZ61Z+kghaSdV57SurZK7XMQN/1HugbpVrqOi2Jw55iPwnZX6CiN/ix3Ln+QKKSGifzXiMuk
-glUMbjb7Vm3h+XG4LaK7RuHb6ju8hvufS1FjQ96kqc28MCjMqR3oQQwBLUvOEmrvKzN7LwqiDS502aW5
-ibP5uZChwrvn4LeU+tfpTTFD5eImb2X6SM651BhOLVNqaIfM36uIrZw3nIed9XOgU0hTj06XUmg8DJ50
-49XG/PLpeFlPtW2o7Tj5IopmoHjo3tNzIKzanfiv42x28EHGdqejzQb2PsQ1uslPRbppwjdHwvQ4iJ5p
-8idLKuCQ8V9SwZIwqAQrSo4FCoPpk248EPEGsL+NNYKQCbDgzk4nsF1BwdnpDuzb8Ve2oCvFyZfPH9eL
-ZIkFzttx01x7Yngv7Sx4OvljuKZmOYfg8INlcHXobnox/OimQvf2RC4woxU3F4xyVMT+hBVZuHtlGMXj
-Af77HeX+oVIb2mTDxeHchlrQFY7LrivHTSNki02Xrmi6US5dwYTRFgB+7ibdvN2oVOhcj7f+9t2e21vU
-9+3ZHqfbpfbvRwwFak1z7E8yN+ov/eqGw+HQ7I1fFiwBFmm0V/dWIV3t1Kp3Sh2fZ6ctvqPDvNTb0rSb
-U40cR29/EwaoRhtaDHJl2T47tXHO97H8Qq5+gl7fKHs42yk2S3ss+U8c4bTyd5luPk8dVOf1z1bS70N1
-rX526oPbnS+NIu0TxsT5X5Ov0U1t/Gpkg/7bOPc1kpCvihlsR0x/lLxlgqrHy3YgWXD/BwQHDoqjnxod
-zRnGxLm7DJzvu7aJdM8Htf8FAAD//4pKHswGFgAA
+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
 `,
 	},
 
@@ -245,7 +245,7 @@ zRnGxLm7DJzvu7aJdM8Htf8FAAD//4pKHswGFgAA
 		name:    "hrpc-server-echo-go.htmpl",
 		local:   "../templates/hrpc-server-echo-go.htmpl",
 		size:    9796,
-		modtime: 1614874692,
+		modtime: 1614909047,
 		compressed: `
 H4sIAAAAAAAC/+xaX3PcthF/jj4FcqN2SA2Fczp5ukQPld04ntSWx4qnD5mMB0cuefDxAAYAJas3/O4d
 /CEJHsETT3HbTOt78R0ILPbPb3+7S2u/RxLUD7QERnaAooJ33zFaSBB3IBYxapqzs/0enVMFO7S6Qtis
@@ -287,7 +287,7 @@ uHRsbr/yVWNeAAf+sOZfAQAA///04BkQRCYAAA==
 		name:    "hrpc-server-go.htmpl",
 		local:   "../templates/hrpc-server-go.htmpl",
 		size:    8256,
-		modtime: 1613407163,
+		modtime: 1613010077,
 		compressed: `
 H4sIAAAAAAAC/+xZW2/bOhJ+969gjexCChR6d7FP2eahaXfbYrdNkAv2oSgOGGksEZZIhaTi5hj67wck
 RZm62UlOTnNufqlLDsmZb775OHQ2GyRB/YfmwEgBKEh5+x2juQRxB2IeorqezTYbdEAVFOj4BGEzUpJ4
