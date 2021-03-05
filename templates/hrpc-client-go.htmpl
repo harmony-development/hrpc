@@ -137,6 +137,8 @@ import "bytes"
                         select {
                         case msg, ok := <-msgs:
                             if !ok {
+                                close(inC)
+                                close(outC)
                                 return
                             }
 
@@ -149,6 +151,7 @@ import "bytes"
                             outC <- thing
                         case send, ok := <-inC:
                             if !ok {
+                                close(outC)
                                 return
                             }
 
