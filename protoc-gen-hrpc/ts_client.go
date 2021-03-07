@@ -69,10 +69,6 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 				if (resp.status >= 400 && resp.status < 600) throw resp
 				return resp
 				}`)
-			add(`
-			stream(endpoint: string) {
-				return new WebSocket(` + "`" + `${this.host}${endpoint}` + "`" + `, ["access_token", this.session || ""])
-			}`)
 			for _, meth := range service.Method {
 				path := fmt.Sprintf("/%s.%s/%s", *f.Package, *service.Name, *meth.Name)
 				inputPackage := finalRemoved(splitter((*meth.InputType)[1:]))
@@ -87,7 +83,7 @@ func GenerateTSClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 
 				if meth.GetClientStreaming() || meth.GetServerStreaming() {
 					add(`%s() {`, *meth.Name)
-					add(`return new Stream<typeof %s, typeof %s, %s, %s>(this.host, "%s", %s, %s)`, outputJSType, inputJSType, inputJSType, outputJSType, path, outputJSType, inputJSType)
+					add(`return new Stream<typeof %s, typeof %s, %s, %s>(this.host, "%s", %s, %s, this.session)`, outputJSType, inputJSType, IinputJSType, outputJSType, path, outputJSType, inputJSType)
 					add("}")
 				} else {
 					add(`async %s (req: %s) {`, *meth.Name, IinputJSType)
