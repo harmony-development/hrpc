@@ -241,11 +241,27 @@ LhpOtOD+AQQHctXRk9irPkaZmLn7yGzfzVGke77p/RUAAP//+4OCk4kWAAA=
 `,
 	},
 
+	"/templates/hrpc-scanner.htmpl": {
+		name:    "hrpc-scanner.htmpl",
+		local:   "../templates/hrpc-scanner.htmpl",
+		size:    591,
+		modtime: 1618289015,
+		compressed: `
+H4sIAAAAAAAC/3SQQW/UMBCFz+tfMURCslHkvVPtBQk4oFIkChfEYZKMXauOHcYOSmXlvyMnu10E6s2e
+9/zeNy4FEuUPzlPAkUDa+HzW0KQeQyBuFKyrEBP2j2gJSgHjPE2YH95hItB3U3YxJP0xfjlbqt2NU+QM
+zYAZO0x0TL/8cWD3m7h5Fm2M1pO20WOwOrI9Thxz7GazH65OM+ZGiFLAGdC3lBJaun+atq59i7tPkHm+
+DCgMG0YpwBgs/ffIzKEHucCbUkB/rhuvq4Lv6GeSCuROqrd7C8QcWUERB6Y8c4CNTt8ipwf0clFiFS8k
+fu0xyMQ9uJCJDfZUVrUH1jxnoIqnEwTn6+DSEJwXh3UzdC3ER3h7qk4tf/zsnjKpmzqrfmdqWpV3qG9h
+PGN1LSzqZlNfXfMvBcQsDrXh38bz1YxZv6+YRjZzoGWiPtMAuf7f6/umrTR1778++08AAAD//6ZjmSRP
+AgAA
+`,
+	},
+
 	"/templates/hrpc-server-echo-go.htmpl": {
 		name:    "hrpc-server-echo-go.htmpl",
 		local:   "../templates/hrpc-server-echo-go.htmpl",
 		size:    9796,
-		modtime: 1614909047,
+		modtime: 1618288944,
 		compressed: `
 H4sIAAAAAAAC/+xaX3PcthF/jj4FcqN2SA2Fczp5ukQPld04ntSWx4qnD5mMB0cuefDxAAYAJas3/O4d
 /CEJHsETT3HbTOt78R0ILPbPb3+7S2u/RxLUD7QERnaAooJ33zFaSBB3IBYxapqzs/0enVMFO7S6Qtis
@@ -331,6 +347,7 @@ var _escDirs = map[string][]os.FileInfo{
 
 	"../templates": {
 		_escData["/templates/hrpc-client-go.htmpl"],
+		_escData["/templates/hrpc-scanner.htmpl"],
 		_escData["/templates/hrpc-server-echo-go.htmpl"],
 		_escData["/templates/hrpc-server-go.htmpl"],
 	},
