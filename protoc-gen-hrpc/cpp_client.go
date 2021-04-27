@@ -200,10 +200,19 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorp
 
 					add(
 						fmt.Sprintf(
-							"\t[[ nodiscard ]] Result<%s> %s(const %s& in, QMap<QByteArray,QString> headers = {});",
+							"\t[[ nodiscard ]] Result<%s> %sSync(const %s& in, QMap<QByteArray,QString> headers = {});",
 
 							typeToCxxNamespaces(meth.GetOutputType()),
 							meth.GetName(),
+							typeToCxxNamespaces(meth.GetInputType()),
+						),
+					)
+					add(
+						fmt.Sprintf(
+							"\tvoid %s(std::function<void(Result<%s>)> callback, const %s& in, QMap<QByteArray,QString> headers = {});",
+
+							meth.GetName(),
+							typeToCxxNamespaces(meth.GetOutputType()),
 							typeToCxxNamespaces(meth.GetInputType()),
 						),
 					)
@@ -306,27 +315,14 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 			} else {
 				// unary request
 
-				add(
-					fmt.Sprintf(
-						"auto %sServiceClient::%s(const %s& in, QMap<QByteArray,QString> headers) -> %sServiceClient::Result<%s>",
+				addBody := func() {
+					add(fmt.Sprintf(
+						`
 
-						service.GetName(),
-						meth.GetName(),
-						typeToCxxNamespaces(meth.GetInputType()),
-						service.GetName(),
-						typeToCxxNamespaces(meth.GetOutputType()),
-					),
-				)
-				add(`{`)
-				add(`	std::string strData;`)
-				add(`	if (!in.SerializeToString(&strData)) { return {QStringLiteral("failed to serialize protobuf")}; }`)
-				add(`	QByteArray data = QByteArray::fromStdString(strData);`)
-				add(
-					fmt.Sprintf(`
 	initialiseGlobalNam(secure, host);
 
 	QUrl serviceURL = QUrl(httpProtocol()+host);
-	serviceURL.setPath(QStringLiteral("`+path+`"));
+	serviceURL.setPath(QStringLiteral("` + path + `"));
 
 	QNetworkRequest req(serviceURL);
 	for (const auto& item : headers.keys()) {
@@ -337,6 +333,32 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 
 	auto nam = globalNam.localData();
 	auto val = nam->post(req, data);
+`,
+					))
+				}
+
+				add(
+					fmt.Sprintf(
+						"auto %sServiceClient::%sSync(const %s& in, QMap<QByteArray,QString> headers) -> %sServiceClient::Result<%s>",
+
+						service.GetName(),
+						meth.GetName(),
+						typeToCxxNamespaces(meth.GetInputType()),
+						service.GetName(),
+						typeToCxxNamespaces(meth.GetOutputType()),
+					),
+				)
+
+				add(`
+{
+	std::string strData;
+	if (!in.SerializeToString(&strData)) { return {QStringLiteral("failed to serialize protobuf")}; }
+	QByteArray data = QByteArray::fromStdString(strData);
+`)
+
+				addBody()
+				add(
+					fmt.Sprintf(`
 
 	while (!val->isFinished()) {
 		QCoreApplication::processEvents();
@@ -354,6 +376,52 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 	}
 
 	return {ret};
+`, typeToCxxNamespaces(meth.GetOutputType())),
+				)
+				add(`}`)
+
+				add(
+					fmt.Sprintf(
+						"void %sServiceClient::%s(std::function<void(%sServiceClient::Result<%s>)> callback, const %s& in, QMap<QByteArray,QString> headers)",
+
+						service.GetName(),
+						meth.GetName(),
+						service.GetName(),
+						typeToCxxNamespaces(meth.GetOutputType()),
+						typeToCxxNamespaces(meth.GetInputType()),
+					),
+				)
+
+				add(`
+{
+	std::string strData;
+	if (!in.SerializeToString(&strData)) { callback({QStringLiteral("failed to serialize protobuf")}); return; }
+	QByteArray data = QByteArray::fromStdString(strData);
+`)
+				addBody()
+				add(
+					fmt.Sprintf(`
+
+	QObject::connect(val, &QNetworkReply::finished, [val, callback]() {
+		if (val->error() != QNetworkReply::NoError) {
+			val->deleteLater();
+			callback({QStringLiteral("network failure(%%1): %%2").arg(val->error()).arg(val->errorString())});
+			return;
+		}
+		
+		auto response = val->readAll();
+		
+		%s ret;
+		if (!ret.ParseFromArray(response.constData(), response.length())) {
+			val->deleteLater();
+			callback({QStringLiteral("error parsing response into protobuf")});
+			return;
+		}
+		
+		val->deleteLater();
+		callback({ret});
+		return;
+	});
 `, typeToCxxNamespaces(meth.GetOutputType())),
 				)
 
