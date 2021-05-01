@@ -166,6 +166,7 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorp
 		add(fmt.Sprintf(`	QString wsProtocol() const { return secure ? QStringLiteral("wss://") : QStringLiteral("ws://"); }`))
 		add(fmt.Sprintf("\tpublic: explicit %sServiceClient(const QString& host, bool secure) : host(host), secure(secure) {}", *service.Name))
 		add(`public:`)
+		add(`	QMap<QByteArray,QString> universalHeaders;`)
 		add(`	template<typename T> using Result = std::variant<T, QString>;`)
 		{
 			for _, meth := range service.Method {
@@ -276,6 +277,9 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 				add(`{`)
 				add(`auto url = QUrl(wsProtocol()+host); url.setPath(QStringLiteral("` + path + `")); auto req = QNetworkRequest(url);`)
 				add(`
+					for (const auto& item : universalHeaders.keys()) {
+						req.setRawHeader(item, universalHeaders[item].toLocal8Bit());
+					}
 					for (const auto& item : headers.keys()) {
 						req.setRawHeader(item, headers[item].toLocal8Bit());
 					}
@@ -301,6 +305,9 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 				add(`{`)
 				add(`auto url = QUrl(wsProtocol()+host); url.setPath(QStringLiteral("` + path + `")); auto req = QNetworkRequest(url);`)
 				add(`
+					for (const auto& item : universalHeaders.keys()) {
+						req.setRawHeader(item, universalHeaders[item].toLocal8Bit());
+					}
 					for (const auto& item : headers.keys()) {
 						req.setRawHeader(item, headers[item].toLocal8Bit());
 					}
@@ -326,6 +333,9 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 	serviceURL.setPath(QStringLiteral("` + path + `"));
 
 	QNetworkRequest req(serviceURL);
+	for (const auto& item : universalHeaders.keys()) {
+		req.setRawHeader(item, universalHeaders[item].toLocal8Bit());
+	}
 	for (const auto& item : headers.keys()) {
 		req.setRawHeader(item, headers[item].toLocal8Bit());
 	}
@@ -395,6 +405,9 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 
 				add(`
 {
+	if (callback == nullptr) {
+		callback = [](auto) {};
+	}
 	std::string strData;
 	if (!in.SerializeToString(&strData)) { callback({QStringLiteral("failed to serialize protobuf")}); return; }
 	QByteArray data = QByteArray::fromStdString(strData);
