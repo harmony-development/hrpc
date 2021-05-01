@@ -33,6 +33,7 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 	add(`#include <QNetworkAccessManager>`)
 	add(`#include <QNetworkReply>`)
 	add(`#include <QString>`)
+	add(`#include <functional>`)
 	add(`#include <variant>`)
 
 	add(inc(convertCxxProto(*d.Name, "pb", "h")))
