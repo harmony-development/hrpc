@@ -102,6 +102,25 @@ func GenerateGoClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 					Id("WSProto"):   Id("wsproto"),
 				})),
 			)
+
+			for _, fun := range serv.Method {
+				e := func() *Statement {
+					return If(Id("err").Op("!=").Nil()).Block(
+						Return(Nil(), Qual("fmt", "Errorf").Call(Lit("error reading response: %w"), Id("err"))),
+					)
+				}
+
+				// bidi
+				if *fun.ClientStreaming && *fun.ServerStreaming {
+
+					// uni serv
+				} else if *fun.ServerStreaming {
+
+					// unary request
+				} else {
+
+				}
+			}
 		}
 
 		file.Content = new(string)
