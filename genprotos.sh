@@ -8,7 +8,7 @@ for dir in $(find "protocol" -name '*.proto' -print0 | xargs -0 -n1 dirname | so
     protoc \
     --proto_path=protocol \
     --hrpc_out=./gen \
-    --hrpc_opt=hrpc-server-echo-go:hrpc-scanner:hrpc-client-go \
+    --hrpc_opt=hrpc-server-echo-go:hrpc-scanner:go_client \
     $(find "${dir}" -name '*.proto')
 done
 

@@ -109,6 +109,7 @@ func main() {
 			"d_client":      GenerateDClient,
 			"ts_client":     GenerateTSClient,
 			"dart_client":   GenerateDartClient,
+			"go_client":     GenerateGoClient,
 		}
 
 		if fn, ok := builtins[item]; ok {

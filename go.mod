@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/alecthomas/repr v0.0.0-20201103221029-55c485bd663f
+	github.com/dave/jennifer v1.4.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.1 // indirect
