@@ -17,7 +17,7 @@ func inc(s string) string {
 	return fmt.Sprintf(`#include "%s"`, s)
 }
 
-func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDescriptorProto) string {
+func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDescriptorProto, isHrpcTypes bool) string {
 	set := []string{}
 	add := func(s string) {
 		for _, item := range set {
@@ -33,10 +33,16 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 	add(`#include <QNetworkAccessManager>`)
 	add(`#include <QNetworkReply>`)
 	add(`#include <QString>`)
+	add(`#include <QFuture>`)
 	add(`#include <functional>`)
 	add(`#include <variant>`)
 
+	add(`#include <future.h>`)
+
 	add(inc(convertCxxProto(*d.Name, "pb", "h")))
+	if !isHrpcTypes {
+		add(inc(convertCxxProto(*d.Name, "hrpc.types", "h")))
+	}
 
 	for _, kind := range d.Service {
 		for _, meth := range kind.Method {
@@ -49,6 +55,9 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 	for _, f := range mu {
 		for _, dep := range f.Dependency {
 			add(inc(convertCxxProto(dep, "pb", "h")))
+			if !isHrpcTypes {
+				add(inc(convertCxxProto(dep, "hrpc.types", "h")))
+			}
 		}
 	}
 
@@ -57,6 +66,10 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 
 func typeToCxxNamespaces(s string) string {
 	return strings.ReplaceAll(s[1:], ".", "::")
+}
+
+func localTypeToCxxNamespaces(s string) string {
+	return strings.ReplaceAll(s, ".", "::")
 }
 
 type sPair struct {
@@ -150,9 +163,37 @@ class %s : public QWebSocket {
 	return sb.String()
 }
 
+func getAllTypes(in []*descriptorpb.DescriptorProto) (out []*descriptorpb.DescriptorProto) {
+	out = append(out, in...)
+
+	for _, kind := range in {
+		for _, item := range getAllTypes(kind.NestedType) {
+			*item.Name = *kind.Name + "." + *item.Name
+			out = append(out, item)
+		}
+	}
+
+	return
+}
+
+func generateClientTypesHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDescriptorProto) string {
+	sb := strings.Builder{}
+	sb.WriteString("#pragma once\n")
+	sb.WriteString(getImports(d, mu, true))
+
+	add := func(s string) { sb.WriteString(s + "\n") }
+
+	for _, kind := range getAllTypes(d.MessageType) {
+		add(fmt.Sprintf(`Q_DECLARE_METATYPE(%s)`, localTypeToCxxNamespaces(d.GetPackage())+"::"+localTypeToCxxNamespaces(kind.GetName())))
+	}
+
+	return sb.String()
+}
+
 func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDescriptorProto) string {
 	sb := strings.Builder{}
-	sb.WriteString(getImports(d, mu))
+	sb.WriteString("#pragma once\n")
+	sb.WriteString(getImports(d, mu, false))
 
 	add := func(s string) { sb.WriteString(s + "\n") }
 
@@ -211,10 +252,10 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorp
 					)
 					add(
 						fmt.Sprintf(
-							"\tvoid %s(std::function<void(Result<%s>)> callback, const %s& in, QMap<QByteArray,QString> headers = {});",
+							"\t[[ nodiscard ]] FutureResult<%s, QString> %s(const %s& in, QMap<QByteArray,QString> headers = {});",
 
-							meth.GetName(),
 							typeToCxxNamespaces(meth.GetOutputType()),
+							meth.GetName(),
 							typeToCxxNamespaces(meth.GetInputType()),
 						),
 					)
@@ -393,33 +434,31 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 
 				add(
 					fmt.Sprintf(
-						"void %sServiceClient::%s(std::function<void(%sServiceClient::Result<%s>)> callback, const %s& in, QMap<QByteArray,QString> headers)",
+						"FutureResult<%s, QString> %sServiceClient::%s(const %s& in, QMap<QByteArray,QString> headers)",
 
+						typeToCxxNamespaces(meth.GetOutputType()),
 						service.GetName(),
 						meth.GetName(),
-						service.GetName(),
-						typeToCxxNamespaces(meth.GetOutputType()),
 						typeToCxxNamespaces(meth.GetInputType()),
 					),
 				)
 
 				add(`
 {
-	if (callback == nullptr) {
-		callback = [](auto) {};
-	}
+	FutureResult<` + typeToCxxNamespaces(meth.GetOutputType()) + `, QString> res;
+
 	std::string strData;
-	if (!in.SerializeToString(&strData)) { callback({QStringLiteral("failed to serialize protobuf")}); return; }
+	if (!in.SerializeToString(&strData)) { res.fail({QStringLiteral("failed to serialize protobuf")}); return res; }
 	QByteArray data = QByteArray::fromStdString(strData);
 `)
 				addBody()
 				add(
 					fmt.Sprintf(`
 
-	QObject::connect(val, &QNetworkReply::finished, [val, callback]() {
+	QObject::connect(val, &QNetworkReply::finished, [val, res]() mutable {
 		if (val->error() != QNetworkReply::NoError) {
 			val->deleteLater();
-			callback({QStringLiteral("network failure(%%1): %%2").arg(val->error()).arg(val->errorString())});
+			res.fail({QStringLiteral("network failure(%%1): %%2").arg(val->error()).arg(val->errorString())});
 			return;
 		}
 		
@@ -428,14 +467,16 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 		%s ret;
 		if (!ret.ParseFromArray(response.constData(), response.length())) {
 			val->deleteLater();
-			callback({QStringLiteral("error parsing response into protobuf")});
+			res.fail({QStringLiteral("error parsing response into protobuf")});
 			return;
 		}
 		
 		val->deleteLater();
-		callback({ret});
+		res.succeed({ret});
 		return;
 	});
+
+	return res;
 `, typeToCxxNamespaces(meth.GetOutputType())),
 				)
 
@@ -451,6 +492,16 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 func GenerateQtCxxClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGeneratorResponse) {
 	r = new(pluginpb.CodeGeneratorResponse)
 	for _, file := range d.ProtoFile {
+		{
+			metatypesFile := new(pluginpb.CodeGeneratorResponse_File)
+			metatypesFile.Name = new(string)
+			*metatypesFile.Name = convertCxxProto(*file.Name, "hrpc.types", "h")
+
+			metatypesFile.Content = new(string)
+			*metatypesFile.Content = generateClientTypesHeader(file, d.ProtoFile)
+
+			r.File = append(r.File, metatypesFile)
+		}
 		if len(file.Service) == 0 {
 			continue
 		}
