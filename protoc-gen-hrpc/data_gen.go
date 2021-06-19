@@ -213,7 +213,7 @@ var _escData = map[string]*_escFile{
 		name:    "hrpc-client-go.htmpl",
 		local:   "../templates/hrpc-client-go.htmpl",
 		size:    5769,
-		modtime: 1614909041,
+		modtime: 1624070934,
 		compressed: `
 H4sIAAAAAAAC/+RYy27bOBfe5ylOhaSQCoXeG+midf6/LaZpgjpFF0VRMNKRTJgiFZJKJjD87gOSuka+
 xG0zM8BkEQs8F57vXD5SWq3g+IZqhOlrCI1ixbzKMvYnhBnjWFKzeGuF5BMtMIKAlEoaGUSwXh+tVqDR
@@ -261,7 +261,7 @@ AgAA
 		name:    "hrpc-server-echo-go.htmpl",
 		local:   "../templates/hrpc-server-echo-go.htmpl",
 		size:    9796,
-		modtime: 1618288944,
+		modtime: 1624070934,
 		compressed: `
 H4sIAAAAAAAC/+xaX3PcthF/jj4FcqN2SA2Fczp5ukQPld04ntSWx4qnD5mMB0cuefDxAAYAJas3/O4d
 /CEJHsETT3HbTOt78R0ILPbPb3+7S2u/RxLUD7QERnaAooJ33zFaSBB3IBYxapqzs/0enVMFO7S6Qtis
