@@ -1,9 +1,11 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
@@ -18,8 +20,10 @@ type HRPCServer struct {
 	serveMux *http.ServeMux
 }
 
-type Handler func(c echo.Context, req protoreflect.ProtoMessage) (protoreflect.ProtoMessage, error)
-type HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, service *descriptorpb.ServiceDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
+type (
+	Handler            func(c echo.Context, req protoreflect.ProtoMessage) (protoreflect.ProtoMessage, error)
+	HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, service *descriptorpb.ServiceDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
+)
 
 func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 	switch len(funs) {
@@ -56,4 +60,17 @@ func (h *HRPCServer) SetUnaryPre(han HandlerTransformer) {
 	for _, item := range h.handlers {
 		item.SetUnaryPre(han)
 	}
+}
+
+func ScanProto(src interface{}, m protoreflect.ProtoMessage) error {
+	if src == nil {
+		return nil
+	}
+	if b, ok := src.([]byte); ok {
+		if err := proto.Unmarshal(b, m); err != nil {
+			return err
+		}
+		return nil
+	}
+	return fmt.Errorf("unexpected type %T", src)
 }
