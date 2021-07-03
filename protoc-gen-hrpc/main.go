@@ -231,7 +231,7 @@ func main() {
 				return ""
 			},
 		})
-		data, err = f.ReadFile("./templates/" + item + ".htmpl")
+		data, err = f.ReadFile("templates/" + item + ".htmpl")
 		if err != nil {
 			data, err = ioutil.ReadFile(item)
 			if err != nil {
