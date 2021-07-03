@@ -1,6 +1,6 @@
 module github.com/harmony-development/hrpc
 
-go 1.15
+go 1.16
 
 require (
 	github.com/alecthomas/repr v0.0.0-20201103221029-55c485bd663f
