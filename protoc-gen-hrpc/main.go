@@ -19,7 +19,7 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-//go:embed templates/*
+//go:embed templates
 var f embed.FS
 
 type QualPair struct {
@@ -231,7 +231,7 @@ func main() {
 				return ""
 			},
 		})
-		data, err = f.ReadFile(item + ".htmpl")
+		data, err = f.ReadFile("./templates/" + item + ".htmpl")
 		if err != nil {
 			data, err = ioutil.ReadFile(item)
 			if err != nil {
