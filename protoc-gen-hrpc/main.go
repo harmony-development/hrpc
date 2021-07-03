@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -17,6 +18,9 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
 )
+
+//go:embed templates/*
+var f embed.FS
 
 type QualPair struct {
 	Package string
@@ -227,8 +231,7 @@ func main() {
 				return ""
 			},
 		})
-
-		data, err = FSByte(false, "/templates/"+item+".htmpl")
+		data, err = f.ReadFile(item + ".htmpl")
 		if err != nil {
 			data, err = ioutil.ReadFile(item)
 			if err != nil {
