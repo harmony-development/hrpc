@@ -114,6 +114,7 @@ func main() {
 			"ts_client":     GenerateTSClient,
 			"dart_client":   GenerateDartClient,
 			"swift_server":  GenerateSwiftServer,
+			"elixir_server": GenerateElixirServer,
 		}
 
 		if fn, ok := builtins[item]; ok {
