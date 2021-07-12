@@ -66,7 +66,7 @@ func GenerateElixirServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGen
 			for _, rpc := range service.GetMethod() {
 				route := fmt.Sprintf(`/%s.%s/%s`, f.GetPackage(), service.GetName(), rpc.GetName())
 
-				add(`{"%s", %t, %t, %s, %s},`, route, rpc.GetClientStreaming(), rpc.GetServerStreaming(), elixirName(rpc.GetInputType()), elixirName(rpc.GetOutputType()))
+				add(`{"%s", "%s", %t, %t, %s, %s},`, rpc.GetName(), route, rpc.GetClientStreaming(), rpc.GetServerStreaming(), elixirName(rpc.GetInputType()), elixirName(rpc.GetOutputType()))
 			}
 
 			addD(`]`)
