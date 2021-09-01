@@ -416,11 +416,11 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 		QCoreApplication::processEvents();
 	}
 
-	if (val->error() != QNetworkReply::NoError) {
-		return {QStringLiteral("network failure(%%1): %%2").arg(val->error()).arg(val->errorString())};
-	}
-
 	auto response = val->readAll();
+
+	if (val->error() != QNetworkReply::NoError) {
+		return {QStringLiteral("network failure(%%1): %%2\n%%3").arg(val->error()).arg(val->errorString()).arg(QString::fromLocal8Bit(response))};
+	}
 
 	%s ret;
 	if (!ret.ParseFromArray(response.constData(), response.length())) {
@@ -456,14 +456,14 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 					fmt.Sprintf(`
 
 	QObject::connect(val, &QNetworkReply::finished, [val, res]() mutable {
+		auto response = val->readAll();
+
 		if (val->error() != QNetworkReply::NoError) {
 			val->deleteLater();
-			res.fail({QStringLiteral("network failure(%%1): %%2").arg(val->error()).arg(val->errorString())});
+			res.fail({QStringLiteral("request failure(%%1): %%2\n%%3").arg(val->error()).arg(val->errorString()).arg(QString::fromLocal8Bit(response))});
 			return;
 		}
-		
-		auto response = val->readAll();
-		
+
 		%s ret;
 		if (!ret.ParseFromArray(response.constData(), response.length())) {
 			val->deleteLater();
