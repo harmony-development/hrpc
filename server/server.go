@@ -1,10 +1,13 @@
 package server
 
 import (
+	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -21,7 +24,8 @@ type HRPCServer struct {
 }
 
 type (
-	Handler            func(c echo.Context, req protoreflect.ProtoMessage) (protoreflect.ProtoMessage, error)
+	RawHandler         func(c context.Context, w http.ResponseWriter, r *http.Request) error
+	Handler            func(c context.Context, req protoreflect.ProtoMessage) (protoreflect.ProtoMessage, error)
 	HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, service *descriptorpb.ServiceDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
 )
 
@@ -73,4 +77,35 @@ func ScanProto(src interface{}, m protoreflect.ProtoMessage) error {
 		return nil
 	}
 	return fmt.Errorf("unexpected type %T", src)
+}
+
+// NewUnaryHandler creates a new raw HTTP handler that deserializes a given message type
+func NewUnaryHandler(messageType proto.Message, unaryHandler Handler) RawHandler {
+	return func(c context.Context, w http.ResponseWriter, r *http.Request) error {
+		newMessage := proto.Clone(messageType)
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return err
+		}
+		if err := proto.Unmarshal(body, newMessage); err != nil {
+			return err
+		}
+		result, err := unaryHandler(c, newMessage)
+		if err != nil {
+			return err
+		}
+		var response []byte
+		switch r.Header.Get("Content-Type") {
+		case "application/hrpc":
+			response, err = proto.Marshal(result)
+		default:
+			response, err = protojson.Marshal(result)
+		}
+		if err != nil {
+			return err
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(response)
+		return nil
+	}
 }
