@@ -3,10 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/valyala/fasthttp"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -14,18 +12,13 @@ import (
 )
 
 type HRPCServiceHandler interface {
-	Routes() map[string]echo.HandlerFunc
-	SetUnaryPre(h HandlerTransformer)
-}
-
-type HRPCServer struct {
-	handlers []HRPCServiceHandler
-	serveMux *http.ServeMux
+	Name() string
+	Routes() map[string]RawHandler
 }
 
 type (
-	RawHandler         func(c context.Context, w http.ResponseWriter, r *http.Request) error
-	Handler            func(c context.Context, req protoreflect.ProtoMessage) (protoreflect.ProtoMessage, error)
+	RawHandler         func(c context.Context, r *fasthttp.Request) ([]byte, error)
+	Handler            func(c context.Context, req proto.Message) (proto.Message, error)
 	HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, service *descriptorpb.ServiceDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
 )
 
@@ -47,25 +40,6 @@ func ChainHandlerTransformers(funs ...HandlerTransformer) HandlerTransformer {
 	}
 }
 
-func NewHRPCServer(e *echo.Echo, items ...HRPCServiceHandler) *HRPCServer {
-	hentaiRPCServer := &HRPCServer{
-		handlers: items,
-		serveMux: http.NewServeMux(),
-	}
-	for _, item := range hentaiRPCServer.handlers {
-		for handler, route := range item.Routes() {
-			e.Any(handler, route)
-		}
-	}
-	return hentaiRPCServer
-}
-
-func (h *HRPCServer) SetUnaryPre(han HandlerTransformer) {
-	for _, item := range h.handlers {
-		item.SetUnaryPre(han)
-	}
-}
-
 func ScanProto(src interface{}, m protoreflect.ProtoMessage) error {
 	if src == nil {
 		return nil
@@ -81,31 +55,25 @@ func ScanProto(src interface{}, m protoreflect.ProtoMessage) error {
 
 // NewUnaryHandler creates a new raw HTTP handler that deserializes a given message type
 func NewUnaryHandler(messageType proto.Message, unaryHandler Handler) RawHandler {
-	return func(c context.Context, w http.ResponseWriter, r *http.Request) error {
+	return func(c context.Context, r *fasthttp.Request) ([]byte, error) {
 		newMessage := proto.Clone(messageType)
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			return err
-		}
-		if err := proto.Unmarshal(body, newMessage); err != nil {
-			return err
+		if err := proto.Unmarshal(r.Body(), newMessage); err != nil {
+			return nil, err
 		}
 		result, err := unaryHandler(c, newMessage)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		var response []byte
-		switch r.Header.Get("Content-Type") {
+		switch string(r.Header.Peek("Content-Type")) {
 		case "application/hrpc":
 			response, err = proto.Marshal(result)
 		default:
 			response, err = protojson.Marshal(result)
 		}
 		if err != nil {
-			return err
+			return nil, err
 		}
-		w.WriteHeader(http.StatusOK)
-		w.Write(response)
-		return nil
+		return response, nil
 	}
 }
