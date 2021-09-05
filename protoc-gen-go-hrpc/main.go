@@ -13,6 +13,8 @@ var generators = map[string]GeneratorFunc{}
 
 func main() {
 	var flags flag.FlagSet
+	client := flags.Bool("client", true, "generate client code")
+	server := flags.Bool("server", true, "generate server code")
 	protogen.Options{
 		ParamFunc: flags.Set,
 	}.Run(func(gen *protogen.Plugin) error {
@@ -21,7 +23,12 @@ func main() {
 			if !f.Generate {
 				continue
 			}
-			GenerateGoServer(gen, f)
+			if *client {
+				GenerateGoClient(gen, f)
+			}
+			if *server {
+				GenerateGoServer(gen, f)
+			}
 		}
 		return nil
 	})
