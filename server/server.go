@@ -53,38 +53,46 @@ func ScanProto(src interface{}, m protoreflect.ProtoMessage) error {
 	return fmt.Errorf("unexpected type %T", src)
 }
 
+func MarshalHRPC(content proto.Message, contentType string) ([]byte, error) {
+	var response []byte
+	var err error
+	switch contentType {
+	case "application/hrpc":
+		response, err = proto.Marshal(content)
+	default:
+		response, err = protojson.Marshal(content)
+	}
+	return response, err
+}
+
+func UnmarshalHRPC(content []byte, contentType string, messageType proto.Message) (proto.Message, error) {
+	newMessage := proto.Clone(messageType)
+	var err error
+	switch contentType {
+	case "application/hrpc":
+		if err := proto.Unmarshal(content, newMessage); err != nil {
+			return nil, err
+		}
+	default:
+		if err := protojson.Unmarshal(content, newMessage); err != nil {
+			return nil, err
+		}
+	}
+	return newMessage, err
+}
+
 // NewUnaryHandler creates a new raw HTTP handler that deserializes a given message type
 func NewUnaryHandler(messageType proto.Message, unaryHandler Handler) RawHandler {
 	return func(c context.Context, r *fasthttp.Request) ([]byte, error) {
 		contentType := string(r.Header.Peek("Content-Type"))
-
-		newMessage := proto.Clone(messageType)
-
-		switch contentType {
-		case "application/hrpc":
-			if err := proto.Unmarshal(r.Body(), newMessage); err != nil {
-				return nil, err
-			}
-		default:
-			if err := protojson.Unmarshal(r.Body(), newMessage); err != nil {
-				return nil, err
-			}
-		}
-
-		result, err := unaryHandler(c, newMessage)
+		msg, err := UnmarshalHRPC(r.Body(), contentType, messageType)
 		if err != nil {
 			return nil, err
 		}
-		var response []byte
-		switch contentType {
-		case "application/hrpc":
-			response, err = proto.Marshal(result)
-		default:
-			response, err = protojson.Marshal(result)
-		}
+		result, err := unaryHandler(c, msg)
 		if err != nil {
 			return nil, err
 		}
-		return response, nil
+		return MarshalHRPC(result, contentType)
 	}
 }
