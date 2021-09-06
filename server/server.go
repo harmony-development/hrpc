@@ -56,16 +56,27 @@ func ScanProto(src interface{}, m protoreflect.ProtoMessage) error {
 // NewUnaryHandler creates a new raw HTTP handler that deserializes a given message type
 func NewUnaryHandler(messageType proto.Message, unaryHandler Handler) RawHandler {
 	return func(c context.Context, r *fasthttp.Request) ([]byte, error) {
+		contentType := string(r.Header.Peek("Content-Type"))
+
 		newMessage := proto.Clone(messageType)
-		if err := proto.Unmarshal(r.Body(), newMessage); err != nil {
-			return nil, err
+
+		switch contentType {
+		case "application/hrpc":
+			if err := proto.Unmarshal(r.Body(), newMessage); err != nil {
+				return nil, err
+			}
+		default:
+			if err := protojson.Unmarshal(r.Body(), newMessage); err != nil {
+				return nil, err
+			}
 		}
+
 		result, err := unaryHandler(c, newMessage)
 		if err != nil {
 			return nil, err
 		}
 		var response []byte
-		switch string(r.Header.Peek("Content-Type")) {
+		switch contentType {
 		case "application/hrpc":
 			response, err = proto.Marshal(result)
 		default:
