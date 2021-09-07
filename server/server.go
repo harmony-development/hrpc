@@ -57,10 +57,10 @@ func MarshalHRPC(content proto.Message, contentType string) ([]byte, error) {
 	var response []byte
 	var err error
 	switch contentType {
-	case "application/hrpc":
-		response, err = proto.Marshal(content)
-	default:
+	case "application/hrpc-json":
 		response, err = protojson.Marshal(content)
+	default:
+		response, err = proto.Marshal(content)
 	}
 	return response, err
 }
@@ -69,12 +69,12 @@ func UnmarshalHRPC(content []byte, contentType string, messageType proto.Message
 	newMessage := proto.Clone(messageType)
 	var err error
 	switch contentType {
-	case "application/hrpc":
-		if err := proto.Unmarshal(content, newMessage); err != nil {
+	case "application/hrpc-json":
+		if err := protojson.Unmarshal(content, newMessage); err != nil {
 			return nil, err
 		}
 	default:
-		if err := protojson.Unmarshal(content, newMessage); err != nil {
+		if err := proto.Unmarshal(content, newMessage); err != nil {
 			return nil, err
 		}
 	}
