@@ -62,7 +62,6 @@ func genClientHTTPImpl(g *protogen.GeneratedFile, service *protogen.Service) {
 }
 
 func genClientTestHTTPImpl(g *protogen.GeneratedFile, service *protogen.Service) {
-	errorNewType := g.QualifiedGoIdent(errorPackage.Ident("New"))
 	dummyType := "HTTPTest" + service.GoName + "Client"
 	g.P("type ", dummyType, " struct {")
 	g.P("Client ", "interface { Test(", "*", g.QualifiedGoIdent(httpPackage.Ident("Request")), ", ...int", ")", "(*", httpPackage.Ident("Response"), ", error) }")
@@ -70,11 +69,11 @@ func genClientTestHTTPImpl(g *protogen.GeneratedFile, service *protogen.Service)
 	for _, method := range service.Methods {
 		g.P("func (", "client *", dummyType, ") ", clientSignature(g, method), " {")
 		if method.Desc.IsStreamingClient() && method.Desc.IsStreamingServer() {
-			g.P("return nil, ", errorNewType, `("unimplemented")`)
+			g.P("return nil, ", g.QualifiedGoIdent(errorPackage.Ident("New")), `("unimplemented")`)
 		} else if method.Desc.IsStreamingServer() {
-			g.P("return nil, ", errorNewType, `("unimplemented")`)
+			g.P("return nil, ", g.QualifiedGoIdent(errorPackage.Ident("New")), `("unimplemented")`)
 		} else if method.Desc.IsStreamingClient() {
-			g.P("return nil, ", errorNewType, `("unimplemented")`)
+			g.P("return nil, ", g.QualifiedGoIdent(errorPackage.Ident("New")), `("unimplemented")`)
 		} else {
 			genClientTestUnary(g, service, method)
 		}
