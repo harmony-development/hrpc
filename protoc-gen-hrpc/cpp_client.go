@@ -40,8 +40,10 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 	add(`#include <future.h>`)
 
 	add(inc(convertCxxProto(*d.Name, "pb", "h")))
-	if !isHrpcTypes {
-		add(inc(convertCxxProto(*d.Name, "hrpc.types", "h")))
+	if len(d.MessageType) > 0 {
+		if !isHrpcTypes {
+			add(inc(convertCxxProto(*d.Name, "hrpc.types", "h")))
+		}
 	}
 
 	for _, kind := range d.Service {
@@ -168,6 +170,9 @@ func getAllTypes(in []*descriptorpb.DescriptorProto) (out []*descriptorpb.Descri
 
 	for _, kind := range in {
 		for _, item := range getAllTypes(kind.NestedType) {
+			if strings.Contains(item.GetName(), "ExtensionEntry") {
+				continue
+			}
 			*item.Name = *kind.Name + "." + *item.Name
 			out = append(out, item)
 		}
