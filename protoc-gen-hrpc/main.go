@@ -106,6 +106,8 @@ func main() {
 	}
 
 	response := pluginpb.CodeGeneratorResponse{}
+	response.SupportedFeatures = new(uint64)
+	*response.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 
 	for _, item := range strings.Split(*input.Parameter, ":") {
 		builtins := map[string]func(d *pluginpb.CodeGeneratorRequest) *pluginpb.CodeGeneratorResponse{
