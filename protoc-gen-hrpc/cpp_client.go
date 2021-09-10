@@ -38,6 +38,7 @@ func getImports(d *descriptorpb.FileDescriptorProto, mu []*descriptorpb.FileDesc
 	add(`#include <variant>`)
 
 	add(`#include <future.h>`)
+	add(`using namespace Croutons;`)
 
 	add(inc(convertCxxProto(*d.Name, "pb", "h")))
 	if len(d.MessageType) > 0 {
