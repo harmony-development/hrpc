@@ -54,10 +54,10 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 		for _, service := range f.Service {
 			add(`class %sClient {`, *service.Name)
 			indent++
-			add(`bool secure;`)
-			add(`String host;`)
-			add(`Map<String,String> commonHeaders;`)
-			add(`%sClient({required this.secure, required this.host, this.commonHeaders = const {}});`, *service.Name)
+			add(`late bool secure;`)
+			add(`late String host;`)
+			add(`late Map<String,String> commonHeaders;`)
+
 			add(`String get unaryPrefix => secure ? "https" : "http";`)
 			add(`String get wsPrefix => secure ? "wss" : "ws";`)
 			for _, meth := range service.Method {
