@@ -54,9 +54,9 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 		for _, service := range f.Service {
 			add(`class %sClient {`, *service.Name)
 			indent++
-			add(`bool secure = true;`)
+			add(`bool secure;`)
 			add(`String host;`)
-			add(`%sClient({this.secure,this.host});`, *service.Name)
+			add(`%sClient({required this.secure, required this.host});`, *service.Name)
 			add(`String get unaryPrefix => secure ? "https" : "http";`)
 			add(`String get wsPrefix => secure ? "wss" : "ws";`)
 			for _, meth := range service.Method {
@@ -80,7 +80,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 							add(`} else if (value is %s) {`, kind(*meth.InputType))
 							indent++
 							{
-								add(`await socket.add(value.writeToBuffer());`)
+								add(`socket.add(value.writeToBuffer());`)
 							}
 							indent--
 							add(`}`)
@@ -94,7 +94,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Future<%s> %s(%s input, {Map<String,String> headers = const {}}) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var response = await $http.post("${this.unaryPrefix}://${this.host}/%s.%s/%s", body: input.writeToBuffer(), headers: {"content-type": "application/hrpc"}..addAll(headers));`, *f.Package, *service.Name, *meth.Name)
+						add(`var response = await $http.post(Uri.parse("${this.unaryPrefix}://${this.host}/%s.%s/%s"), body: input.writeToBuffer(), headers: {"content-type": "application/hrpc"}..addAll(headers));`, *f.Package, *service.Name, *meth.Name)
 						add(`if (response.statusCode != 200) { throw response; }`)
 						add(`return %s.fromBuffer(response.bodyBytes);`, kind(*meth.OutputType))
 					}
@@ -105,7 +105,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					indent++
 					{
 						add(`var socket = await $io.WebSocket.connect("${this.wsPrefix}://${this.host}/%s.%s/%s", headers: headers);`, *f.Package, *service.Name, *meth.Name)
-						add(`await socket.add(input.writeToBuffer());`)
+						add(`socket.add(input.writeToBuffer());`)
 						add(`await for (var value in socket) {`)
 						indent++
 						{
