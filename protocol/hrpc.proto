@@ -1,8 +1,6 @@
 syntax = "proto3";
 
-package hrpc;
-
-import "google/protobuf/descriptor.proto";
+package hrpc.v1;
 
 // Error type that will be returned by servers.
 message Error {
