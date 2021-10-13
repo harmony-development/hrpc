@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package hrpc;
+
+import "google/protobuf/descriptor.proto";
+
+// Error type that will be returned by servers.
+message Error {
+  // The identifier of this error, can be used as an i18n key.
+  string identifier = 1;
+  // A (usually english) human message for this error.
+  string human_message = 2;
+  // More details about this message. Is dependent on the endpoint.
+  bytes more_details = 3;
+}
