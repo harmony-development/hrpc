@@ -11,7 +11,7 @@ That said, we have already built with hRPC using the following languages:
 
 - Go (using `protoc-gen-go-hrpc` **not `protoc-gen-hrpc`**)
 - Rust (using [hrpc-rs](https://github.com/harmony-development/hrpc-rs))
-- TypeScript (using [@harmony-dev/hrpc]())
+- TypeScript (using [@harmony-dev/hrpc](https://github.com/harmony-development/protobuf-ts-transport-hrpc))
 - C++ (using `protoc-gen-hrpc` with `--hrpc_opt="cpp_client"`)
 - Dart (using `protoc-gen-hrpc` with `--hrpc_opt="dart_client"`)
 - Elixir (using `protoc-gen-hrpc` with `--hrpc_opt="elixir_server"`)
