@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Danil Korennykh <bluskript@gmail.com>
+//
+// SPDX-License-Identifier: MPL-2.0
+
 package main
 
 import (
