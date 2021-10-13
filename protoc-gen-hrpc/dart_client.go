@@ -39,8 +39,10 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 		}
 
 		for _, dep := range f.Dependency {
+			add(`export '%s/%s';`, path.Join(arr...), strings.TrimSuffix(dep, ".proto")+".pb.dart")
 			add(`import '%s/%s';`, path.Join(arr...), strings.TrimSuffix(dep, ".proto")+".pb.dart")
 		}
+		add(`export '%s';`, strings.TrimSuffix(path.Base(*f.Name), ".proto")+".pb.dart")
 		add(`import '%s';`, strings.TrimSuffix(path.Base(*f.Name), ".proto")+".pb.dart")
 		add(`import 'package:http/http.dart' as $http;`)
 		add(`import 'dart:io' as $io;`)
@@ -54,12 +56,10 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 		for _, service := range f.Service {
 			add(`class %sClient {`, *service.Name)
 			indent++
-			add(`late bool secure;`)
-			add(`late String host;`)
+			add(`late Uri server;`)
 			add(`late Map<String,String> commonHeaders;`)
 
-			add(`String get unaryPrefix => secure ? "https" : "http";`)
-			add(`String get wsPrefix => secure ? "wss" : "ws";`)
+			add(`Uri get wsServer => server.hasScheme ? server.replace(scheme: server.scheme == "https" ? "wss" : "ws") : server.replace(scheme: "wss");`)
 			for _, meth := range service.Method {
 				if meth.GetClientStreaming() && !meth.GetServerStreaming() {
 					continue
@@ -67,7 +67,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Stream<%s> %s(Stream<%s> input, {Map<String,dynamic> headers = const {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var socket = await $io.WebSocket.connect("${this.wsPrefix}://${this.host}/%s.%s/%s", headers: headers..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
+						add(`var socket = await $io.WebSocket.connect(this.wsServer.replace(path: "/%s.%s/%s").toString(), headers: headers..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
 						add(`var combined = $async.StreamGroup.merge<dynamic>([socket, input]);`)
 						add(`await for (var value in combined) {`)
 						indent++
@@ -95,7 +95,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Future<%s> %s(%s input, {Map<String,String> headers = const {}}) async {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var response = await $http.post(Uri.parse("${this.unaryPrefix}://${this.host}/%s.%s/%s"), body: input.writeToBuffer(), headers: {"content-type": "application/hrpc"}..addAll(headers)..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
+						add(`var response = await $http.post(this.server.replace(path: "/%s.%s/%s"), body: input.writeToBuffer(), headers: {"content-type": "application/hrpc"}..addAll(headers)..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
 						add(`if (response.statusCode != 200) { throw response; }`)
 						add(`return %s.fromBuffer(response.bodyBytes);`, kind(*meth.OutputType))
 					}
@@ -105,7 +105,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Stream<%s> %s(%s input, {Map<String,dynamic> headers = const {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var socket = await $io.WebSocket.connect("${this.wsPrefix}://${this.host}/%s.%s/%s", headers: headers..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
+						add(`var socket = await $io.WebSocket.connect(this.server.replace(path: "/%s.%s/%s").toString(), headers: headers..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
 						add(`socket.add(input.writeToBuffer());`)
 						add(`await for (var value in socket) {`)
 						indent++
