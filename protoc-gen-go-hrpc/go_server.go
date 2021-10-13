@@ -89,8 +89,9 @@ func genHandlerStruct(g *protogen.GeneratedFile, service *protogen.Service, serv
 		}
 		g.P(
 			fmt.Sprintf(
-				`"/%s/": %s,`,
-				method.Desc.FullName(),
+				`"/%s/%s": %s,`,
+				method.Desc.FullName().Parent(),
+				method.Desc.Name(),
 				genRawHandler(g, service, method),
 			),
 		)
