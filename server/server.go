@@ -8,7 +8,9 @@ package server
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/fasthttp/websocket"
 	"github.com/valyala/fasthttp"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -24,6 +26,7 @@ type HRPCServiceHandler interface {
 type (
 	RawHandler         func(c context.Context, r *fasthttp.Request) ([]byte, error)
 	Handler            func(c context.Context, req proto.Message) (proto.Message, error)
+	StreamHandler      func(c context.Context, req chan proto.Message) (chan proto.Message, error)
 	HandlerTransformer func(meth *descriptorpb.MethodDescriptorProto, service *descriptorpb.ServiceDescriptorProto, d *descriptorpb.FileDescriptorProto, h Handler) Handler
 )
 
@@ -99,5 +102,71 @@ func NewUnaryHandler(messageType proto.Message, unaryHandler Handler) RawHandler
 			return nil, err
 		}
 		return MarshalHRPC(result, contentType)
+	}
+}
+
+var upgrader = websocket.FastHTTPUpgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
+func reader(conn *websocket.Conn, msgType proto.Message, in chan proto.Message) {
+	defer func() {
+		conn.Close()
+	}()
+	for {
+		_, rawMessage, err := conn.ReadMessage()
+		if err != nil {
+			break
+		}
+		msg, err := UnmarshalHRPC(rawMessage, "application/hrpc", msgType)
+		if err != nil {
+			break
+		}
+		in <- msg
+	}
+}
+
+func writer(conn *websocket.Conn, out chan proto.Message) {
+	ticker := time.NewTicker(time.Second * 10)
+	defer func() {
+		conn.Close()
+	}()
+	for {
+		select {
+		case message := <-out:
+			w, err := conn.NextWriter(websocket.BinaryMessage)
+			if err != nil {
+				return
+			}
+			raw, err := MarshalHRPC(message, "application/hrpc")
+			if err != nil {
+				return
+			}
+			if _, err := w.Write(raw); err != nil {
+				return
+			}
+		case <-ticker.C:
+			if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
+		}
+	}
+}
+
+// NewStreamingHandler creates a new raw HTTP handler that
+func NewStreamingHandler(messageType proto.Message, stream StreamHandler) RawHandler {
+	return func(c context.Context, r *fasthttp.Request) ([]byte, error) {
+		ctx := c.(*fasthttp.RequestCtx)
+		err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
+			inChan := make(chan proto.Message)
+			go reader(conn, messageType, inChan)
+			outChan, err := stream(c, inChan)
+			if err != nil {
+				return
+			}
+			go writer(conn, outChan)
+		})
+		return nil, err
 	}
 }
