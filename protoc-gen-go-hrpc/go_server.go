@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Danil Korennykh <bluskript@gmail.com>
+//
+// SPDX-License-Identifier: MPL-2.0
+
 package main
 
 import (
@@ -80,20 +84,43 @@ func genHandlerStruct(g *protogen.GeneratedFile, service *protogen.Service, serv
 	g.P(fmt.Sprintf("func (h *%s) Routes() %s {", handlerType, handlerMapType))
 	g.P("return ", handlerMapType, "{")
 	for _, method := range service.Methods {
+		routePath := fmt.Sprintf("/%s/%s", method.Desc.FullName().Parent(), method.Desc.Name())
 		if method.Desc.IsStreamingClient() || method.Desc.IsStreamingServer() {
-			continue
+			g.P(
+				fmt.Sprintf(
+					`"%s": %s,`,
+					routePath,
+					genStreamHandler(g, service, method),
+				),
+			)
+		} else {
+			g.P(
+				fmt.Sprintf(
+					`"%s": %s,`,
+					routePath,
+					genRawHandler(g, service, method),
+				),
+			)
 		}
-		g.P(
-			fmt.Sprintf(
-				`"/%s/": %s,`,
-				method.Desc.FullName(),
-				genRawHandler(g, service, method),
-			),
-		)
 	}
 	g.P("}")
 	g.P("}")
 	g.P()
+}
+
+func genStreamHandler(g *protogen.GeneratedFile, service *protogen.Service, m *protogen.Method) string {
+	newStreamingHandlerType := g.QualifiedGoIdent(serverPackage.Ident("NewStreamingHandler"))
+	messageType := g.QualifiedGoIdent(protoPackage.Ident("Message"))
+	return fmt.Sprintf(
+		"%s(&%s{}, func(c context.Context, req chan %s) (chan %s, error) { res, err := h.Server.%s(c, req.(chan *%s)); return res.(chan %s), err })",
+		newStreamingHandlerType,
+		g.QualifiedGoIdent(m.Input.GoIdent),
+		messageType,
+		messageType,
+		m.GoName,
+		g.QualifiedGoIdent(m.Input.GoIdent),
+		messageType,
+	)
 }
 
 func genRawHandler(g *protogen.GeneratedFile, service *protogen.Service, m *protogen.Method) string {
@@ -116,12 +143,12 @@ func serverSignature(g *protogen.GeneratedFile, m *protogen.Method) string {
 	inputType := g.QualifiedGoIdent(m.Input.GoIdent)
 	outputType := g.QualifiedGoIdent(m.Output.GoIdent)
 	inputArgs = append(inputArgs, g.QualifiedGoIdent(contextPackage.Ident("Context")))
-	if m.Desc.IsStreamingClient() {
+	if m.Desc.IsStreamingClient() || m.Desc.IsStreamingServer() {
 		inputArgs = append(inputArgs, "chan *"+inputType)
 	} else {
 		inputArgs = append(inputArgs, "*"+inputType)
 	}
-	if m.Desc.IsStreamingServer() {
+	if m.Desc.IsStreamingClient() || m.Desc.IsStreamingServer() {
 		ret = "chan *" + outputType
 	} else {
 		ret = "*" + outputType

@@ -1,0 +1,14 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_NO_PACKAGE_IN_DEPENDENCIES",
+    "err": {
+      "name": "Error",
+      "message": "None of the specified packages were found in the dependencies.",
+      "code": "ERR_PNPM_NO_PACKAGE_IN_DEPENDENCIES",
+      "stack": "Error: None of the specified packages were found in the dependencies.\n    at Object.handler [as default] (/home/amadeus/.nvm/versions/node/v14.15.1/pnpm-global/5/node_modules/.pnpm/pnpm@6.12.1/node_modules/pnpm/dist/pnpm.cjs:116214:17)\n    at async /home/amadeus/.nvm/versions/node/v14.15.1/pnpm-global/5/node_modules/.pnpm/pnpm@6.12.1/node_modules/pnpm/dist/pnpm.cjs:125733:20\n    at async run (/home/amadeus/.nvm/versions/node/v14.15.1/pnpm-global/5/node_modules/.pnpm/pnpm@6.12.1/node_modules/pnpm/dist/pnpm.cjs:125708:34)\n    at async runPnpm (/home/amadeus/.nvm/versions/node/v14.15.1/pnpm-global/5/node_modules/.pnpm/pnpm@6.12.1/node_modules/pnpm/dist/pnpm.cjs:125918:5)\n    at async /home/amadeus/.nvm/versions/node/v14.15.1/pnpm-global/5/node_modules/.pnpm/pnpm@6.12.1/node_modules/pnpm/dist/pnpm.cjs:125910:7"
+    }
+  }
+}
