@@ -6,8 +6,14 @@ package hrpc.v1;
 message Error {
   // The identifier of this error, can be used as an i18n key.
   string identifier = 1;
-  // A (usually english) human message for this error.
+  // A human readable message in English, explaining why the error occured.
   string human_message = 2;
-  // More details about this message. Is dependent on the endpoint.
-  bytes more_details = 3;
+  // Details about this message. This is dependent on the error identifier.
+  bytes details = 3;
+}
+
+// Information that can be used by clients for retrying requests.
+message RetryInfo {
+  // How many seconds to wait before retrying the request.
+  uint32 retry_after = 1;
 }
