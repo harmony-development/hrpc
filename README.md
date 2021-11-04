@@ -18,3 +18,7 @@ That said, we have already built with hRPC using the following languages:
 ### WIP Languages
 
 - Go (using `protoc-gen-go-hrpc` **not `protoc-gen-hrpc`**)
+
+### Protocol Types
+
+See the protobuf files in [`protocol`](./protocol).
