@@ -2,11 +2,16 @@ syntax = "proto3";
 
 package chat;
 
-import "google/protobuf/empty.proto";
-
+// A chat message.
 message Message { string content = 1; }
 
-service ChatService {
-  rpc SendMessage(Message) returns (google.protobuf.Empty);
-  rpc StreamMessages(google.protobuf.Empty) returns (stream Message);
+// An empty message.
+message Empty {}
+
+// Chat service.
+service Chat {
+  // Endpoint to send a chat message.
+  rpc SendMessage(Message) returns (Empty);
+  // Endpoint to stream chat messages.
+  rpc StreamMessages(Empty) returns (stream Message);
 }

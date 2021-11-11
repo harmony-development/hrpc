@@ -8,18 +8,18 @@
   },
   "dependencies": {
     "@protobuf-ts/runtime": "^2.0.7",
-    "vue": "^3.2.20"
+    "vue": "^3.2.21"
   },
   "devDependencies": {
-    "@harmony-dev/transport-hrpc": "^1.0.0-2",
+    "@harmony-dev/transport-hrpc": "^1.0.3",
     "@protobuf-ts/plugin": "^2.0.7",
     "@protobuf-ts/protoc": "^2.0.7",
     "@protobuf-ts/runtime-rpc": "^2.0.7",
-    "@vitejs/plugin-vue": "^1.9.3",
+    "@vitejs/plugin-vue": "^1.9.4",
     "typescript": "^4.4.4",
-    "vite": "^2.6.7",
-    "vite-plugin-windicss": "^1.4.11",
+    "vite": "^2.6.14",
+    "vite-plugin-windicss": "^1.5.1",
     "vue-tsc": "^0.3.0",
-    "windicss": "^3.1.9"
+    "windicss": "^3.2.1"
   }
 }

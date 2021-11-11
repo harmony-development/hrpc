@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ChatServiceClient } from "../gen/chat.client";
+import { ChatClient } from "../gen/chat.client";
 import { HrpcTransport } from "@harmony-dev/transport-hrpc";
 import { onMounted, reactive, ref } from "vue";
-const client = new ChatServiceClient(
+const client = new ChatClient(
   new HrpcTransport({
-    baseUrl: "http://localhost:6969",
+    baseUrl: "http://127.0.0.1:2289",
+    insecure: true
   })
 );
 
@@ -28,8 +29,8 @@ const send = (ev: KeyboardEvent) => {
 
 <template>
   <div class="h-100vh w-100vw bg-surface-900 flex flex-col justify-center p-3">
-    <div class="flex-1 p-3">
-      <p v-for="m in msgs" :key="m">{{ m }}</p>
+    <div class="flex-1 p-3 flex flex-col gap-2 overflow-auto">
+      <p class="p-3 max-w-30ch rounded-md bg-surface-800" v-for="m in msgs" :key="m">{{ m }}</p>
     </div>
     <input
       class="
@@ -38,6 +39,7 @@ const send = (ev: KeyboardEvent) => {
         rounded-md
         focus:outline-none focus:ring-3
         ring-secondary-400
+	mt-2
       "
       v-model="content"
       @keydown="send"

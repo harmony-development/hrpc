@@ -3,44 +3,56 @@
 // tslint:disable
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
-import { ChatService } from "./chat";
+import { Chat } from "./chat";
 import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
-import type { Empty } from "./google/protobuf/empty";
+import type { Empty } from "./chat";
 import type { Message } from "./chat";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
 /**
- * @generated from protobuf service chat.ChatService
+ * Chat service.
+ *
+ * @generated from protobuf service chat.Chat
  */
-export interface IChatServiceClient {
+export interface IChatClient {
     /**
-     * @generated from protobuf rpc: SendMessage(chat.Message) returns (google.protobuf.Empty);
+     * Endpoint to send a chat message.
+     *
+     * @generated from protobuf rpc: SendMessage(chat.Message) returns (chat.Empty);
      */
     sendMessage(input: Message, options?: RpcOptions): UnaryCall<Message, Empty>;
     /**
-     * @generated from protobuf rpc: StreamMessages(google.protobuf.Empty) returns (stream chat.Message);
+     * Endpoint to stream chat messages.
+     *
+     * @generated from protobuf rpc: StreamMessages(chat.Empty) returns (stream chat.Message);
      */
     streamMessages(input: Empty, options?: RpcOptions): ServerStreamingCall<Empty, Message>;
 }
 /**
- * @generated from protobuf service chat.ChatService
+ * Chat service.
+ *
+ * @generated from protobuf service chat.Chat
  */
-export class ChatServiceClient implements IChatServiceClient, ServiceInfo {
-    typeName = ChatService.typeName;
-    methods = ChatService.methods;
-    options = ChatService.options;
+export class ChatClient implements IChatClient, ServiceInfo {
+    typeName = Chat.typeName;
+    methods = Chat.methods;
+    options = Chat.options;
     constructor(private readonly _transport: RpcTransport) {
     }
     /**
-     * @generated from protobuf rpc: SendMessage(chat.Message) returns (google.protobuf.Empty);
+     * Endpoint to send a chat message.
+     *
+     * @generated from protobuf rpc: SendMessage(chat.Message) returns (chat.Empty);
      */
     sendMessage(input: Message, options?: RpcOptions): UnaryCall<Message, Empty> {
         const method = this.methods[0], opt = this._transport.mergeOptions(options);
         return stackIntercept<Message, Empty>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: StreamMessages(google.protobuf.Empty) returns (stream chat.Message);
+     * Endpoint to stream chat messages.
+     *
+     * @generated from protobuf rpc: StreamMessages(chat.Empty) returns (stream chat.Message);
      */
     streamMessages(input: Empty, options?: RpcOptions): ServerStreamingCall<Empty, Message> {
         const method = this.methods[1], opt = this._transport.mergeOptions(options);
