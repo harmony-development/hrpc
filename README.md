@@ -22,7 +22,11 @@ built with hRPC using the following languages:
 
 - Go (using `protoc-gen-go-hrpc` **not `protoc-gen-hrpc`**)
 
-### Protocol Types
+### Examples
+
+Example applications are located at [the hRPC examples repository](https://github.com/harmony-development/hrpc-examples).
+
+### Protocol and Spec
 
 See the protobuf files in [`protocol`](./protocol). That folder also contains
 documentation regarding to hRPC.
