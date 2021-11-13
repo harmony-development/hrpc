@@ -1,4 +1,4 @@
-# hRPC Error Identifier List
+## hRPC Error Identifier List
 
 This is a list of identifiers that are used by hRPC servers in the `Error` type.
 The `hrpc.` prefix is reserved by hRPC and should not be used by server
@@ -31,6 +31,17 @@ and 1 repetition if not documented.
 
 ### HTTP
 
+#### Additional Identifiers
+
+The `hrpc.http.` prefix is reserved for hRPC HTTP errors.
+
+| Identifier                        | Description                                                     |
+|-----------------------------------|-----------------------------------------------------------------|
+| `hrpc.http.bad-unary-request`     | The unary request didn't match spec requirements.               |
+| `hrpc.http.bad-streaming-request` | The streaming handshake request didn't match spec requirements. |
+
+#### Status Codes
+
 If using hRPC over HTTP, the following response statuses should be used for
 the respective identifiers:
 
@@ -41,6 +52,8 @@ the respective identifiers:
 | `hrpc.not-found`                         | `404 Not Found`             |
 | `hrpc.not-implemented`                   | `501 Not Implemented`       |
 | `hrpc.unavailable`                       | `503 Service Unavailable`   |
+| `hrpc.http.bad-unary-request`            | `400 Bad Request`           |
+| `hrpc.http.bad-streaming-request`        | `400 Bad Request`           |
 
 For any non `hrpc.` identifiers, check the documentation of the hRPC API you
 are using.
