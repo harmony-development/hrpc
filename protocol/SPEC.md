@@ -161,7 +161,9 @@ This applies to socket handshake requests and unary requests.
 
 Below should be implemented for error responses:
 
-- **MUST** set the body to a serialized [hRPC error] message.
+- **MUST** set the body to a serialized [hRPC error] message. Implementations
+**MUST** use the [hRPC errors document] to decide what error identifier to use.
+Implementations **SHOULD** set a descriptive human readable error message.
 - **MUST** set the status to an **unsuccessful** [HTTP status]. This should be
 the status code corresponding to the error identifier. Implementations **MUST**
 use the [hRPC errors document] to decide what status to set.
