@@ -1,3 +1,7 @@
+# hRPC Errors
+
+This document describes hRPC errors and lists error identifiers.
+
 ## hRPC Error Identifier List
 
 This is a list of identifiers that are used by hRPC servers in the `Error` type.
