@@ -176,6 +176,6 @@ use the [hRPC errors document] to decide what status to set.
 [websocket_messages]: https://datatracker.ietf.org/doc/html/rfc6455#section-5.6
 [websocket_protocol_header]: https://datatracker.ietf.org/doc/html/rfc6455#section-11.3.4
 [websocket_extensions_header]: https://datatracker.ietf.org/doc/html/rfc6455#section-11.3.2
-[hrpc error]: https://github.com/harmony-development/hrpc/blob/8e648895ece3eb1466f457125556cc86feeb92b3/protocol/hrpc.proto#L5-L13
+[hrpc error]: ./hrpc.proto#L5-L13
 [http status]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 [hrpc errors document]: ./ERRORS.md
