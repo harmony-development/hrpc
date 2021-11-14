@@ -128,11 +128,24 @@ func generateClientSockets(d *descriptorpb.FileDescriptorProto) string {
 		connect(this, &QWebSocket::binaryMessageReceived, [=](const QByteArray& msg) {
 			%s incoming;
 
-			if (!incoming.ParseFromArray(msg.constData(), msg.length())) {
+			switch (msg[0]) {
+			case 0: {
+				auto data = msg.constData();
+				data++;
+				const auto len = msg.length() - 1;
+				if (!incoming.ParseFromArray(data, len)) {
+					return;
+				}
+
+				Q_EMIT receivedMessage(incoming);
 				return;
 			}
 
-			Q_EMIT receivedMessage(incoming);
+			case 1: {
+				qWarning() << "TODO: error handling in sockets";
+				return;
+			}
+			}
 		});
 	}
 `,
