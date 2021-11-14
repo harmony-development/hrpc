@@ -125,22 +125,19 @@ between server and client. The initial handshake is done through HTTP.
 ##### Handshake requests
 
 - **MUST** have method set to `GET`.
-- **MUST** contain `hrpc` in the [`Sec-WebSocket-Protocol`][websocket_protocol_header] header.
-- **SHOULD** add `hrpc-version=<current spec version>` to [`Sec-WebSocket-Extensions`][websocket_extensions_header] header,
+- **MUST** contain `hrpc<current spec version>` in the [`Sec-WebSocket-Protocol`][websocket_protocol_header] header,
 where `<current spec version>` is the [version defined at the start of this document](#Version).
 
 ##### Handshake responses
 
-- **IF** the request had `hrpc` in the [`Sec-WebSocket-Protocol`][websocket_protocol_header] header,
-**MUST** set the same header to `hrpc`.
-- **MUST** add `hrpc-version=<current spec version>` to [`Sec-WebSocket-Extensions`][websocket_extensions_header] header,
-where `<current spec version>` is the [version defined at the start of this document](#Version).
+- **IF** the request had `hrpc<current spec version>` in the [`Sec-WebSocket-Protocol`][websocket_protocol_header] header,
+**MUST** set the same header to `hrpc<current spec version>`, where `<current spec version>` is the [version defined at the start of this document](#Version).
 
 ##### Client behaviour
 
 - After getting a successful handshake response from the server, a client
-**SHOULD** look for `hrpc-version=number` in the [`Sec-WebSocket-Extensions`][websocket_extensions_header] header.
-The `number` will be the version of hRPC implemented by the server. A client
+**SHOULD** look for `hrpc<number>` in the [`Sec-WebSocket-Protocol`][websocket_protocol_header] header.
+The `<number>` will be the version of hRPC implemented by the server. A client
 then **SHOULD** check if it can work with this version of the specification.
 If a client can't work with this version, it **SHOULD** close the [`WebSocket`][websocket].
 - [`WebSocket` binary messages][websocket_messages] **MUST** be used to send
