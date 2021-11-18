@@ -48,11 +48,14 @@ func genClientHTTPImpl(g *protogen.GeneratedFile, service *protogen.Service) {
 	g.P("type ", dummyType, " struct {")
 	g.P("Client ", g.QualifiedGoIdent(httpPackage.Ident("Client")))
 	g.P("BaseURL string")
+	g.P("WebsocketProto string")
+	g.P("WebsocketHost string")
+	g.P("Header ", httpPackage.Ident("Header"))
 	g.P("}")
 	for _, method := range service.Methods {
 		g.P("func (", "client *", dummyType, ") ", clientSignature(g, method), " {")
 		if method.Desc.IsStreamingClient() && method.Desc.IsStreamingServer() {
-			g.P("return nil, ", g.QualifiedGoIdent(errorPackage.Ident("New")), `("unimplemented")`)
+			genClientBidiStreaming(g, service, method)
 		} else if method.Desc.IsStreamingServer() {
 			g.P("return nil, ", g.QualifiedGoIdent(errorPackage.Ident("New")), `("unimplemented")`)
 		} else if method.Desc.IsStreamingClient() {
@@ -95,6 +98,88 @@ func genClientMarshal(fromVar, toVar, err string, g *protogen.GeneratedFile, ser
 	g.P("}")
 }
 
+func genClientBidiStreaming(g *protogen.GeneratedFile, service *protogen.Service, method *protogen.Method) {
+	g.P(`u := `,
+		g.QualifiedGoIdent(urlPackage.Ident("URL")), `{`,
+		`Scheme: client.WebsocketProto,`,
+		`Host: client.WebsocketHost,`,
+		`Path: `, fmt.Sprintf(`"/%s/"`, method.Desc.FullName()), `,`,
+		`}`)
+
+	g.P(`inC := req`)
+	g.P(`outC := make(chan *`, g.QualifiedGoIdent(method.Output.GoIdent), `)`)
+
+	g.P(`c, _, err := `, g.QualifiedGoIdent(websocketPackage.Ident("DefaultDialer")), `.Dial(u.String(), client.Header)`)
+	g.P(`if err != nil {`)
+	g.P(`return nil, err`)
+	g.P(`}`)
+
+	g.P(`go func() {`)
+	{
+		g.P(`defer c.Close()`)
+
+		g.P(`msgs := make(chan []byte)`)
+
+		g.P(`go func() {`)
+		{
+			g.P(`for {`)
+			{
+				g.P(`_, message, err := c.ReadMessage()`)
+				g.P(`if err != nil {`)
+				g.P(`close(msgs)`)
+				g.P(`break`)
+				g.P(`}`)
+				g.P(`msgs <- message`)
+			}
+			g.P(`}`)
+		}
+		g.P(`}()`)
+
+		g.P(`for {`)
+		g.P(`select {`)
+		{
+			g.P(`case msg, ok := <-msgs:`)
+			g.P(`if !ok {
+				close(inC)
+				close(outC)
+				return
+			}`)
+
+			g.P(`thing := &`, g.QualifiedGoIdent(method.Output.GoIdent), `{}`)
+			g.P(`err := `, g.QualifiedGoIdent(protoPackage.Ident("Unmarshal")), `(msg[1:], thing)`)
+			g.P(`if err != nil {
+				close(inC)
+				close(outC)
+				return
+				}`)
+
+			g.P(`outC <- thing`)
+		}
+		{
+			g.P(`case send, ok := <-inC:`)
+			g.P(`if !ok {
+				close(outC)
+				return
+				}`)
+
+			g.P(`data, err := proto.Marshal(send)`)
+			g.P(`if err != nil {
+				return
+				}`)
+
+			g.P(`err = c.WriteMessage(`, g.QualifiedGoIdent(websocketPackage.Ident("BinaryMessage")), `, data)`)
+			g.P(`if err != nil {
+				return
+				}`)
+		}
+		g.P(`}`)
+		g.P(`}`)
+	}
+	g.P(`}()`)
+
+	g.P(`return outC, nil`)
+}
+
 func genClientUnmarshal(fromVar, toVar, err string, kind protogen.GoIdent, g *protogen.GeneratedFile, service *protogen.Service) {
 	unmarshal := g.QualifiedGoIdent(protoPackage.Ident("Unmarshal"))
 
@@ -108,7 +193,15 @@ func genClientUnmarshal(fromVar, toVar, err string, kind protogen.GoIdent, g *pr
 func genClientUnary(g *protogen.GeneratedFile, service *protogen.Service, method *protogen.Method) {
 	genClientMarshal("req", "data", "marshalErr", g, service)
 	g.P("reader := ", g.QualifiedGoIdent(bytesPackage.Ident("NewReader")), "(data)")
-	g.P("resp, err := ", "client.Client.Post(client.BaseURL + ", fmt.Sprintf(`"/%s/"`, method.Desc.FullName()), `, "application/hrpc", reader)`)
+	g.P(`hreq, err := http.NewRequest("POST", client.BaseURL + `, fmt.Sprintf(`"/%s/"`, method.Desc.FullName()), `, reader)`)
+	g.P(`if err != nil {`)
+	g.P(`return nil, err`)
+	g.P(`}`)
+	g.P(`for k, v := range client.Header {`)
+	g.P(`hreq.Header[k] = v`)
+	g.P(`}`)
+	g.P(`hreq.Header.Add("content-typ", "application/hrpc")`)
+	g.P(`resp, err := client.Client.Do(hreq)`)
 	g.P("if err != nil {")
 	g.P("return nil, err")
 	g.P("}")

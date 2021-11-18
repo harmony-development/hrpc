@@ -12,15 +12,17 @@ import (
 )
 
 const (
-	errorPackage    = protogen.GoImportPath("errors")
-	contextPackage  = protogen.GoImportPath("context")
-	fastHttpPackage = protogen.GoImportPath("fasthttp")
-	httpPackage     = protogen.GoImportPath("net/http")
-	ioutilPackage   = protogen.GoImportPath("io/ioutil")
-	bytesPackage    = protogen.GoImportPath("bytes")
-	httptestPackage = protogen.GoImportPath("net/http/httptest")
-	protoPackage    = protogen.GoImportPath("google.golang.org/protobuf/proto")
-	serverPackage   = protogen.GoImportPath("github.com/harmony-development/hrpc/server")
+	errorPackage     = protogen.GoImportPath("errors")
+	contextPackage   = protogen.GoImportPath("context")
+	fastHttpPackage  = protogen.GoImportPath("fasthttp")
+	httpPackage      = protogen.GoImportPath("net/http")
+	ioutilPackage    = protogen.GoImportPath("io/ioutil")
+	urlPackage       = protogen.GoImportPath("net/url")
+	bytesPackage     = protogen.GoImportPath("bytes")
+	websocketPackage = protogen.GoImportPath("github.com/gorilla/websocket")
+	httptestPackage  = protogen.GoImportPath("net/http/httptest")
+	protoPackage     = protogen.GoImportPath("google.golang.org/protobuf/proto")
+	serverPackage    = protogen.GoImportPath("github.com/harmony-development/hrpc/server")
 )
 
 func GenerateGoServer(gen *protogen.Plugin, file *protogen.File) {
