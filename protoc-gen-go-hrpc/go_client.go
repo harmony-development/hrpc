@@ -103,7 +103,7 @@ func genClientBidiStreaming(g *protogen.GeneratedFile, service *protogen.Service
 		g.QualifiedGoIdent(urlPackage.Ident("URL")), `{`,
 		`Scheme: client.WebsocketProto,`,
 		`Host: client.WebsocketHost,`,
-		`Path: `, fmt.Sprintf(`"/%s/"`, method.Desc.FullName()), `,`,
+		`Path: `, fmt.Sprintf(`"/%s/%s"`, method.Desc.FullName().Parent(), method.Desc.Name()), `,`,
 		`}`)
 
 	g.P(`inC := req`)
@@ -193,7 +193,7 @@ func genClientUnmarshal(fromVar, toVar, err string, kind protogen.GoIdent, g *pr
 func genClientUnary(g *protogen.GeneratedFile, service *protogen.Service, method *protogen.Method) {
 	genClientMarshal("req", "data", "marshalErr", g, service)
 	g.P("reader := ", g.QualifiedGoIdent(bytesPackage.Ident("NewReader")), "(data)")
-	g.P(`hreq, err := http.NewRequest("POST", client.BaseURL + `, fmt.Sprintf(`"/%s/"`, method.Desc.FullName()), `, reader)`)
+	g.P(`hreq, err := http.NewRequest("POST", client.BaseURL + `, fmt.Sprintf(`"/%s/%s"`, method.Desc.FullName().Parent(), method.Desc.Name()), `, reader)`)
 	g.P(`if err != nil {`)
 	g.P(`return nil, err`)
 	g.P(`}`)
@@ -216,7 +216,7 @@ func genClientUnary(g *protogen.GeneratedFile, service *protogen.Service, method
 func genClientTestUnary(g *protogen.GeneratedFile, service *protogen.Service, method *protogen.Method) {
 	genClientMarshal("req", "data", "marshalErr", g, service)
 	g.P("reader := ", g.QualifiedGoIdent(bytesPackage.Ident("NewReader")), "(data)")
-	g.P("testreq := ", g.QualifiedGoIdent(httptestPackage.Ident("NewRequest")), `("POST", `, fmt.Sprintf(`"/%s/"`, method.Desc.FullName()), `, reader)`)
+	g.P("testreq := ", g.QualifiedGoIdent(httptestPackage.Ident("NewRequest")), `("POST", `, fmt.Sprintf(`"/%s/%s"`, method.Desc.FullName().Parent(), method.Desc.Name()), `, reader)`)
 	g.P("resp, err := client.Client.Test(testreq)")
 	g.P("if err != nil {")
 	g.P("return nil, err")
