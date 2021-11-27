@@ -200,7 +200,7 @@ func genClientUnary(g *protogen.GeneratedFile, service *protogen.Service, method
 	g.P(`for k, v := range client.Header {`)
 	g.P(`hreq.Header[k] = v`)
 	g.P(`}`)
-	g.P(`hreq.Header.Add("content-typ", "application/hrpc")`)
+	g.P(`hreq.Header.Add("content-type", "application/hrpc")`)
 	g.P(`resp, err := client.Client.Do(hreq)`)
 	g.P("if err != nil {")
 	g.P("return nil, err")
