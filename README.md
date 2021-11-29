@@ -26,7 +26,11 @@ built with hRPC using the following languages:
 
 Example applications are located at [the hRPC examples repository](https://github.com/harmony-development/hrpc-examples).
 
+Also checkout our [blog post] containing a tutorial.
+
 ### Protocol and Spec
 
 See the protobuf files in [`protocol`](./protocol). That folder also contains
 documentation regarding to hRPC.
+
+[blog post]: https://dev.to/harmonydevelopment/introducing-hrpc-a-simple-rpc-system-for-user-facing-apis-16ge
