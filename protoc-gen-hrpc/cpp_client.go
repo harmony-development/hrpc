@@ -282,6 +282,15 @@ func generateClientHeader(d *descriptorpb.FileDescriptorProto, mu []*descriptorp
 							typeToCxxNamespaces(meth.GetInputType()),
 						),
 					)
+					add(
+						fmt.Sprintf(
+							"\t[[ nodiscard ]] FutureResult<QList<%s>, QString> Batch%s(const QList<%s>& in, QMap<QByteArray,QString> headers = {});",
+
+							typeToCxxNamespaces(meth.GetOutputType()),
+							meth.GetName(),
+							typeToCxxNamespaces(meth.GetInputType()),
+						),
+					)
 				}
 			}
 		}
@@ -298,6 +307,7 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 
 	add(inc(convertCxxProto(*d.Name, "hrpc.client", "h")))
 	add(inc("QThreadStorage"))
+	add(inc("batch/v1/batch.pb.h"))
 
 	add(`namespace {`)
 	add(`QThreadStorage<QNetworkAccessManager*> globalNam;`)
@@ -504,6 +514,100 @@ func generateClientImpl(d *descriptorpb.FileDescriptorProto) string {
 				)
 
 				add(`}`)
+
+				// batched
+				{
+					add(
+						fmt.Sprintf(
+							"FutureResult<QList<%s>, QString> %sServiceClient::Batch%s(const QList<%s>& in, QMap<QByteArray,QString> headers)",
+
+							typeToCxxNamespaces(meth.GetOutputType()),
+							service.GetName(),
+							meth.GetName(),
+							typeToCxxNamespaces(meth.GetInputType()),
+						),
+					)
+
+					add(`{`)
+
+					add(`
+	FutureResult<QList<` + typeToCxxNamespaces(meth.GetOutputType()) + `>, QString> res;
+
+	protocol::batch::v1::BatchSameRequest breq;
+
+	breq.set_endpoint("` + path + `");
+	for (const auto& subreq : in) {
+		std::string strData;
+		if (!subreq.SerializeToString(&strData)) {
+			res.fail({QStringLiteral("failed to serialize individual protobuf")});
+			return res;
+		}
+		
+		breq.add_requests(strData);
+	}
+
+	std::string strData;
+	if (!breq.SerializeToString(&strData)) {
+		res.fail({QStringLiteral("failed to serialize batched protobuf")});
+		return res;
+	}
+	QByteArray data = QByteArray::fromStdString(strData);
+
+	initialiseGlobalNam(secure, host);
+
+	QUrl serviceURL = QUrl(httpProtocol()+host);
+	serviceURL.setPath(QStringLiteral("/protocol.batch.v1.BatchService/BatchSame"));
+
+	QNetworkRequest req(serviceURL);
+	for (const auto& item : universalHeaders.keys()) {
+		req.setRawHeader(item, universalHeaders[item].toLocal8Bit());
+	}
+	for (const auto& item : headers.keys()) {
+		req.setRawHeader(item, headers[item].toLocal8Bit());
+	}
+	req.setRawHeader("content-type", "application/hrpc");
+	req.setAttribute(QNetworkRequest::Http2AllowedAttribute, true);
+
+	auto nam = globalNam.localData();
+	auto val = nam->post(req, data);
+
+	QObject::connect(val, &QNetworkReply::finished, [val, res]() mutable {
+		auto response = val->readAll();
+
+		if (val->error() != QNetworkReply::NoError) {
+			val->deleteLater();
+			res.fail({QStringLiteral("request failure(%%1): %%2\n%%3").arg(val->error()).arg(val->errorString()).arg(QString::fromLocal8Bit(response))});
+			return;
+		}
+
+		protocol::batch::v1::BatchSameResponse ret;
+		if (!ret.ParseFromArray(response.constData(), response.length())) {
+			val->deleteLater();
+			res.fail({QStringLiteral("error parsing batch same response into protobuf")});
+			return;
+		}
+
+		QList<` + typeToCxxNamespaces(meth.GetOutputType()) + `> items;
+		for (const auto& thing : ret.responses()) {
+			` + typeToCxxNamespaces(meth.GetOutputType()) + ` deser;
+			if (!deser.ParseFromString(thing)) {
+				val->deleteLater();
+				res.fail({QStringLiteral("error parsing individual response into protobuf")});
+				return;
+			}
+			items << deser;
+		}
+
+		val->deleteLater();
+		res.succeed({items});
+		return;
+	});
+
+	return res;
+`)
+
+					add(`}`)
+				}
 			}
 		}
 	}
