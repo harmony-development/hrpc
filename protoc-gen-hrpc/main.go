@@ -113,6 +113,7 @@ func main() {
 	for _, item := range strings.Split(*input.Parameter, ":") {
 		builtins := map[string]func(d *pluginpb.CodeGeneratorRequest) *pluginpb.CodeGeneratorResponse{
 			"qt_cpp_client": GenerateQtCxxClient,
+			"csharp_client": GenerateCsharpClient,
 			"d_client":      GenerateDClient,
 			"ts_client":     GenerateTSClient,
 			"dart_client":   GenerateDartClient,
