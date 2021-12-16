@@ -89,9 +89,12 @@ func GenerateCsharpClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGen
 }
 
 func fixMethodString(inp string) string {
-	// todo: this sucks and will probably break eventually
-	tmp := strings.Split(strings.ToUpper(string(inp[1]))+inp[2:], ".")
-	tmp[1] = strings.ToUpper(string(tmp[1][0])) + tmp[1][1:]
-	tmp[2] = strings.ToUpper(string(tmp[2][0])) + tmp[2][1:]
+	// why
+	inp = strings.TrimPrefix(inp, ".")
+
+	tmp := strings.Split(inp, ".")
+	for i := range tmp {
+		tmp[i] = strings.ToUpper(string(tmp[i][0])) + tmp[i][1:]
+	}
 	return strings.Join(tmp, ".")
 }
