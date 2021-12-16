@@ -27,7 +27,7 @@ built with hRPC using the following languages:
 
 Example applications are located at [the hRPC examples repository](https://github.com/harmony-development/hrpc-examples).
 
-Also checkout our [blog post] containing a tutorial.
+Also check out our [blog post] containing a tutorial.
 
 ### Protocol and Spec
 
