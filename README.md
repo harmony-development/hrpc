@@ -15,7 +15,7 @@ built with hRPC using the following languages:
 - Rust (using [hrpc-rs](https://github.com/harmony-development/hrpc-rs))
 - TypeScript (using [@harmony-dev/hrpc](https://github.com/harmony-development/protobuf-ts-transport-hrpc))
 - C++ (using `protoc-gen-hrpc` with `--hrpc_opt="cpp_client"`)
-- C# (using `protoc-gen-hrpc` with `--hrpc-opt="csharp_client"`, and [hrpc.net](https://github.com/harmony-development/hrpc.net) wrapper)
+- C# (using `protoc-gen-hrpc` with `--hrpc-opt="csharp_client"` or `--hrpc-opt="csharp_server"`, and [hrpc.net](https://github.com/harmony-development/hrpc.net) wrapper)
 - Dart (using `protoc-gen-hrpc` with `--hrpc_opt="dart_client"`)
 - Elixir (using `protoc-gen-hrpc` with `--hrpc_opt="elixir_server"`)
 
