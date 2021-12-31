@@ -93,8 +93,10 @@ func GenerateSwiftServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGene
 
 			addI(`func registerRoutes(withBuilder builder: RoutesBuilder) {`)
 
+			addI(`builder.group("%s.%s") { builder in`, f.GetPackage(), service.GetName())
+
 			for _, rpc := range service.Method {
-				route := fmt.Sprintf(`/%s.%s/%s`, f.GetPackage(), service.GetName(), rpc.GetName())
+				route := rpc.GetName()
 
 				if rpc.GetClientStreaming() && rpc.GetServerStreaming() {
 					addI(`builder.webSocket("%s") { request, ws in`, route)
@@ -185,6 +187,8 @@ func GenerateSwiftServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGene
 					addD(`}`)
 				}
 			}
+
+			addD(`}`)
 
 			addD(`}`)
 
