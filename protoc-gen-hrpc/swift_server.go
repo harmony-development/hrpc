@@ -73,7 +73,7 @@ func GenerateSwiftServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGene
 				} else if rpc.GetServerStreaming() && !rpc.GetClientStreaming() {
 					add(`func %s (req: Request, in: %s, out: (%s) -> Void)`, rpc.GetName(), swiftName(rpc.GetInputType()), swiftName(rpc.GetOutputType()))
 				} else {
-					add(`func %s (req: Request, in: %s) throws -> %s`, rpc.GetName(), swiftName(rpc.GetInputType()), swiftName(rpc.GetOutputType()))
+					add(`func %s (req: Request, in: %s) async throws -> %s`, rpc.GetName(), swiftName(rpc.GetInputType()), swiftName(rpc.GetOutputType()))
 				}
 			}
 
@@ -87,7 +87,7 @@ func GenerateSwiftServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGene
 				} else if rpc.GetServerStreaming() && !rpc.GetClientStreaming() {
 					add(`func %s (req: Request, in: %s, out: (%s) -> Void) { }`, rpc.GetName(), swiftName(rpc.GetInputType()), swiftName(rpc.GetOutputType()))
 				} else {
-					add(`func %s (req: Request, in: %s) throws -> %s { throw Abort(.internalServerError, reason: "unimplemented") }`, rpc.GetName(), swiftName(rpc.GetInputType()), swiftName(rpc.GetOutputType()))
+					add(`func %s (req: Request, in: %s) async throws -> %s { throw Abort(.internalServerError, reason: "unimplemented") }`, rpc.GetName(), swiftName(rpc.GetInputType()), swiftName(rpc.GetOutputType()))
 				}
 			}
 
@@ -175,12 +175,12 @@ func GenerateSwiftServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGene
 					addI(`do {`)
 
 					add(`let message: %s = try request.decodeMessage()`, swiftName(rpc.GetInputType()))
-					add(`let response = try self.%s(req: request, in: message)`, rpc.GetName())
+					add(`let response = try await self.%s(req: request, in: message)`, rpc.GetName())
 					add(`return try response.toResponse(on: request)`)
 
 					addD(`} catch {`)
 
-					addI(`throw Abort(.internalServerError, reason: "something did an oops")`)
+					addI(`throw Abort(.internalServerError, reason: "something did an oops \(error)")`)
 
 					addD(`}`)
 
