@@ -17,8 +17,15 @@
           inherit system;
         };
         packages = rec {
-          protoc-gen-hrpc = pkgs.callPackage ./build-hrpc-gen.nix {
+          protoc-gen-hrpc = pkgs.callPackage ./build-generic.nix {
             src = inputs.self;
+            name = "protoc-gen-hrpc";
+            vendorSha256 = "sha256-VoOBEpdkGIonW0AHO7fYsgmyAtDcSU8V/hTR0KHB7i0=";
+          };
+          protoc-gen-go-hrpc = pkgs.callPackage ./build-generic.nix {
+            src = inputs.self;
+            name = "protoc-gen-go-hrpc";
+            vendorSha256 = "sha256-VoOBEpdkGIonW0AHO7fYsgmyAtDcSU8V/hTR0KHB7i0=";
           };
         };
       in
