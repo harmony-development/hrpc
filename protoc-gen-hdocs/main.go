@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -63,10 +64,11 @@ type FilePath struct {
 }
 
 type PackageData struct {
-	Comments map[FilePath]CommentData
-	Messages []DescriptorData
-	Services []ServiceData
-	Enums    []EnumData
+	PackageComment string
+	Comments       map[FilePath]CommentData
+	Messages       []DescriptorData
+	Services       []ServiceData
+	Enums          []EnumData
 }
 
 type DescriptorData struct {
@@ -336,6 +338,12 @@ func main() {
 			out.Comments[FilePath{item, strings.Join(key, ".")}] = commentDataFrom(location)
 		}
 
+		it := strings.Split(item.GetPackage(), ".")
+		base := strings.TrimSuffix(path.Base(item.GetName()), ".proto")
+		if it[len(it)-1] == base || it[len(it)-2] == base {
+			out.PackageComment = out.Comments[FilePath{item, strconv.Itoa(packageCommentPath)}].Trailing
+		}
+
 		out.Enums = append(out.Enums, getAllEnums(item.MessageType, item, nil)...)
 		for idx, enum := range item.EnumType {
 			out.Enums = append(out.Enums, EnumData{enum, fmt.Sprintf("%d.%d", enumCommentPath, idx), item})
@@ -369,6 +377,11 @@ func main() {
 		file.WriteString("---\n")
 		file.WriteString(fmt.Sprintf("title: \"Reference: %s\"\n", pkg))
 		file.WriteString("---\n")
+
+		if stuff.PackageComment != "" {
+			file.WriteString(stuff.PackageComment)
+			file.WriteString("\n\n")
+		}
 
 		goto serv
 
