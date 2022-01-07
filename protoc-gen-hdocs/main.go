@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -16,9 +17,76 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
+const (
+	packageCommentPath          = 2
+	messageCommentPath          = 4
+	enumCommentPath             = 5
+	serviceCommentPath          = 6
+	extensionCommentPath        = 7
+	syntaxCommentPath           = 12
+	messageFieldCommentPath     = 2
+	messageMessageCommentPath   = 3
+	messageEnumCommentPath      = 4
+	messageExtensionCommentPath = 6
+	enumValueCommentPath        = 2
+	serviceMethodCommentPath    = 2
+)
+
+type CommentData struct {
+	LeadingDetached []string
+
+	Leading  string
+	Trailing string
+}
+
+func removeExcessSpace(str string) string {
+	return strings.TrimSpace(strings.ReplaceAll(str, "\n ", "\n"))
+}
+
+func commentDataFrom(loc *descriptor.SourceCodeInfo_Location) CommentData {
+	detached := make([]string, len(loc.GetLeadingDetachedComments()))
+	for i, c := range loc.GetLeadingDetachedComments() {
+		detached[i] = removeExcessSpace(c)
+	}
+
+	return CommentData{
+		Leading:         removeExcessSpace(loc.GetLeadingComments()),
+		Trailing:        removeExcessSpace(loc.GetTrailingComments()),
+		LeadingDetached: detached,
+	}
+}
+
+type FilePath struct {
+	f *descriptorpb.FileDescriptorProto
+	s string
+}
+
 type PackageData struct {
-	Messages []*descriptor.DescriptorProto
-	Services []*descriptor.ServiceDescriptorProto
+	Comments map[FilePath]CommentData
+	Messages []DescriptorData
+	Services []ServiceData
+	Enums    []EnumData
+}
+
+type DescriptorData struct {
+	*descriptor.DescriptorProto
+
+	Path string
+	FD   *descriptorpb.FileDescriptorProto
+}
+
+type ServiceData struct {
+	*descriptor.ServiceDescriptorProto
+
+	Path string
+	FD   *descriptorpb.FileDescriptorProto
+}
+
+type EnumData struct {
+	*descriptor.EnumDescriptorProto
+
+	Path string
+	FD   *descriptorpb.FileDescriptorProto
 }
 
 type Docs map[string]PackageData
@@ -44,11 +112,54 @@ var wellKnown = map[descriptor.FieldDescriptorProto_Type]string{
 	// descriptor.FieldDescriptorProto_TYPE_ENUM
 }
 
-func getAllTypes(in []*descriptorpb.DescriptorProto) (out []*descriptorpb.DescriptorProto) {
-	out = append(out, in...)
+func getAllEnums(in []*descriptorpb.DescriptorProto, file *descriptorpb.FileDescriptorProto, parent *DescriptorData) (out []EnumData) {
+	var rin = []DescriptorData{}
 
-	for _, kind := range in {
-		for _, item := range getAllTypes(kind.NestedType) {
+	for mi, msg := range in {
+		var path string
+
+		if parent == nil {
+			path = fmt.Sprintf("%d.%d", messageCommentPath, mi)
+		} else {
+			path = fmt.Sprintf("%s.%d.%d", parent.Path, messageCommentPath, mi)
+		}
+
+		for ei, enum := range msg.EnumType {
+			epath := fmt.Sprintf("%s.%d.%d", path, enumCommentPath, ei)
+			out = append(out, EnumData{enum, epath, file})
+		}
+
+		rin = append(rin, DescriptorData{msg, path, file})
+	}
+
+	for _, kind := range rin {
+		for _, item := range getAllEnums(kind.NestedType, file, &kind) {
+			*item.Name = *kind.Name + "." + *item.Name
+			out = append(out, item)
+		}
+	}
+
+	return
+}
+
+func getAllTypes(in []*descriptorpb.DescriptorProto, file *descriptorpb.FileDescriptorProto, parent *DescriptorData) (out []DescriptorData) {
+	var rin = []DescriptorData{}
+
+	for i, msg := range in {
+		var path string
+
+		if parent == nil {
+			path = fmt.Sprintf("%d.%d", messageCommentPath, i)
+		} else {
+			path = fmt.Sprintf("%s.%d.%d", parent.Path, messageCommentPath, i)
+		}
+
+		rin = append(rin, DescriptorData{msg, path, file})
+	}
+
+	for _, kind := range rin {
+		out = append(out, kind)
+		for _, item := range getAllTypes(kind.NestedType, file, &kind) {
 			*item.Name = *kind.Name + "." + *item.Name
 			out = append(out, item)
 		}
@@ -72,8 +183,32 @@ func main() {
 
 	for _, item := range gen.ProtoFile {
 		out := docs[*item.Package]
-		out.Messages = append(out.Messages, getAllTypes(item.MessageType)...)
-		out.Services = append(out.Services, item.Service...)
+		if out.Comments == nil {
+			out.Comments = map[FilePath]CommentData{}
+		}
+
+		for _, location := range item.GetSourceCodeInfo().GetLocation() {
+			if location.GetLeadingComments() == "" && location.GetTrailingComments() == "" && len(location.GetLeadingDetachedComments()) == 0 {
+				continue
+			}
+
+			path := location.GetPath()
+			key := make([]string, len(path))
+			for idx, p := range path {
+				key[idx] = strconv.Itoa(int(p))
+			}
+
+			out.Comments[FilePath{item, strings.Join(key, ".")}] = commentDataFrom(location)
+		}
+
+		out.Enums = append(out.Enums, getAllEnums(item.MessageType, item, nil)...)
+		for idx, enum := range item.EnumType {
+			out.Enums = append(out.Enums, EnumData{enum, fmt.Sprintf("%d.%d", enumCommentPath, idx), item})
+		}
+		out.Messages = append(out.Messages, getAllTypes(item.MessageType, item, nil)...)
+		for idx, service := range item.Service {
+			out.Services = append(out.Services, ServiceData{service, fmt.Sprintf("%d.%d", serviceCommentPath, idx), item})
+		}
 		docs[*item.Package] = out
 	}
 
@@ -82,7 +217,7 @@ func main() {
 	for pkg, stuff := range docs {
 		resolveLink := func(s string) string {
 			transform := func(s string) string {
-				return strings.ReplaceAll(strings.ToLower(s), ".", "-")
+				return strings.ReplaceAll(strings.ToLower(s), ".", "")
 			}
 			if strings.HasPrefix(s, pkg) {
 				return fmt.Sprintf("#%s", transform(strings.TrimPrefix(s, pkg)[1:]))
@@ -100,72 +235,143 @@ func main() {
 		file.WriteString(fmt.Sprintf("title: \"Reference: %s\"\n", pkg))
 		file.WriteString("---\n")
 
+		if len(stuff.Messages) == 0 {
+			goto enum
+		}
+
 		file.WriteString("## Message Types \n\n")
 		for _, item := range stuff.Messages {
 			file.WriteString(fmt.Sprintf("### %s\n", item.GetName()))
-			file.WriteString("\nFields\n\n")
-			file.WriteString("| Name | Type |\n")
-			file.WriteString("| ---- | ---- |\n")
-			for _, field := range item.Field {
-				file.WriteString("| ")
+
+			comments := stuff.Comments[FilePath{item.FD, item.Path}]
+			file.WriteString(comments.Leading)
+			file.WriteString("\n\n")
+
+			if len(item.Field) == 0 {
+				file.WriteString("This item has no fields.")
+			} else {
+				file.WriteString("#### Fields\n\n")
+			}
+
+			file.WriteString("\n")
+			for idx, field := range item.Field {
+				path := fmt.Sprintf("%s.%d.%d", item.Path, messageFieldCommentPath, idx)
+				comments := stuff.Comments[FilePath{item.FD, path}]
+
+				file.WriteString(fmt.Sprintf("##### %s (", field.GetName()))
+
+				label :=
+					descriptorpb.FieldDescriptorProto_Label(field.Label.Number())
+
+				isOptional :=
+					label == descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL
+
+				isRepeated :=
+					label == descriptorpb.FieldDescriptorProto_LABEL_REPEATED
+
+				modifier := ""
+
+				if isOptional {
+					modifier = "optional "
+				}
+				if isRepeated {
+					modifier = "repeated "
+				}
+
 				switch field.GetType() {
 				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-					file.WriteString(fmt.Sprintf("%s | [%s](%s)", field.GetName(), field.GetTypeName()[1:], resolveLink(field.GetTypeName()[1:])))
+					file.WriteString(fmt.Sprintf("%s [%s](%s)", modifier, field.GetTypeName()[1:], resolveLink(field.GetTypeName()[1:])))
 				default:
 					if v, ok := wellKnown[field.GetType()]; ok {
-						file.WriteString(fmt.Sprintf("%s | `%s`", field.GetName(), v))
+						file.WriteString(fmt.Sprintf("%s `%s`", modifier, v))
 					} else {
 						file.WriteString("UNHANDLED | TYPE")
 					}
 				}
-				file.WriteString(" |\n")
+
+				file.WriteString(")\n")
+
+				file.WriteString(comments.Leading)
+				file.WriteString("\n")
 			}
 			file.WriteString("\n")
+		}
+
+	enum:
+		if len(stuff.Enums) == 0 {
+			goto serv
+		}
+
+		file.WriteString("## Enums \n\n")
+		for _, enum := range stuff.Enums {
+			comment := stuff.Comments[FilePath{enum.FD, enum.Path}]
+
+			file.WriteString(fmt.Sprintf("### %s\n\n", enum.GetName()))
+
+			file.WriteString(comment.Leading)
+			file.WriteString("\n")
+
+			for idx, value := range enum.Value {
+				vpath := fmt.Sprintf("%s.%d.%d", enum.Path, enumValueCommentPath, idx)
+				comment := stuff.Comments[FilePath{enum.FD, vpath}]
+
+				file.WriteString(fmt.Sprintf("#### %s\n", value.GetName()))
+
+				file.WriteString(comment.Leading)
+				file.WriteString("\n\n")
+			}
+		}
+
+	serv:
+
+		if len(stuff.Services) == 0 {
+			goto after
 		}
 
 		file.WriteString("## Services \n\n")
-		for _, serv := range stuff.Services {
+		for idx, serv := range stuff.Services {
+			path := fmt.Sprintf("%d.%d", serviceCommentPath, idx)
+			comment := stuff.Comments[FilePath{serv.FD, path}]
+
 			file.WriteString(fmt.Sprintf("### %s\n\n", serv.GetName()))
 
-			file.WriteString("#### Unary Methods\n\n")
-
-			file.WriteString("| Name | Request | Response |\n")
-			file.WriteString("| ---- | ------- | -------- |\n")
-
-			for _, method := range serv.Method {
-				if method.GetClientStreaming() || method.GetServerStreaming() {
-					continue
-				}
-
-				file.WriteString("|")
-				file.WriteString(*method.Name)
-				file.WriteString("|")
-				file.WriteString(fmt.Sprintf("[%s](%s)", method.GetInputType()[1:], resolveLink(method.GetInputType()[1:])))
-				file.WriteString("|")
-				file.WriteString(fmt.Sprintf("[%s](%s)", method.GetOutputType()[1:], resolveLink(method.GetOutputType()[1:])))
-				file.WriteString("|\n")
-			}
+			file.WriteString(comment.Leading)
 			file.WriteString("\n")
 
-			file.WriteString("#### Streaming Methods\n\n")
+			file.WriteString("#### Methods\n\n")
 
-			file.WriteString("| Name | Client Streams | Server Streams |\n")
-			file.WriteString("| ---- | -------------- | -------------- |\n")
+			for idx, method := range serv.Method {
+				file.WriteString(fmt.Sprintf("##### %s\n", method.GetName()))
 
-			for _, method := range serv.Method {
-				if !method.GetClientStreaming() || !method.GetServerStreaming() {
-					continue
+				cStream := method.GetClientStreaming()
+				sStream := method.GetServerStreaming()
+
+				cType := fmt.Sprintf("[%s](%s)", method.GetInputType()[1:], resolveLink(method.GetInputType()[1:]))
+				sType := fmt.Sprintf("[%s](%s)", method.GetOutputType()[1:], resolveLink(method.GetOutputType()[1:]))
+
+				if cStream {
+					file.WriteString("streaming ")
 				}
+				file.WriteString(cType)
 
-				file.WriteString("|")
-				file.WriteString(*method.Name)
-				file.WriteString("|")
-				file.WriteString(fmt.Sprintf("[%s](%s)", method.GetInputType()[1:], resolveLink(method.GetInputType()[1:])))
-				file.WriteString("|")
-				file.WriteString(fmt.Sprintf("[%s](%s)", method.GetOutputType()[1:], resolveLink(method.GetOutputType()[1:])))
-				file.WriteString("|\n")
+				file.WriteString(" -> ")
+
+				if sStream {
+					file.WriteString("streaming ")
+				}
+				file.WriteString(sType)
+
+				file.WriteString("\n\n")
+
+				mpath := fmt.Sprintf("%s.%d.%d", path, serviceMethodCommentPath, idx)
+				comment := stuff.Comments[FilePath{serv.FD, mpath}]
+
+				file.WriteString(comment.Leading)
+				file.WriteString("\n")
 			}
 		}
+
+	after:
 
 		n := new(string)
 		*n = pkg + ".md"
