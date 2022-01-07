@@ -72,8 +72,9 @@ type PackageData struct {
 type DescriptorData struct {
 	*descriptor.DescriptorProto
 
-	Path string
-	FD   *descriptorpb.FileDescriptorProto
+	Path      string
+	FD        *descriptorpb.FileDescriptorProto
+	IsRequest bool
 }
 
 type ServiceData struct {
@@ -130,7 +131,12 @@ func getAllEnums(in []*descriptorpb.DescriptorProto, file *descriptorpb.FileDesc
 			out = append(out, EnumData{enum, epath, file})
 		}
 
-		rin = append(rin, DescriptorData{msg, path, file})
+		n := msg.GetName()
+
+		isReq :=
+			len(msg.NestedType) == 0 && parent == nil && (strings.HasSuffix(n, "Request") || strings.HasSuffix(n, "Response"))
+
+		rin = append(rin, DescriptorData{msg, path, file, isReq})
 	}
 
 	for _, kind := range rin {
@@ -155,7 +161,12 @@ func getAllTypes(in []*descriptorpb.DescriptorProto, file *descriptorpb.FileDesc
 			path = fmt.Sprintf("%s.%d.%d", parent.Path, messageCommentPath, i)
 		}
 
-		rin = append(rin, DescriptorData{msg, path, file})
+		n := msg.GetName()
+
+		isReq :=
+			len(msg.NestedType) == 0 && parent == nil && (strings.HasSuffix(n, "Request") || strings.HasSuffix(n, "Response"))
+
+		rin = append(rin, DescriptorData{msg, path, file, isReq})
 	}
 
 	for _, kind := range rin {
@@ -170,6 +181,100 @@ func getAllTypes(in []*descriptorpb.DescriptorProto, file *descriptorpb.FileDesc
 }
 
 var rex = regexp.MustCompile(`(\w+)=(\w+)`)
+
+func outputMessageType(item *DescriptorData, stuff *PackageData, file *strings.Builder, resolveLink func(s string) string, isSub bool) {
+	pfx := ""
+	if isSub {
+		pfx = "###"
+	}
+	file.WriteString(fmt.Sprintf("%s## %s%s\n", pfx, iconMessage, item.GetName()))
+
+	comments := stuff.Comments[FilePath{item.FD, item.Path}]
+	file.WriteString(comments.Leading)
+	file.WriteString("\n\n")
+
+	if len(item.Field) == 0 {
+		file.WriteString("This item has no fields.")
+	} else {
+		if useHTML {
+			if isSub {
+				file.WriteString(`<span class="h5" aria-level="5">Fields</span>`)
+			} else {
+				file.WriteString(`<span class="h3" aria-level="3">Fields</span>`)
+			}
+		} else {
+			file.WriteString(pfx + "### Fields\n\n")
+		}
+	}
+
+	if isSub {
+		if useHTML {
+			pfx = "###"
+		} else {
+			pfx = "##"
+		}
+	} else if useHTML {
+		pfx = ""
+	}
+
+	file.WriteString("\n")
+	for idx, field := range item.Field {
+		path := fmt.Sprintf("%s.%d.%d", item.Path, messageFieldCommentPath, idx)
+		comments := stuff.Comments[FilePath{item.FD, path}]
+
+		file.WriteString(fmt.Sprintf("%s### %s%s\n", pfx, iconMessageField, field.GetName()))
+
+		label :=
+			descriptorpb.FieldDescriptorProto_Label(field.Label.Number())
+
+		isOptional :=
+			label == descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL
+
+		isRepeated :=
+			label == descriptorpb.FieldDescriptorProto_LABEL_REPEATED
+
+		modifier := ""
+
+		if isOptional {
+			modifier = "optional "
+		}
+		if isRepeated {
+			modifier = "repeated "
+		}
+
+		file.WriteString("Type: ")
+
+		switch field.GetType() {
+		case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
+			file.WriteString(fmt.Sprintf("%s[%s](%s)", modifier, field.GetTypeName()[1:], resolveLink(field.GetTypeName()[1:])))
+		default:
+			if v, ok := wellKnown[field.GetType()]; ok {
+				file.WriteString(fmt.Sprintf("%s`%s`", modifier, v))
+			} else {
+				file.WriteString("UNHANDLED | TYPE")
+			}
+		}
+
+		file.WriteString("\n\n")
+
+		file.WriteString(comments.Leading)
+		file.WriteString("\n")
+	}
+	file.WriteString("\n")
+}
+
+var (
+	iconMessage      string
+	iconMessageField string
+
+	iconEnum      string
+	iconEnumValue string
+
+	iconService       string
+	iconServiceMethod string
+)
+
+var useHTML bool
 
 func main() {
 	gen := pluginpb.CodeGeneratorRequest{}
@@ -193,16 +298,9 @@ func main() {
 	codicons :=
 		res["codicon"] == "yes"
 
-	var (
-		iconMessage      string
-		iconMessageField string
+	useHTML =
+		res["usehtml"] == "yes"
 
-		iconEnum      string
-		iconEnumValue string
-
-		iconService       string
-		iconServiceMethod string
-	)
 	if codicons {
 		f := func(icon string) string {
 			return fmt.Sprintf(`<span class="codicon codicon-%s %s"></span>`, icon, icon)
@@ -276,62 +374,15 @@ func main() {
 			goto enum
 		}
 
-		file.WriteString("## Message Types \n\n")
-		for _, item := range stuff.Messages {
-			file.WriteString(fmt.Sprintf("### %s%s\n", iconMessage, item.GetName()))
-
-			comments := stuff.Comments[FilePath{item.FD, item.Path}]
-			file.WriteString(comments.Leading)
-			file.WriteString("\n\n")
-
-			if len(item.Field) == 0 {
-				file.WriteString("This item has no fields.")
-			} else {
-				file.WriteString("#### Fields\n\n")
+		file.WriteString("# Standalone Message Types \n\n")
+		for idx, item := range stuff.Messages {
+			if item.IsRequest {
+				continue
 			}
-
-			file.WriteString("\n")
-			for idx, field := range item.Field {
-				path := fmt.Sprintf("%s.%d.%d", item.Path, messageFieldCommentPath, idx)
-				comments := stuff.Comments[FilePath{item.FD, path}]
-
-				file.WriteString(fmt.Sprintf("##### %s%s (", iconMessageField, field.GetName()))
-
-				label :=
-					descriptorpb.FieldDescriptorProto_Label(field.Label.Number())
-
-				isOptional :=
-					label == descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL
-
-				isRepeated :=
-					label == descriptorpb.FieldDescriptorProto_LABEL_REPEATED
-
-				modifier := ""
-
-				if isOptional {
-					modifier = "optional "
-				}
-				if isRepeated {
-					modifier = "repeated "
-				}
-
-				switch field.GetType() {
-				case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-					file.WriteString(fmt.Sprintf("%s [%s](%s)", modifier, field.GetTypeName()[1:], resolveLink(field.GetTypeName()[1:])))
-				default:
-					if v, ok := wellKnown[field.GetType()]; ok {
-						file.WriteString(fmt.Sprintf("%s `%s`", modifier, v))
-					} else {
-						file.WriteString("UNHANDLED | TYPE")
-					}
-				}
-
-				file.WriteString(")\n")
-
-				file.WriteString(comments.Leading)
-				file.WriteString("\n")
+			outputMessageType(&item, &stuff, &file, resolveLink, false)
+			if idx < len(stuff.Messages)-1 {
+				file.WriteString("------\n")
 			}
-			file.WriteString("\n")
 		}
 
 	enum:
@@ -339,11 +390,11 @@ func main() {
 			goto serv
 		}
 
-		file.WriteString("## Enums \n\n")
-		for _, enum := range stuff.Enums {
+		file.WriteString("# Enums \n\n")
+		for idx, enum := range stuff.Enums {
 			comment := stuff.Comments[FilePath{enum.FD, enum.Path}]
 
-			file.WriteString(fmt.Sprintf("### %s%s\n\n", iconEnum, enum.GetName()))
+			file.WriteString(fmt.Sprintf("## %s%s\n\n", iconEnum, enum.GetName()))
 
 			file.WriteString(comment.Leading)
 			file.WriteString("\n")
@@ -352,10 +403,14 @@ func main() {
 				vpath := fmt.Sprintf("%s.%d.%d", enum.Path, enumValueCommentPath, idx)
 				comment := stuff.Comments[FilePath{enum.FD, vpath}]
 
-				file.WriteString(fmt.Sprintf("#### %s%s\n", iconEnumValue, value.GetName()))
+				file.WriteString(fmt.Sprintf("### %s%s\n", iconEnumValue, value.GetName()))
 
 				file.WriteString(comment.Leading)
 				file.WriteString("\n\n")
+			}
+
+			if idx < len(stuff.Enums)-1 {
+				file.WriteString("------\n")
 			}
 		}
 
@@ -365,20 +420,20 @@ func main() {
 			goto after
 		}
 
-		file.WriteString("## Services \n\n")
+		file.WriteString("# Services \n\n")
 		for idx, serv := range stuff.Services {
 			path := fmt.Sprintf("%d.%d", serviceCommentPath, idx)
 			comment := stuff.Comments[FilePath{serv.FD, path}]
 
-			file.WriteString(fmt.Sprintf("### %s%s\n\n", iconService, serv.GetName()))
+			file.WriteString(fmt.Sprintf("## %s%s\n\n", iconService, serv.GetName()))
 
 			file.WriteString(comment.Leading)
 			file.WriteString("\n")
 
-			file.WriteString("#### Methods\n\n")
+			file.WriteString("### Methods\n\n")
 
 			for idx, method := range serv.Method {
-				file.WriteString(fmt.Sprintf("##### %s%s\n", iconServiceMethod, method.GetName()))
+				file.WriteString(fmt.Sprintf("#### %s%s\n", iconServiceMethod, method.GetName()))
 
 				cStream := method.GetClientStreaming()
 				sStream := method.GetServerStreaming()
@@ -405,6 +460,38 @@ func main() {
 
 				file.WriteString(comment.Leading)
 				file.WriteString("\n")
+
+				fstOK := false
+
+				for _, item := range stuff.Messages {
+					if !item.IsRequest {
+						continue
+					}
+
+					if item.FD.GetPackage()+"."+item.GetName() == method.GetInputType()[1:] {
+						fstOK = true
+						file.WriteString("\n<br/>\n\n")
+						outputMessageType(&item, &stuff, &file, resolveLink, true)
+						break
+					}
+				}
+				for _, item := range stuff.Messages {
+					if !item.IsRequest {
+						continue
+					}
+
+					if item.FD.GetPackage()+"."+item.GetName() == method.GetOutputType()[1:] {
+						if fstOK {
+							file.WriteString("\n<br/>\n\n")
+						}
+						outputMessageType(&item, &stuff, &file, resolveLink, true)
+						break
+					}
+				}
+
+				if idx < len(serv.Method)-1 {
+					file.WriteString("------\n")
+				}
 			}
 		}
 
