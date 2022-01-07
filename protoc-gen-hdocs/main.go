@@ -430,7 +430,11 @@ func main() {
 			file.WriteString(comment.Leading)
 			file.WriteString("\n")
 
-			file.WriteString("### Methods\n\n")
+			if useHTML {
+				file.WriteString(`<span class="h3" aria-level="3">Fields</span>` + "\n")
+			} else {
+				file.WriteString("### Methods\n\n")
+			}
 
 			for idx, method := range serv.Method {
 				file.WriteString(fmt.Sprintf("#### %s%s\n", iconServiceMethod, method.GetName()))
