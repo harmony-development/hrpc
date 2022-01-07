@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -168,6 +169,8 @@ func getAllTypes(in []*descriptorpb.DescriptorProto, file *descriptorpb.FileDesc
 	return
 }
 
+var rex = regexp.MustCompile(`(\w+)=(\w+)`)
+
 func main() {
 	gen := pluginpb.CodeGeneratorRequest{}
 	data, err := ioutil.ReadAll(os.Stdin)
@@ -177,6 +180,40 @@ func main() {
 	err = proto.Unmarshal(data, &gen)
 	if err != nil {
 		panic(err)
+	}
+
+	rgx := rex.FindAllStringSubmatch(gen.GetParameter(), -1)
+	res := make(map[string]string)
+	for _, kv := range rgx {
+		k := kv[1]
+		v := kv[2]
+		res[k] = v
+	}
+
+	codicons :=
+		res["codicon"] == "yes"
+
+	var (
+		iconMessage      string
+		iconMessageField string
+
+		iconEnum      string
+		iconEnumValue string
+
+		iconService       string
+		iconServiceMethod string
+	)
+	if codicons {
+		f := func(icon string) string {
+			return fmt.Sprintf(`<span class="codicon codicon-%s %s"></span>`, icon, icon)
+		}
+
+		iconMessage = f("symbol-structure")
+		iconMessageField = f("symbol-field")
+		iconEnum = f("symbol-enum")
+		iconEnumValue = f("symbol-enum-member")
+		iconService = f("symbol-class")
+		iconServiceMethod = f("symbol-method")
 	}
 
 	docs := Docs{}
@@ -241,7 +278,7 @@ func main() {
 
 		file.WriteString("## Message Types \n\n")
 		for _, item := range stuff.Messages {
-			file.WriteString(fmt.Sprintf("### %s\n", item.GetName()))
+			file.WriteString(fmt.Sprintf("### %s%s\n", iconMessage, item.GetName()))
 
 			comments := stuff.Comments[FilePath{item.FD, item.Path}]
 			file.WriteString(comments.Leading)
@@ -258,7 +295,7 @@ func main() {
 				path := fmt.Sprintf("%s.%d.%d", item.Path, messageFieldCommentPath, idx)
 				comments := stuff.Comments[FilePath{item.FD, path}]
 
-				file.WriteString(fmt.Sprintf("##### %s (", field.GetName()))
+				file.WriteString(fmt.Sprintf("##### %s%s (", iconMessageField, field.GetName()))
 
 				label :=
 					descriptorpb.FieldDescriptorProto_Label(field.Label.Number())
@@ -306,7 +343,7 @@ func main() {
 		for _, enum := range stuff.Enums {
 			comment := stuff.Comments[FilePath{enum.FD, enum.Path}]
 
-			file.WriteString(fmt.Sprintf("### %s\n\n", enum.GetName()))
+			file.WriteString(fmt.Sprintf("### %s%s\n\n", iconEnum, enum.GetName()))
 
 			file.WriteString(comment.Leading)
 			file.WriteString("\n")
@@ -315,7 +352,7 @@ func main() {
 				vpath := fmt.Sprintf("%s.%d.%d", enum.Path, enumValueCommentPath, idx)
 				comment := stuff.Comments[FilePath{enum.FD, vpath}]
 
-				file.WriteString(fmt.Sprintf("#### %s\n", value.GetName()))
+				file.WriteString(fmt.Sprintf("#### %s%s\n", iconEnumValue, value.GetName()))
 
 				file.WriteString(comment.Leading)
 				file.WriteString("\n\n")
@@ -333,7 +370,7 @@ func main() {
 			path := fmt.Sprintf("%d.%d", serviceCommentPath, idx)
 			comment := stuff.Comments[FilePath{serv.FD, path}]
 
-			file.WriteString(fmt.Sprintf("### %s\n\n", serv.GetName()))
+			file.WriteString(fmt.Sprintf("### %s%s\n\n", iconService, serv.GetName()))
 
 			file.WriteString(comment.Leading)
 			file.WriteString("\n")
@@ -341,7 +378,7 @@ func main() {
 			file.WriteString("#### Methods\n\n")
 
 			for idx, method := range serv.Method {
-				file.WriteString(fmt.Sprintf("##### %s\n", method.GetName()))
+				file.WriteString(fmt.Sprintf("##### %s%s\n", iconServiceMethod, method.GetName()))
 
 				cStream := method.GetClientStreaming()
 				sStream := method.GetServerStreaming()
