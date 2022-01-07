@@ -370,54 +370,12 @@ func main() {
 		file.WriteString(fmt.Sprintf("title: \"Reference: %s\"\n", pkg))
 		file.WriteString("---\n")
 
-		if len(stuff.Messages) == 0 {
-			goto enum
-		}
-
-		file.WriteString("# Standalone Message Types \n\n")
-		for idx, item := range stuff.Messages {
-			if item.IsRequest {
-				continue
-			}
-			outputMessageType(&item, &stuff, &file, resolveLink, false)
-			if idx < len(stuff.Messages)-1 {
-				file.WriteString("------\n")
-			}
-		}
-
-	enum:
-		if len(stuff.Enums) == 0 {
-			goto serv
-		}
-
-		file.WriteString("# Enums \n\n")
-		for idx, enum := range stuff.Enums {
-			comment := stuff.Comments[FilePath{enum.FD, enum.Path}]
-
-			file.WriteString(fmt.Sprintf("## %s%s\n\n", iconEnum, enum.GetName()))
-
-			file.WriteString(comment.Leading)
-			file.WriteString("\n")
-
-			for idx, value := range enum.Value {
-				vpath := fmt.Sprintf("%s.%d.%d", enum.Path, enumValueCommentPath, idx)
-				comment := stuff.Comments[FilePath{enum.FD, vpath}]
-
-				file.WriteString(fmt.Sprintf("### %s%s\n", iconEnumValue, value.GetName()))
-
-				file.WriteString(comment.Leading)
-				file.WriteString("\n\n")
-			}
-
-			if idx < len(stuff.Enums)-1 {
-				file.WriteString("------\n")
-			}
-		}
+		goto serv
 
 	serv:
 
 		if len(stuff.Services) == 0 {
-			goto after
+			goto msg
 		}
 
 		file.WriteString("# Services \n\n")
@@ -496,6 +454,52 @@ func main() {
 				if idx < len(serv.Method)-1 {
 					file.WriteString("------\n")
 				}
+			}
+		}
+
+	msg:
+
+		if len(stuff.Messages) == 0 {
+			goto enum
+		}
+
+		file.WriteString("# Standalone Message Types \n\n")
+		for idx, item := range stuff.Messages {
+			if item.IsRequest {
+				continue
+			}
+			outputMessageType(&item, &stuff, &file, resolveLink, false)
+			if idx < len(stuff.Messages)-1 {
+				file.WriteString("------\n")
+			}
+		}
+
+	enum:
+		if len(stuff.Enums) == 0 {
+			goto after
+		}
+
+		file.WriteString("# Enums \n\n")
+		for idx, enum := range stuff.Enums {
+			comment := stuff.Comments[FilePath{enum.FD, enum.Path}]
+
+			file.WriteString(fmt.Sprintf("## %s%s\n\n", iconEnum, enum.GetName()))
+
+			file.WriteString(comment.Leading)
+			file.WriteString("\n")
+
+			for idx, value := range enum.Value {
+				vpath := fmt.Sprintf("%s.%d.%d", enum.Path, enumValueCommentPath, idx)
+				comment := stuff.Comments[FilePath{enum.FD, vpath}]
+
+				file.WriteString(fmt.Sprintf("### %s%s\n", iconEnumValue, value.GetName()))
+
+				file.WriteString(comment.Leading)
+				file.WriteString("\n\n")
+			}
+
+			if idx < len(stuff.Enums)-1 {
+				file.WriteString("------\n")
 			}
 		}
 
