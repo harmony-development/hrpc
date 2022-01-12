@@ -68,24 +68,19 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 				if meth.GetClientStreaming() && !meth.GetServerStreaming() {
 					continue
 				} else if meth.GetClientStreaming() && meth.GetServerStreaming() {
-					add(`Stream<%s> %s(Stream<%s> input, {Map<String,dynamic> headers = const {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
+					add(`Stream<%s> %s(%s input, {Map<String,dynamic> headers = const {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var socket = await $io.WebSocket.connect(this.wsServer.replace(path: "/%s.%s/%s").toString(), headers: headers..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
-						add(`var combined = $async.StreamGroup.merge<dynamic>([socket, input]);`)
-						add(`await for (var value in combined) {`)
+						add(`var socket = await $io.WebSocket.connect(this.wsServer.replace(path: "/%s.%s/%s").toString(), headers: {}..addAll(headers)..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
+						add(`socket.add(input.writeToBuffer());`)
+						add(`await for (var value in socket) {`)
 						indent++
 						{
 							add(`if (value is List<int>) {`)
 							indent++
 							{
-								add(`yield %s.fromBuffer(value);`, kind(*meth.OutputType))
-							}
-							indent--
-							add(`} else if (value is %s) {`, kind(*meth.InputType))
-							indent++
-							{
-								add(`socket.add(value.writeToBuffer());`)
+								add(`if (value[0] == 0) yield %s.fromBuffer(value.sublist(1));`, kind(*meth.OutputType))
+								add(`else throw value.sublist(1);`)
 							}
 							indent--
 							add(`}`)
@@ -100,7 +95,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					indent++
 					{
 						add(`var response = await $http.post(this.server.replace(path: "/%s.%s/%s"), body: input.writeToBuffer(), headers: {"content-type": "application/hrpc"}..addAll(headers)..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
-						add(`if (response.statusCode != 200) { throw response; }`)
+						add(`if (response.statusCode != 200) { print("hrpc %s error: ${response.statusCode}"); throw response; }`, *meth.Name)
 						add(`return %s.fromBuffer(response.bodyBytes);`, kind(*meth.OutputType))
 					}
 					indent--
@@ -109,7 +104,7 @@ func GenerateDartClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGener
 					add(`Stream<%s> %s(%s input, {Map<String,dynamic> headers = const {}}) async* {`, kind(*meth.OutputType), *meth.Name, kind(*meth.InputType))
 					indent++
 					{
-						add(`var socket = await $io.WebSocket.connect(this.server.replace(path: "/%s.%s/%s").toString(), headers: headers..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
+						add(`var socket = await $io.WebSocket.connect(this.server.replace(path: "/%s.%s/%s").toString(), headers: {}..addAll(headers)..addAll(this.commonHeaders));`, *f.Package, *service.Name, *meth.Name)
 						add(`socket.add(input.writeToBuffer());`)
 						add(`await for (var value in socket) {`)
 						indent++
