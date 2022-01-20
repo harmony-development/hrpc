@@ -115,6 +115,7 @@ func main() {
 			"d_client":      GenerateDClient,
 			"ts_client":     GenerateTSClient,
 			"dart_client":   GenerateDartClient,
+			"ruby_client":   GenerateRubyClient,
 			"swift_server":  GenerateSwiftServer,
 			"elixir_server": GenerateElixirServer,
 		}
