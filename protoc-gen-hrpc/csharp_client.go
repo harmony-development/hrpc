@@ -36,11 +36,6 @@ func GenerateCsharpClient(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGen
 			add("using System.Text.RegularExpressions;")
 			add("using Hrpc;")
 
-			// this is a hack: protoc generates types in "Protocol" namespace
-			// but in harmony-dotnet-sdk we rename it to "Harmony" namespace for exporting
-			// so as to not `sed` here as well after generation, we alias the type
-			add("using Protocol = Harmony;")
-
 			add("")
 
 			add("namespace Harmony.Client;")

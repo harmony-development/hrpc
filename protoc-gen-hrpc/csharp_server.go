@@ -45,8 +45,6 @@ func GenerateCsharpServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGen
 				}
 			}
 
-			// see notes in csharp_client.go
-			add("using Protocol = Harmony;")
 			add("")
 
 			add("namespace Harmony.Server;\n")
