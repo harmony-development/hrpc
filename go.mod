@@ -10,6 +10,7 @@ require (
 	github.com/gofiber/websocket/v2 v2.0.12 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.6 // indirect
+	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/valyala/fasthttp v1.31.0
 	golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac // indirect
