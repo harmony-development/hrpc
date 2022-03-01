@@ -35,7 +35,7 @@ func genClientService(g *protogen.GeneratedFile, service *protogen.Service) {
 	serverType := service.GoName + "Client"
 	g.P("type ", serverType, " interface {")
 	for _, method := range service.Methods {
-		g.P(method.Comments.Leading, serverSignature(g, method))
+		g.P(method.Comments.Leading, serverSignature(g, method, false))
 	}
 	g.P("}")
 	g.P()

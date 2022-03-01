@@ -120,6 +120,7 @@ func main() {
 			"dart_client":   GenerateDartClient,
 			"swift_server":  GenerateSwiftServer,
 			"elixir_server": GenerateElixirServer,
+			"go_server":     GenerateGoServer,
 		}
 
 		if fn, ok := builtins[item]; ok {

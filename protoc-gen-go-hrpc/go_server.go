@@ -48,9 +48,9 @@ func genContent(g *protogen.GeneratedFile, file *protogen.File) {
 
 func genService(g *protogen.GeneratedFile, service *protogen.Service) {
 	serverType := service.GoName + "Server"
-	g.P("type ", serverType, " interface {")
+	g.P("type ", serverType, "[T ", contextPackage.Ident("Context"), "] interface {")
 	for _, method := range service.Methods {
-		g.P(method.Comments.Leading, serverSignature(g, method))
+		g.P(method.Comments.Leading, serverSignature(g, method, true))
 	}
 	g.P("}")
 	g.P()
@@ -63,14 +63,14 @@ func genDefaultImpl(g *protogen.GeneratedFile, service *protogen.Service) {
 	dummyType := "Default" + service.GoName
 	g.P("type ", dummyType, " struct {}")
 	for _, method := range service.Methods {
-		g.P("func (", dummyType, ") ", serverSignature(g, method), " {")
+		g.P("func (", dummyType, ") ", serverSignature(g, method, false), " {")
 		g.P("return nil, ", errorNewType, `("unimplemented")`)
 		g.P("}")
 	}
 }
 
 func genHandlerStruct(g *protogen.GeneratedFile, service *protogen.Service, serverType string) {
-	handlerType := service.GoName + "Handler"
+	handlerType := service.GoName + "Handler[T context.Context]"
 	handlerFuncType := g.QualifiedGoIdent(serverPackage.Ident("RawHandler"))
 	handlerMapType := fmt.Sprintf("map[string]%s", handlerFuncType)
 
@@ -139,12 +139,16 @@ func genRawHandler(g *protogen.GeneratedFile, service *protogen.Service, m *prot
 	)
 }
 
-func serverSignature(g *protogen.GeneratedFile, m *protogen.Method) string {
+func serverSignature(g *protogen.GeneratedFile, m *protogen.Method, generic bool) string {
 	var inputArgs []string
 	var ret string
 	inputType := g.QualifiedGoIdent(m.Input.GoIdent)
 	outputType := g.QualifiedGoIdent(m.Output.GoIdent)
-	inputArgs = append(inputArgs, g.QualifiedGoIdent(contextPackage.Ident("Context")))
+	if generic {
+		inputArgs = append(inputArgs, "T")
+	} else {
+		inputArgs = append(inputArgs, "context.Context")
+	}
 	if m.Desc.IsStreamingClient() || m.Desc.IsStreamingServer() {
 		inputArgs = append(inputArgs, "chan *"+inputType)
 	} else {
