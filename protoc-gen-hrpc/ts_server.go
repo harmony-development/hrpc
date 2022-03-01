@@ -75,7 +75,7 @@ func GenerateTSServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 
 			for _, meth := range streams {
 				add("")
-				add("%s(ctx: C, request: AsyncIterable<%s>): AsyncIterable<%s>", strcase.ToLowerCamel(*meth.Name), rawType(*meth.InputType), rawType(*meth.OutputType))
+				add("%s(ctx: C, request: AsyncIterable<%s>): AsyncIterable<Uint8Array>", strcase.ToLowerCamel(*meth.Name), rawType(*meth.InputType))
 			}
 			indent--
 			add("}")
