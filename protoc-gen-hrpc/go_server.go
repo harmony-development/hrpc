@@ -45,7 +45,13 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 			add(")")
 
 			add(`
-			func FromProtoChannel[T proto.Message](in chan proto.Message) chan T {
+			type VTProtoMessage interface {
+				proto.Message
+				MarshalVT() ([]byte, error)
+				UnmarshalVT([]byte) error
+			}
+
+			func FromProtoChannel[T VTProtoMessage](in chan VTProtoMessage) chan T {
 				res := make(chan T)
 				go func() {
 					for {
@@ -57,8 +63,8 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 				return res
 			}
 			
-			func ToProtoChannel[T proto.Message](in chan T) chan proto.Message {
-				res := make(chan proto.Message)
+			func ToProtoChannel[T VTProtoMessage](in chan T) chan VTProtoMessage {
+				res := make(chan VTProtoMessage)
 				go func() {
 					for {
 						v := <-in
@@ -100,12 +106,12 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 			indent--
 			add("}")
 
-			add("func (h *%sHandler[T]) Routes() map[string]func(T, proto.Message) (proto.Message, error) {", *service.Name)
+			add("func (h *%sHandler[T]) Routes() map[string]func(T, VTProtoMessage) (VTProtoMessage, error) {", *service.Name)
 			indent++
-			add("return map[string]func(T, proto.Message) (proto.Message, error){")
+			add("return map[string]func(T, VTProtoMessage) (VTProtoMessage, error){")
 			indent++
 			for _, meth := range requests {
-				add("\"%s.%s/%s\": func(c T, msg proto.Message) (proto.Message, error) {", *f.Package, *service.Name, *meth.Name)
+				add("\"%s.%s/%s\": func(c T, msg VTProtoMessage) (VTProtoMessage, error) {", *f.Package, *service.Name, *meth.Name)
 				indent++
 				add("return h.impl.%s(c, msg.(*%s))", *meth.Name, rawType(*meth.InputType))
 				indent--
@@ -116,12 +122,12 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 			indent--
 			add("}")
 
-			add("func (h *%sHandler[T]) StreamRoutes() map[string]func(T, chan proto.Message) (chan proto.Message, error) {", *service.Name)
+			add("func (h *%sHandler[T]) StreamRoutes() map[string]func(T, chan VTProtoMessage) (chan VTProtoMessage, error) {", *service.Name)
 			indent++
-			add("return map[string]func(T, chan proto.Message) (chan proto.Message, error){")
+			add("return map[string]func(T, chan VTProtoMessage) (chan VTProtoMessage, error){")
 			indent++
 			for _, meth := range streams {
-				add("\"%s.%s/%s\": func(c T, msg chan proto.Message) (chan proto.Message, error) {", *f.Package, *service.Name, *meth.Name)
+				add("\"%s.%s/%s\": func(c T, msg chan VTProtoMessage) (chan VTProtoMessage, error) {", *f.Package, *service.Name, *meth.Name)
 				indent++
 				add("res, err := h.impl.%s(c, FromProtoChannel[*%s](msg))", *meth.Name, rawType(*meth.InputType))
 				add("return ToProtoChannel(res), err")
