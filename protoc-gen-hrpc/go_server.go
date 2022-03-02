@@ -70,7 +70,7 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 
 			add("type %sHandler[T context.Context] struct {", *service.Name)
 			indent++
-			add("impl %s[T]", *service.Name)
+			add("Impl %s[T]", *service.Name)
 			indent--
 			add("}")
 
@@ -89,7 +89,7 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 				add(`"%s": {`, reqPath)
 				add("MethodData: %s,", methodData(input, output))
 				add(`Handler: func(c T, msg goserver.VTProtoMessage) (goserver.VTProtoMessage, error) {
-						return h.impl.%s(c, msg.(*%s))
+						return h.Impl.%s(c, msg.(*%s))
 					},
 				},
 				`, *meth.Name, input)
@@ -112,7 +112,7 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 				indent++
 				add("MethodData: %s,", methodData(input, output))
 				add(`Handler: func(c T, msg chan goserver.VTProtoMessage) (chan goserver.VTProtoMessage, error) {
-					res, err := h.impl.%s(c, goserver.FromProtoChannel[*%s](msg))
+					res, err := h.Impl.%s(c, goserver.FromProtoChannel[*%s](msg))
 					return goserver.ToProtoChannel(res), err
 				},`, *meth.Name, input)
 				indent--
