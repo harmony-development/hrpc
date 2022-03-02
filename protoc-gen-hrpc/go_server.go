@@ -40,41 +40,9 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 			add("import (")
 			indent++
 			add("\"context\"")
-			add("\"google.golang.org/protobuf/proto\"")
+			add("goserver \"github.com/harmony-development/hrpc/pkg/go-server\"")
 			indent--
 			add(")")
-
-			add(`
-			type VTProtoMessage interface {
-				proto.Message
-				MarshalVT() ([]byte, error)
-				UnmarshalVT([]byte) error
-			}
-
-			func FromProtoChannel[T VTProtoMessage](in chan VTProtoMessage) chan T {
-				res := make(chan T)
-				go func() {
-					for {
-						v := <-in
-						res <- v.(T)
-					}
-				}()
-			
-				return res
-			}
-			
-			func ToProtoChannel[T VTProtoMessage](in chan T) chan VTProtoMessage {
-				res := make(chan VTProtoMessage)
-				go func() {
-					for {
-						v := <-in
-						res <- v
-					}
-				}()
-			
-				return res
-			}			
-			`)
 
 			var requests []*descriptorpb.MethodDescriptorProto
 			var streams []*descriptorpb.MethodDescriptorProto
@@ -106,37 +74,52 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 			indent--
 			add("}")
 
-			add("func (h *%sHandler[T]) Routes() map[string]func(T, VTProtoMessage) (VTProtoMessage, error) {", *service.Name)
+			methodData := func(i string, o string) string {
+				return fmt.Sprintf("goserver.MethodData{Input: &%s{}, Output: &%s{}}", i, o)
+			}
+
+			add("func (h *%sHandler[T]) Routes() map[string]goserver.UnaryMethodData[T] {", *service.Name)
 			indent++
-			add("return map[string]func(T, VTProtoMessage) (VTProtoMessage, error){")
+			add("return map[string]goserver.UnaryMethodData[T]{")
 			indent++
 			for _, meth := range requests {
-				add("\"%s.%s/%s\": func(c T, msg VTProtoMessage) (VTProtoMessage, error) {", *f.Package, *service.Name, *meth.Name)
-				indent++
-				add("return h.impl.%s(c, msg.(*%s))", *meth.Name, rawType(*meth.InputType))
-				indent--
-				add("},")
+				reqPath := fmt.Sprintf("%s.%s/%s", *f.Package, *service.Name, *meth.Name)
+				input := rawType(*meth.InputType)
+				output := rawType(*meth.OutputType)
+				add(`"%s": {`, reqPath)
+				add("MethodData: %s,", methodData(input, output))
+				add(`Handler: func(c T, msg goserver.VTProtoMessage) (goserver.VTProtoMessage, error) {
+						return h.impl.%s(c, msg.(*%s))
+					},
+				},
+				`, *meth.Name, input)
 			}
 			indent--
 			add("}")
 			indent--
 			add("}")
 
-			add("func (h *%sHandler[T]) StreamRoutes() map[string]func(T, chan VTProtoMessage) (chan VTProtoMessage, error) {", *service.Name)
+			add("func (h *%sHandler[T]) StreamRoutes() map[string]goserver.StreamMethodData[T] {", *service.Name)
 			indent++
-			add("return map[string]func(T, chan VTProtoMessage) (chan VTProtoMessage, error){")
+			add("return map[string]goserver.StreamMethodData[T]{")
 			indent++
 			for _, meth := range streams {
-				add("\"%s.%s/%s\": func(c T, msg chan VTProtoMessage) (chan VTProtoMessage, error) {", *f.Package, *service.Name, *meth.Name)
+				reqPath := fmt.Sprintf("%s.%s/%s", *f.Package, *service.Name, *meth.Name)
+				input := rawType(*meth.InputType)
+				output := rawType(*meth.OutputType)
+
+				add(`"%s": {`, reqPath)
 				indent++
-				add("res, err := h.impl.%s(c, FromProtoChannel[*%s](msg))", *meth.Name, rawType(*meth.InputType))
-				add("return ToProtoChannel(res), err")
+				add("MethodData: %s,", methodData(input, output))
+				add(`Handler: func(c T, msg chan goserver.VTProtoMessage) (chan goserver.VTProtoMessage, error) {
+					res, err := h.impl.%s(c, goserver.FromProtoChannel[*%s](msg))
+					return goserver.ToProtoChannel(res), err
+				},`, *meth.Name, input)
 				indent--
 				add("},")
 			}
 			indent--
 			add("}")
-			indent--
 			add("}")
 
 			r.File = append(r.File, file)
