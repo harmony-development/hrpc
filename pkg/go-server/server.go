@@ -24,7 +24,7 @@ type UnaryMethodData[C context.Context] struct {
 
 type StreamMethodData[C context.Context] struct {
 	MethodData
-	Handler func(C, chan VTProtoMessage) (chan VTProtoMessage, error)
+	Handler func(C, chan VTProtoMessage, chan VTProtoMessage) error
 }
 
 type MethodHandler[T context.Context] interface {
@@ -44,14 +44,11 @@ func FromProtoChannel[T VTProtoMessage](in chan VTProtoMessage) chan T {
 	return res
 }
 
-func ToProtoChannel[T VTProtoMessage](in chan T) chan VTProtoMessage {
-	res := make(chan VTProtoMessage)
+func ToProtoChannel[T VTProtoMessage](in chan T, out chan VTProtoMessage) {
 	go func() {
 		for {
 			v := <-in
-			res <- v
+			out <- v
 		}
 	}()
-
-	return res
 }

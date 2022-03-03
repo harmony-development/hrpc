@@ -62,7 +62,7 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 				add("%s(T, *%s) (*%s, error)", *meth.Name, rawType(*meth.InputType), rawType(*meth.OutputType))
 			}
 			for _, meth := range streams {
-				add("%s(T, chan *%s) (chan *%s, error)", *meth.Name, rawType(*meth.InputType), rawType(*meth.OutputType))
+				add("%s(T, chan *%s, chan *%s) error", *meth.Name, rawType(*meth.InputType), rawType(*meth.OutputType))
 			}
 
 			indent--
@@ -111,10 +111,12 @@ func GenerateGoServer(d *pluginpb.CodeGeneratorRequest) (r *pluginpb.CodeGenerat
 				add(`"%s": {`, reqPath)
 				indent++
 				add("MethodData: %s,", methodData(input, output))
-				add(`Handler: func(c T, msg chan goserver.VTProtoMessage) (chan goserver.VTProtoMessage, error) {
-					res, err := h.Impl.%s(c, goserver.FromProtoChannel[*%s](msg))
-					return goserver.ToProtoChannel(res), err
-				},`, *meth.Name, input)
+				add(`Handler: func(c T, msg chan goserver.VTProtoMessage, res chan goserver.VTProtoMessage) (error) {
+					ch := make(chan *%s)
+					goserver.ToProtoChannel(ch, res)
+					err := h.Impl.%s(c, goserver.FromProtoChannel[*%s](msg), ch)
+					return err
+				},`, output, *meth.Name, input)
 				indent--
 				add("},")
 			}
