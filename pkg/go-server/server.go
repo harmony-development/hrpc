@@ -35,8 +35,7 @@ type MethodHandler[T context.Context] interface {
 func FromProtoChannel[T VTProtoMessage](in chan VTProtoMessage) chan T {
 	res := make(chan T)
 	go func() {
-		for {
-			v := <-in
+		for v := range in {
 			res <- v.(T)
 		}
 	}()
@@ -46,8 +45,7 @@ func FromProtoChannel[T VTProtoMessage](in chan VTProtoMessage) chan T {
 
 func ToProtoChannel[T VTProtoMessage](in chan T, out chan VTProtoMessage) {
 	go func() {
-		for {
-			v := <-in
+		for v := range in {
 			out <- v
 		}
 	}()
